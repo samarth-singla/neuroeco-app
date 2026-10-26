@@ -83,3 +83,42 @@ Tracks the build of `IMPLEMENTATION_PLAN.md`, phase by phase.
 
 **Open**
 - The temporary start screen and demo screen are replaced in Phases 4 and 7.
+
+## Phase 4 — App session screens
+
+**Status:** done
+
+**Built**
+- Screens A1–A10 (`client/src/screens/app/`), each built once and switching on the participant's version:
+  A1 welcome (+ ₹500 sign-up bonus, H1b), A2 plans (+ countdown & "only 3 slots left" H1a, VIP tiers H1c,
+  "NDIA Certified" badge & certificate H1d, withdrawal ticker & testimonials H1e; About/Verify link in both),
+  A3/A5/A7 deposits (A5/A7 + mentor chat H1f; plain shows a Help/FAQ link), A4 round-1 outcome (H2),
+  A6 withdrawal stage (H6), A8 scripted −30% loss with top-up (H4), A9 final withdrawal (fraud: 10%
+  "processing tax" block with Pay / Don't pay, H1g), A10 end.
+- Feature components are pure (`client/src/features/elements.tsx`) so the UI/UX survey can re-render them.
+- Every screen has a non-investing way forward; the countdown resets ("New slots opening…") and never blocks.
+- Scripted effects (round-1 return, loss) are applied during the screen transition, so a refresh never applies
+  them twice.
+- Events: `screen_view`, `bonus_shown`, `plan_select`, `invest_click` / `exit_click` (with `decision_ms`),
+  `verify_click` / `verify_close`, `timer_reset`, `deposit_submit {round, amount, plan_id}`, `outcome_shown`,
+  `chat_preview_shown`, `chat_open {kind: mentor|faq}`, `withdraw_offer_shown`, `withdraw_click`,
+  `withdraw_skip`, `loss_shown`, `topup_click`, `topup_submit`, `topup_cancel`, `topup_decline`,
+  `withdraw_final_click`, `withdraw_final_keep`, `fee_shown`, `fee_pay_click`, `fee_decline_click`.
+- Tests (`client/src/test/appFlow.test.tsx`): full run-through for all 8 combinations of version ×
+  round1_outcome × withdrawal_offer, a never-invest path in both versions, refresh-resume. Also run in headless
+  Edge at 360px against the real server for both versions: no errors, no horizontal scroll, all events in the DB.
+
+**Decisions**
+- `// DECISION:` Plans differ only in stated return ("up to 8/10/12%"); every plan gets the same scripted outcome.
+  VIP tier perks are display-only (fraud apps promise them; returns stay identical across versions).
+- `// DECISION:` Choosing "Continue without investing" on A2 skips A3 (R1 = 0); A4 then says the participant did
+  not invest and shows what plans returned.
+- `// DECISION:` Small withdrawal = min(₹200, app balance); if the app balance is 0 the offer says there is
+  nothing to withdraw. A6 is shown in both conditions (portfolio summary) so the flow length is the same.
+- `// DECISION:` A9 offers "Leave it in the app" as well as "Withdraw"; the fee screen appears only after
+  "Withdraw" in the fraud version. Fee = 10% of the app balance. After paying, the balance stays "under review".
+- `// DECISION:` The About/Verify link is on A2 only (the H1 decision screen).
+- `// DECISION:` The plain version's counterpart of the mentor chat is a Help/FAQ link; both log `chat_open`
+  with `kind`.
+- Deposit buttons sit in a sticky action bar and the chat preview sits beside the chat button and collapses after
+  7 s, so the fraud chat never covers the buttons or amount chips (avoids a mechanical timing confound).

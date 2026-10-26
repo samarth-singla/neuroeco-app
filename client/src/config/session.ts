@@ -151,6 +151,8 @@ export const CHAT = {
   agentName: 'Asha',
   agentRole: 'Success Mentor',
   previewDelayMs: 1500,
+  /** The preview message collapses back into the chat button after this long */
+  previewHideMs: 7000,
   messages: [
     'Hi 👋 I am your personal success mentor.',
     'Most members upgrade to VIP 2 today.',

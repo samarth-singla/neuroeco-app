@@ -10,7 +10,7 @@ const FLUSH_MS = 3000;
 let participantId: string | null = null;
 let queue: EventOut[] = [];
 let timer: ReturnType<typeof setInterval> | null = null;
-let sending = false;
+let inflight: Promise<void> | null = null;
 
 export function initLogger(id: string): void {
   participantId = id;
@@ -32,18 +32,24 @@ export function logEvent(screen: string, eventType: string, payload?: unknown): 
   queue.push({ client_ts: clientNow(), screen, event_type: eventType, payload });
 }
 
-export async function flush(): Promise<void> {
-  if (!participantId || sending || queue.length === 0) return;
+/** Sends queued events. If a send is already running, waits for it and then sends the rest. */
+export function flush(): Promise<void> {
+  if (inflight) return inflight.then(() => flush());
+  if (!participantId || queue.length === 0) return Promise.resolve();
   const batch = queue;
   queue = [];
-  sending = true;
-  try {
-    await api.postEvents(participantId, batch);
-  } catch {
-    queue = batch.concat(queue); // keep for the next attempt
-  } finally {
-    sending = false;
-  }
+  inflight = api
+    .postEvents(participantId, batch)
+    .then(
+      () => undefined,
+      () => {
+        queue = batch.concat(queue); // keep for the next attempt
+      },
+    )
+    .finally(() => {
+      inflight = null;
+    });
+  return inflight;
 }
 
 function beaconFlush(): void {

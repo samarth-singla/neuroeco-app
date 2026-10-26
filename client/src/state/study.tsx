@@ -26,6 +26,7 @@ export interface SessionData {
   topup?: number;
   finalWithdrawal?: 'done' | 'fee_paid' | 'fee_declined' | 'kept' | 'none';
   fee?: number;
+  finalAmount?: number;
 }
 
 export interface StudyState {

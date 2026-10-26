@@ -89,11 +89,17 @@ export function AppShell({
   wallet,
   version,
   nav = 'home',
+  actions,
+  floating,
   children,
 }: {
   wallet: Wallet;
   version: AppVersion;
   nav?: string;
+  /** Buttons pinned above the bottom nav, so the choice is always visible */
+  actions?: ReactNode;
+  /** Floating element (e.g. mentor chat bubble) shown above the actions */
+  floating?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -111,6 +117,16 @@ export function AppShell({
         </header>
         <main className="flex-1 px-4 pb-6 pt-2">{children}</main>
         <div className="sticky bottom-0 z-20">
+          {floating && (
+            <div className="pointer-events-none absolute bottom-full right-0 left-0 flex justify-end px-4 pb-3">
+              <div className="pointer-events-auto">{floating}</div>
+            </div>
+          )}
+          {actions && (
+            <div className="space-y-2 border-t border-ink-700 bg-ink-900/95 px-4 py-3 backdrop-blur">
+              {actions}
+            </div>
+          )}
           <BottomNav active={nav} />
           <ResearchFooter />
         </div>
