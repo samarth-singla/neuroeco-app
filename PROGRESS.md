@@ -53,3 +53,33 @@ Tracks the build of `IMPLEMENTATION_PLAN.md`, phase by phase.
 
 **Open**
 - `wide.csv` is built in Phase 8 (needs survey item list and derived scores).
+
+## Phase 3 — Shared app shell and simulated wallet
+
+**Status:** done
+
+**Built**
+- Fictional app "Dhanoura" with a generated SVG logo (`client/src/components/Logo.tsx`, `client/public/logo.svg`);
+  dark theme with green/gold accents, cards, decorative bottom nav (`AppShell`), plain `StudyLayout` for surveys.
+- Always-visible footer: "Research prototype — no real money is used."
+- Simulated wallet (`client/src/lib/wallet.ts`, pure reducer): ₹10,000 practice balance, deposits, scripted
+  returns/losses, withdrawals, fee payments, fraud-version sign-up bonus. Header shows practice balance and
+  in-app balance (+ locked bonus and VIP level in the fraud version).
+- Event logger (`lib/logger.ts`): buffers events, flushes every 3 s, on every step change, and via `sendBeacon`
+  when the page is hidden. `useLog(screen)` logs `screen_view` once per mount and returns `log(type, payload)`.
+- Decision timer (`useDecisionTimer`): ms from first render to the first decisive click, sent in the
+  click's payload (`decision_ms`, `first_decision`).
+- Study state (`state/study.tsx`): participant id, assignment, step, wallet, session choices and answers, saved in
+  `sessionStorage` (refresh resumes the same participant and step); step changes are sent to the server.
+- All session amounts, rates and texts in `client/src/config/session.ts`.
+- Tests: wallet maths (9), logger/decision timer incl. StrictMode (2). Checked in headless Edge at 360px:
+  wallet updates, survives refresh, no horizontal scroll, events reach the DB.
+
+**Decisions**
+- `// DECISION:` The sign-up bonus is locked until the first deposit, then joins the in-app balance (so
+  returns/losses apply to it). It cannot be invested on its own.
+- `// DECISION:` Fees are paid from the practice balance; if it is short, only what is left is taken.
+- `// DECISION:` Bottom nav is decorative (the session order is fixed), so it cannot lead to a dead end.
+
+**Open**
+- The temporary start screen and demo screen are replaced in Phases 4 and 7.
