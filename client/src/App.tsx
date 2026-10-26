@@ -3,6 +3,9 @@ import { StudyLayout } from './components/AppShell';
 import { Button, ScreenTitle } from './components/ui';
 import { StudyProvider, useBootstrap, useStudy } from './state/study';
 import type { AppScreen } from './types';
+import { uiuxPages } from './config/survey';
+import { SurveyPage } from './screens/SurveyPage';
+import { FeaturePreview } from './features/FeaturePreview';
 import { A1Welcome } from './screens/app/A1Welcome';
 import { A2Plans } from './screens/app/A2Plans';
 import { DepositScreen } from './screens/app/DepositScreen';
@@ -48,6 +51,35 @@ function Start({ onStart }: { onStart: () => Promise<void> }) {
   );
 }
 
+/** UI/UX survey: one page per design feature + an overall page (Phase 5). */
+function UiuxStep({ index }: { index: number }) {
+  const { state, version } = useStudy();
+  const pages = uiuxPages(version);
+  const i = Math.min(Math.max(0, index || 0), pages.length - 1);
+  const page = pages[i];
+  const last = i === pages.length - 1;
+  const s = state.session;
+  return (
+    <SurveyPage
+      page={page}
+      index={i}
+      total={pages.length}
+      section="About the app"
+      next={last ? 'survey:0' : `uiux:${i + 1}`}
+      preview={
+        page.feature && (
+          <FeaturePreview
+            feature={page.feature}
+            version={version}
+            withdrawAmount={s.finalAmount ?? state.wallet.appBalance}
+            fee={s.fee}
+          />
+        )
+      }
+    />
+  );
+}
+
 function Router() {
   const { state } = useStudy();
   const step = state.step;
@@ -56,6 +88,7 @@ function Router() {
     // key: remount (fresh screen_view + decision timer) on every screen change
     return <Screen key={step} />;
   }
+  if (step.startsWith('uiux:')) return <UiuxStep key={step} index={Number(step.slice(5))} />;
   return (
     <StudyLayout>
       <ScreenTitle title="Survey" subtitle={`Coming in a later phase (${step})`} />

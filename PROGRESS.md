@@ -122,3 +122,24 @@ Tracks the build of `IMPLEMENTATION_PLAN.md`, phase by phase.
   with `kind`.
 - Deposit buttons sit in a sticky action bar and the chat preview sits beside the chat button and collapses after
   7 s, so the fraud chat never covers the buttons or amount chips (avoids a mechanical timing confound).
+
+## Phase 5 — UI/UX survey (H1h / feature ratings)
+
+**Status:** done
+
+**Built**
+- `client/src/config/survey.ts` (pure data, shared with the server): item types (likert, choice, number, slider,
+  text), the 7 feature pages and the overall page. Item ids `uiux_<feature>_<urgency|trust|temptation>`
+  (features: `timer`, `bonus`, `vip`, `regulator`, `social`, `chat`, `withdrawal_tax`), `uiux_overall_trust`,
+  `uiux_overall_urgency` — 23 items.
+- Survey engine: `screens/SurveyPage.tsx` (progress bar, all non-optional answers required, answers saved to
+  the server before moving on, retry message if saving fails) and `components/Question.tsx`.
+- `features/FeaturePreview.tsx` re-renders each element from the participant's own version (plain participants
+  see the plain counterpart), using their own withdrawal amount / fee on the last feature. Previews are inert.
+- Tests: required-answer validation, version-specific preview, all 23 ids saved, hand-off to `survey:0`
+  (both versions). Checked in Edge at 360px.
+
+**Decisions**
+- `// DECISION:` Survey pages have no Back button, so answers are given once in a fixed order.
+- `// DECISION:` Feature page titles use neutral names (e.g. "Mentor chat", "Withdrawal processing tax"), not
+  evaluative ones, so the debrief framing is not revealed early.
