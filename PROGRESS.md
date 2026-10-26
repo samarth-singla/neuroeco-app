@@ -233,3 +233,29 @@ Tracks the build of `IMPLEMENTATION_PLAN.md`, phase by phase.
 
 **Open**
 - `is_pilot` is already a wide.csv column (always 0 until the pilot flag is wired in Phase 10).
+
+## Phase 9 — Testing and QA
+
+**Status:** done
+
+**Built**
+- `server/scripts/simulate.ts` (`npm run simulate`): 40 simulated participants through the real HTTP API with
+  random choices (some drop out during the survey, some withdraw), then checks that `wide.csv` columns match the
+  data dictionary, row count = completed − withdrawn, no required value is missing, conditional columns are blank
+  exactly when they should be, behaviour values match what was sent, and factors are balanced. Also runs as a
+  vitest test.
+- `scripts/browser-smoke.mjs` (`npm run smoke`): real Edge/Chrome (via `playwright-core`, no browser download)
+  completes the whole study at 360 px in both versions, with a refresh mid-session; fails on page errors,
+  horizontal scroll or dead ends. Passed against the dev server.
+- Countdown tests: ticks, shows "New slots opening…" at zero, restarts; A2 choices still work after it runs out.
+- `docs/qa-checklist.md`: manual checks (360 px layout, refresh-resume, both versions, all condition
+  combinations, no dead ends, consent/debrief/withdrawal, admin export, safety rules).
+- Totals: 39 server tests + 38 client tests pass.
+
+**Decisions**
+- `// DECISION:` The browser smoke test uses an installed Edge/Chrome through `playwright-core` instead of
+  downloading browsers, so it runs on the team's laptops without extra setup. It writes real rows, so the DB must
+  be reset afterwards (noted in the checklist).
+
+**Open**
+- The manual checklist in `docs/qa-checklist.md` still needs to be run on a real phone by the team.

@@ -14,7 +14,9 @@
     "test": "npm run test -w server && npm run test -w client",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "typecheck": "npm run typecheck -w server && npm run typecheck -w client"
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
+    "simulate": "npm run simulate -w server",
+    "smoke": "node scripts/browser-smoke.mjs"
   },
   "engines": {
     "node": ">=20.19"
