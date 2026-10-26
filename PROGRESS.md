@@ -199,3 +199,37 @@ Tracks the build of `IMPLEMENTATION_PLAN.md`, phase by phase.
   real regulator names). The team can name it in `client/src/config/study.ts` if the instructor agrees.
 - `// DECISION:` Withdrawal keeps the rows in the database (flag only) and excludes them from every export, as the
   plan says; "reset the database" in the README removes everything.
+
+## Phase 8 — Data export
+
+**Status:** done
+
+**Built**
+- `wide.csv` (`server/src/wide.ts`): one row per completed, non-withdrawn participant (101 columns) —
+  assignments; app behaviour from the event log (A2 decision time, choice, invested, plan, R1, R2, escalation
+  ratio, verify click, chat open, withdrew, post-withdrawal deposit, top-up click / yes-no / amount, fee shown /
+  paid, total deposited); every UI/UX and survey item; derived scores.
+- Scores computed server-side at export (`server/src/scoring.ts`): CRT (0–3), loss aversion λ (+ consistency
+  flag and number accepted), Big Three literacy (0–3), self-rated literacy, overconfidence = z(self) − z(quiz)
+  over the exported sample, herd score (mean), susceptibility index (mean).
+- `/admin`: totals (consented, completed, withdrawn, rows in wide.csv), per-level counts of every randomized
+  factor (all and completed), download buttons for the four CSVs.
+- `docs/data-dictionary.md` is generated from the column definitions (`npm run docs:dictionary -w server`) and
+  maps every column to H1–H9; a test fails if the committed file is out of date.
+- Tests: CRT, λ (switch points, accept-all, reject-all, inconsistent, missing), literacy, z-scores /
+  overconfidence (incl. SD = 0), means, escalation ratio edge cases (R1 = 0), full wide.csv row check, never-
+  invested defaults, exclusion of unfinished and withdrawn participants. 38 server tests pass.
+
+**Decisions**
+- `// DECISION:` λ = smallest accepted gain ÷ ₹100 (accept-all → 0.5). Reject-all is top-coded to 3.5.
+  Choices that switch back (accept then reject) are flagged `la_consistent = 0` and λ is left blank.
+- `// DECISION:` "Don't know" counts as wrong in the literacy score.
+- `// DECISION:` Overconfidence is blank when the self-rating or quiz score has zero variance in the export.
+- `// DECISION:` `invested` = R1 > 0. `withdrew` is blank for `not_offered` participants; `fee_paid` is blank when
+  the fee screen was not shown (all plain participants, and fraud participants who kept their balance or had
+  nothing to withdraw). Yes/no columns are 1/0.
+- `// DECISION:` Yes/no columns, amounts and survey values are exported as stored; survey choices use stable codes
+  (e.g. `more`, `dont_know`), listed in the data dictionary.
+
+**Open**
+- `is_pilot` is already a wide.csv column (always 0 until the pilot flag is wired in Phase 10).
