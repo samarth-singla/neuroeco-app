@@ -1,5 +1,5 @@
 import { Router, type Response } from 'express';
-import type { DB } from '../db';
+import { all, get, type DB } from '../db';
 import { requireAdmin } from '../auth';
 import { FACTORS, type FactorName } from '../randomize';
 import { eventsCsv, participantsCsv, responsesCsv } from '../export';
@@ -20,33 +20,32 @@ function escapeHtml(s: string): string {
 
 const COMPLETE = 'completed_at IS NOT NULL AND withdrawn = 0';
 
-export function adminCounts(db: DB) {
-  const one = (sql: string) => (db.prepare(sql).get() as { n: number }).n;
+export async function adminCounts(db: DB) {
+  const one = async (sql: string) => Number((await get<{ n: number }>(db, sql))?.n ?? 0);
   // Per level (real participants only, pilots excluded): all, and completed non-withdrawn
   const factors: Record<string, Record<string, { all: number; complete: number }>> = {};
   for (const f of Object.keys(FACTORS) as FactorName[]) {
     factors[f] = Object.fromEntries(FACTORS[f].map((l) => [l, { all: 0, complete: 0 }]));
-    const rows = db
-      .prepare(
-        `SELECT ${f} AS level, COUNT(*) AS n,
-           SUM(CASE WHEN ${COMPLETE} THEN 1 ELSE 0 END) AS c
-         FROM participants WHERE is_pilot = 0 GROUP BY ${f}`,
-      )
-      .all() as { level: string; n: number; c: number }[];
-    for (const r of rows) factors[f][r.level] = { all: r.n, complete: r.c };
+    const rows = await all<{ level: string; n: number; c: number }>(
+      db,
+      `SELECT ${f} AS level, COUNT(*) AS n,
+         SUM(CASE WHEN ${COMPLETE} THEN 1 ELSE 0 END) AS c
+       FROM participants WHERE is_pilot = 0 GROUP BY ${f}`,
+    );
+    for (const r of rows) factors[f][r.level] = { all: Number(r.n), complete: Number(r.c) };
   }
   return {
-    total: one('SELECT COUNT(*) AS n FROM participants'),
-    completed: one('SELECT COUNT(*) AS n FROM participants WHERE completed_at IS NOT NULL'),
-    withdrawn: one('SELECT COUNT(*) AS n FROM participants WHERE withdrawn = 1'),
-    inWide: one(`SELECT COUNT(*) AS n FROM participants WHERE ${COMPLETE}`),
-    pilot: one('SELECT COUNT(*) AS n FROM participants WHERE is_pilot = 1'),
+    total: await one('SELECT COUNT(*) AS n FROM participants'),
+    completed: await one('SELECT COUNT(*) AS n FROM participants WHERE completed_at IS NOT NULL'),
+    withdrawn: await one('SELECT COUNT(*) AS n FROM participants WHERE withdrawn = 1'),
+    inWide: await one(`SELECT COUNT(*) AS n FROM participants WHERE ${COMPLETE}`),
+    pilot: await one('SELECT COUNT(*) AS n FROM participants WHERE is_pilot = 1'),
     factors,
   };
 }
 
-function adminPage(db: DB): string {
-  const c = adminCounts(db);
+async function adminPage(db: DB): Promise<string> {
+  const c = await adminCounts(db);
   const factorRows = Object.entries(c.factors)
     .map(([f, levels]) =>
       Object.entries(levels)
@@ -95,18 +94,22 @@ export function adminRouter(db: DB, password: string): Router {
   const r = Router();
   const auth = requireAdmin(password);
 
-  r.get('/admin', auth, (_req, res) => {
+  r.get('/admin', auth, async (_req, res) => {
     res.set('Cache-Control', 'no-store');
-    res.type('html').send(adminPage(db));
+    res.type('html').send(await adminPage(db));
   });
-  r.get('/api/export/participants.csv', auth, (_req, res) =>
-    sendCsv(res, 'participants.csv', participantsCsv(db)),
+  r.get('/api/export/participants.csv', auth, async (_req, res) =>
+    sendCsv(res, 'participants.csv', await participantsCsv(db)),
   );
-  r.get('/api/export/events.csv', auth, (_req, res) => sendCsv(res, 'events.csv', eventsCsv(db)));
-  r.get('/api/export/responses.csv', auth, (_req, res) =>
-    sendCsv(res, 'responses.csv', responsesCsv(db)),
+  r.get('/api/export/events.csv', auth, async (_req, res) =>
+    sendCsv(res, 'events.csv', await eventsCsv(db)),
   );
-  r.get('/api/export/wide.csv', auth, (_req, res) => sendCsv(res, 'wide.csv', wideCsv(db)));
+  r.get('/api/export/responses.csv', auth, async (_req, res) =>
+    sendCsv(res, 'responses.csv', await responsesCsv(db)),
+  );
+  r.get('/api/export/wide.csv', auth, async (_req, res) =>
+    sendCsv(res, 'wide.csv', await wideCsv(db)),
+  );
 
   return r;
 }

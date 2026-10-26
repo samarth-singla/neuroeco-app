@@ -4,11 +4,12 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { basicAuth, makeApp } from './helpers';
+import { run } from '../src/db';
 import { wideColumns } from '../src/wide';
 import { ALL_ITEMS } from '../../client/src/config/survey';
 import { renderDictionary } from '../scripts/data-dictionary';
 
-type App = ReturnType<typeof makeApp>['app'];
+type App = Awaited<ReturnType<typeof makeApp>>['app'];
 
 function parseCsv(text: string): Record<string, string>[] {
   // Simple parser for our own output (quoted fields, "" escapes)
@@ -55,14 +56,14 @@ const ev = (screen: string, event_type: string, payload?: object) => ({
 
 describe('wide.csv', () => {
   it('has one row per completed, non-withdrawn participant with behaviour and scores', async () => {
-    const { app, db } = makeApp();
+    const { app, db } = await makeApp();
     const done = await participant(app);
     const unfinished = await participant(app);
     const withdrawn = await participant(app);
     // Force a known withdrawal condition for the checks below
-    db.prepare("UPDATE participants SET withdrawal_offer = 'allowed' WHERE participant_id = ?").run(
+    await run(db, "UPDATE participants SET withdrawal_offer = 'allowed' WHERE participant_id = ?", [
       done.participant_id,
-    );
+    ]);
 
     await request(app)
       .post('/api/events')
@@ -172,11 +173,13 @@ describe('wide.csv', () => {
   });
 
   it('fills defaults for a participant who never invested', async () => {
-    const { app, db } = makeApp();
+    const { app, db } = await makeApp();
     const p = await participant(app);
-    db.prepare(
+    await run(
+      db,
       "UPDATE participants SET withdrawal_offer = 'not_offered' WHERE participant_id = ?",
-    ).run(p.participant_id);
+      [p.participant_id],
+    );
     await request(app)
       .post('/api/events')
       .send({

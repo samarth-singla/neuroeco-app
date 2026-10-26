@@ -4,7 +4,7 @@
  *
  * `wideColumns()` is also the source of docs/data-dictionary.md (npm run docs:dictionary).
  */
-import type { DB } from './db';
+import { all, type DB } from './db';
 import { toCsv, type Cell } from './csv';
 import { ALL_ITEMS, type Item } from '../../client/src/config/survey';
 import {
@@ -294,25 +294,24 @@ interface ParticipantRow {
 }
 
 /** Rows for wide.csv (completed and not withdrawn), in consent order. */
-export function wideRows(db: DB): Record<string, Cell>[] {
-  const participants = db
-    .prepare(
-      `SELECT * FROM participants
-       WHERE completed_at IS NOT NULL AND withdrawn = 0
-       ORDER BY created_at`,
-    )
-    .all() as ParticipantRow[];
+export async function wideRows(db: DB): Promise<Record<string, Cell>[]> {
+  const participants = await all<ParticipantRow>(
+    db,
+    `SELECT * FROM participants
+     WHERE completed_at IS NOT NULL AND withdrawn = 0
+     ORDER BY created_at`,
+  );
 
   const eligible = `participant_id IN (SELECT participant_id FROM participants
     WHERE completed_at IS NOT NULL AND withdrawn = 0)`;
-  const events = db
-    .prepare(
-      `SELECT participant_id, screen, event_type, payload FROM events WHERE ${eligible} ORDER BY id`,
-    )
-    .all() as EventRow[];
-  const responses = db
-    .prepare(`SELECT participant_id, item_id, value FROM responses WHERE ${eligible}`)
-    .all() as { participant_id: string; item_id: string; value: string | null }[];
+  const events = await all<EventRow>(
+    db,
+    `SELECT participant_id, screen, event_type, payload FROM events WHERE ${eligible} ORDER BY id`,
+  );
+  const responses = await all<{ participant_id: string; item_id: string; value: string | null }>(
+    db,
+    `SELECT participant_id, item_id, value FROM responses WHERE ${eligible}`,
+  );
 
   const eventsBy = new Map<string, { screen: string; event_type: string; payload: Payload }[]>();
   for (const e of events) {
@@ -333,7 +332,7 @@ export function wideRows(db: DB): Record<string, Cell>[] {
     const selfRated = answers.lit_self === undefined ? null : Number(answers.lit_self);
     const row: Record<string, Cell> = {
       participant_id: p.participant_id,
-      is_pilot: p.is_pilot ?? 0,
+      is_pilot: Number(p.is_pilot ?? 0),
       created_at: p.created_at,
       completed_at: p.completed_at,
       app_version: p.app_version,
@@ -367,9 +366,9 @@ export function wideRows(db: DB): Record<string, Cell>[] {
   return rows;
 }
 
-export function wideCsv(db: DB): string {
+export async function wideCsv(db: DB): Promise<string> {
   return toCsv(
     wideColumns().map((c) => c.name),
-    wideRows(db),
+    await wideRows(db),
   );
 }

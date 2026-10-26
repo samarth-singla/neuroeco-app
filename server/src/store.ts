@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { DB } from './db';
+import { all, get, run, type DB } from './db';
 import {
   assignFactors,
   FACTORS,
@@ -38,24 +38,38 @@ export const COMPLETED_STEPS = new Set(['debrief', 'thanks']);
 
 // DECISION: pilot and real participants are balanced separately, so pilot runs never
 // unbalance the real sample.
-function levelCounts(db: DB, isPilot: number): LevelCounts {
+async function levelCounts(db: DB, isPilot: number): Promise<LevelCounts> {
   const counts: LevelCounts = {};
   for (const factor of Object.keys(FACTORS) as FactorName[]) {
     // factor names are fixed constants, never user input
-    const rows = db
-      .prepare(
-        `SELECT ${factor} AS level, COUNT(*) AS n FROM participants WHERE is_pilot = ? GROUP BY ${factor}`,
-      )
-      .all(isPilot) as { level: string; n: number }[];
-    counts[factor] = Object.fromEntries(rows.map((r) => [r.level, r.n]));
+    const rows = await all<{ level: string; n: number }>(
+      db,
+      `SELECT ${factor} AS level, COUNT(*) AS n FROM participants WHERE is_pilot = ? GROUP BY ${factor}`,
+      [isPilot],
+    );
+    counts[factor] = Object.fromEntries(rows.map((r) => [r.level, Number(r.n)]));
   }
   return counts;
 }
 
-export function createParticipant(db: DB, rng: Rng = Math.random, pilot = false): ParticipantRow {
-  // A transaction makes count + insert atomic, so parallel sign-ups cannot unbalance groups.
-  const tx = db.transaction(() => {
-    const assignment = assignFactors(levelCounts(db, pilot ? 1 : 0), rng);
+// Sign-ups are handled one at a time, so the count-then-insert in createParticipant cannot
+// interleave and unbalance the groups.
+// DECISION: this in-process queue replaces a database transaction; it is correct because the
+// app runs as a single server instance (as documented in the README).
+let signupQueue: Promise<unknown> = Promise.resolve();
+function oneAtATime<T>(fn: () => Promise<T>): Promise<T> {
+  const next = signupQueue.then(fn, fn);
+  signupQueue = next.catch(() => undefined);
+  return next;
+}
+
+export function createParticipant(
+  db: DB,
+  rng: Rng = Math.random,
+  pilot = false,
+): Promise<ParticipantRow> {
+  return oneAtATime(async () => {
+    const assignment = assignFactors(await levelCounts(db, pilot ? 1 : 0), rng);
     const row: ParticipantRow = {
       participant_id: randomUUID(),
       created_at: new Date().toISOString(),
@@ -67,71 +81,93 @@ export function createParticipant(db: DB, rng: Rng = Math.random, pilot = false)
       withdrawn: 0,
       is_pilot: pilot ? 1 : 0,
     };
-    db.prepare(
+    await run(
+      db,
       `INSERT INTO participants (participant_id, created_at, consented, app_version, round1_outcome,
          withdrawal_offer, referral_source, money_source, stake_order, current_step, completed_at, is_pilot)
-       VALUES (@participant_id, @created_at, @consented, @app_version, @round1_outcome,
-         @withdrawal_offer, @referral_source, @money_source, @stake_order, @current_step, @completed_at, @is_pilot)`,
-    ).run(row);
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        row.participant_id,
+        row.created_at,
+        row.consented,
+        row.app_version,
+        row.round1_outcome,
+        row.withdrawal_offer,
+        row.referral_source,
+        row.money_source,
+        row.stake_order,
+        row.current_step,
+        row.completed_at,
+        row.is_pilot,
+      ],
+    );
     return row;
   });
-  return tx();
 }
 
-export function getParticipant(db: DB, id: string): ParticipantRow | undefined {
-  return db.prepare('SELECT * FROM participants WHERE participant_id = ?').get(id) as
-    ParticipantRow | undefined;
+export function getParticipant(db: DB, id: string): Promise<ParticipantRow | undefined> {
+  return get<ParticipantRow>(db, 'SELECT * FROM participants WHERE participant_id = ?', [id]);
 }
 
 /** Debrief "withdraw my data": the participant is kept but excluded from all exports. */
-export function withdrawParticipant(db: DB, id: string): void {
-  db.prepare('UPDATE participants SET withdrawn = 1 WHERE participant_id = ?').run(id);
+export async function withdrawParticipant(db: DB, id: string): Promise<void> {
+  await run(db, 'UPDATE participants SET withdrawn = 1 WHERE participant_id = ?', [id]);
 }
 
-export function setStep(db: DB, id: string, step: string): void {
-  db.prepare('UPDATE participants SET current_step = ? WHERE participant_id = ?').run(step, id);
+export async function setStep(db: DB, id: string, step: string): Promise<void> {
+  await run(db, 'UPDATE participants SET current_step = ? WHERE participant_id = ?', [step, id]);
   if (COMPLETED_STEPS.has(step)) {
-    db.prepare(
+    await run(
+      db,
       'UPDATE participants SET completed_at = ? WHERE participant_id = ? AND completed_at IS NULL',
-    ).run(new Date().toISOString(), id);
+      [new Date().toISOString(), id],
+    );
   }
 }
 
-export function insertEvents(db: DB, participantId: string, events: EventInput[]): number {
-  const stmt = db.prepare(
-    `INSERT INTO events (participant_id, ts, client_ts, screen, event_type, payload)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-  );
-  const tx = db.transaction((list: EventInput[]) => {
-    const now = Date.now();
-    for (const e of list) {
-      stmt.run(
+export async function insertEvents(
+  db: DB,
+  participantId: string,
+  events: EventInput[],
+): Promise<number> {
+  if (events.length === 0) return 0;
+  const now = Date.now();
+  // One batch = one round trip, written atomically
+  await db.batch(
+    events.map((e) => ({
+      sql: `INSERT INTO events (participant_id, ts, client_ts, screen, event_type, payload)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+      args: [
         participantId,
         now,
         e.client_ts ?? null,
         e.screen,
         e.event_type,
         e.payload === undefined ? null : JSON.stringify(e.payload),
-      );
-    }
-  });
-  tx(events);
+      ],
+    })),
+    'write',
+  );
   return events.length;
 }
 
-export function upsertResponses(db: DB, participantId: string, responses: ResponseInput[]): number {
+export async function upsertResponses(
+  db: DB,
+  participantId: string,
+  responses: ResponseInput[],
+): Promise<number> {
+  if (responses.length === 0) return 0;
+  const now = new Date().toISOString();
   // DECISION: one row per (participant, item). Re-answering an item keeps the latest answer.
-  const stmt = db.prepare(
-    `INSERT INTO responses (participant_id, item_id, value, answered_at) VALUES (?, ?, ?, ?)
-     ON CONFLICT (participant_id, item_id) DO UPDATE SET value = excluded.value, answered_at = excluded.answered_at`,
+  await db.batch(
+    responses.map((r) => ({
+      sql: `INSERT INTO responses (participant_id, item_id, value, answered_at) VALUES (?, ?, ?, ?)
+            ON CONFLICT (participant_id, item_id)
+            DO UPDATE SET value = excluded.value, answered_at = excluded.answered_at`,
+      args: [participantId, r.item_id, r.value === null ? null : String(r.value), now],
+    })),
+    'write',
   );
-  const tx = db.transaction((list: ResponseInput[]) => {
-    const now = new Date().toISOString();
-    for (const r of list) {
-      stmt.run(participantId, r.item_id, r.value === null ? null : String(r.value), now);
-    }
-  });
-  tx(responses);
   return responses.length;
 }
 

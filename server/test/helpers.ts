@@ -3,8 +3,8 @@ import { createApp } from '../src/app';
 
 export const ADMIN_PASSWORD = 'test-password';
 
-export function makeApp() {
-  const db = openDb(':memory:');
+export async function makeApp() {
+  const db = await openDb(':memory:');
   const app = createApp({ db, adminPassword: ADMIN_PASSWORD });
   return { db, app };
 }

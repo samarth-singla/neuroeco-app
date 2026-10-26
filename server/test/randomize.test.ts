@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { openDb } from '../src/db';
+import { all, get, openDb } from '../src/db';
 import { createParticipant } from '../src/store';
 import { FACTORS, pickBalanced, shuffledStakes, STAKES, type FactorName } from '../src/randomize';
 
@@ -33,15 +33,17 @@ describe('pickBalanced', () => {
 
 describe('balanced randomization over the database', () => {
   for (const seed of [1, 42, 2026]) {
-    it(`keeps every factor within 50 ± 2 for 100 participants (seed ${seed})`, () => {
-      const db = openDb(':memory:');
+    it(`keeps every factor within 50 ± 2 for 100 participants (seed ${seed})`, async () => {
+      const db = await openDb(':memory:');
       const rng = seeded(seed);
-      for (let i = 0; i < 100; i++) createParticipant(db, rng);
+      for (let i = 0; i < 100; i++) await createParticipant(db, rng);
       for (const factor of Object.keys(FACTORS) as FactorName[]) {
         for (const level of FACTORS[factor]) {
-          const { n } = db
-            .prepare(`SELECT COUNT(*) AS n FROM participants WHERE ${factor} = ?`)
-            .get(level) as { n: number };
+          const { n } = (await get<{ n: number }>(
+            db,
+            `SELECT COUNT(*) AS n FROM participants WHERE ${factor} = ?`,
+            [level],
+          ))!;
           expect(n, `${factor}=${level}`).toBeGreaterThanOrEqual(48);
           expect(n, `${factor}=${level}`).toBeLessThanOrEqual(52);
         }
@@ -49,15 +51,14 @@ describe('balanced randomization over the database', () => {
     });
   }
 
-  it('assigns factors independently (all 8 app-session cells get participants)', () => {
-    const db = openDb(':memory:');
+  it('assigns factors independently (all 8 app-session cells get participants)', async () => {
+    const db = await openDb(':memory:');
     const rng = seeded(7);
-    for (let i = 0; i < 100; i++) createParticipant(db, rng);
-    const cells = db
-      .prepare(
-        'SELECT app_version, round1_outcome, withdrawal_offer, COUNT(*) AS n FROM participants GROUP BY 1, 2, 3',
-      )
-      .all();
+    for (let i = 0; i < 100; i++) await createParticipant(db, rng);
+    const cells = await all(
+      db,
+      'SELECT app_version, round1_outcome, withdrawal_offer, COUNT(*) AS n FROM participants GROUP BY 1, 2, 3',
+    );
     expect(cells).toHaveLength(8);
   });
 });

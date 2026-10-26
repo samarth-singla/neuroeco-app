@@ -1,8 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import Database from 'better-sqlite3';
+import { pathToFileURL } from 'node:url';
+import { createClient, type Client, type InArgs } from '@libsql/client';
 
-export type DB = Database.Database;
+/**
+ * Database access through the libSQL client. The same code works with:
+ * - a local SQLite file (development, VPS), and
+ * - a Turso database over the network (hosts without a persistent disk, e.g. Render free).
+ */
+export type DB = Client;
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS participants (
@@ -39,23 +45,62 @@ CREATE TABLE IF NOT EXISTS responses (
 );
 `;
 
-/** Adds a column if an older database file does not have it yet. */
-export function ensureColumn(db: DB, table: string, column: string, definition: string): void {
-  const cols = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
-  if (!cols.some((c) => c.name === column)) {
-    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+type Row = Record<string, unknown>;
+
+/** Runs a query and returns plain row objects. */
+export async function all<T = Row>(db: DB, sql: string, args: InArgs = []): Promise<T[]> {
+  const rs = await db.execute({ sql, args });
+  return rs.rows.map((r) => Object.fromEntries(rs.columns.map((c, i) => [c, r[i]]))) as T[];
+}
+
+/** First row of a query, or undefined. */
+export async function get<T = Row>(db: DB, sql: string, args: InArgs = []): Promise<T | undefined> {
+  return (await all<T>(db, sql, args))[0];
+}
+
+export async function run(db: DB, sql: string, args: InArgs = []): Promise<void> {
+  await db.execute({ sql, args });
+}
+
+/** Column names of a table, in order. */
+export async function columnsOf(db: DB, table: string): Promise<string[]> {
+  return (await all<{ name: string }>(db, `PRAGMA table_info(${table})`)).map((c) => c.name);
+}
+
+/** Adds a column if an older database does not have it yet. */
+export async function ensureColumn(
+  db: DB,
+  table: string,
+  column: string,
+  definition: string,
+): Promise<void> {
+  if (!(await columnsOf(db, table)).includes(column)) {
+    await db.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
   }
 }
 
-export function openDb(file: string): DB {
-  if (file !== ':memory:') fs.mkdirSync(path.dirname(file), { recursive: true });
-  const db = new Database(file);
-  db.pragma('journal_mode = WAL');
-  db.pragma('foreign_keys = ON');
-  db.exec(SCHEMA);
+const URL_RE = /^(libsql|https?|wss?|file):/i;
+
+/**
+ * Opens the database. `target` is either a libSQL/Turso URL (`libsql://…`), `:memory:` (tests),
+ * or a file path (a folder is created if needed). `authToken` is needed for Turso.
+ */
+export async function openDb(target: string, authToken?: string): Promise<DB> {
+  let url = target;
+  if (target !== ':memory:' && !URL_RE.test(target)) {
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    url = pathToFileURL(target).href;
+  }
+  const db = createClient({ url, authToken: authToken || undefined });
+  await db.executeMultiple(SCHEMA);
   // Phase 7: participants can withdraw their data on the debrief screen (excluded from every export)
-  ensureColumn(db, 'participants', 'withdrawn', 'INTEGER NOT NULL DEFAULT 0');
+  await ensureColumn(db, 'participants', 'withdrawn', 'INTEGER NOT NULL DEFAULT 0');
   // Phase 10: participants who came through a ?pilot=1 link (excluded from analysis)
-  ensureColumn(db, 'participants', 'is_pilot', 'INTEGER NOT NULL DEFAULT 0');
+  await ensureColumn(db, 'participants', 'is_pilot', 'INTEGER NOT NULL DEFAULT 0');
   return db;
+}
+
+/** True if the target is a remote (Turso) database rather than a local file. */
+export function isRemote(target: string): boolean {
+  return /^(libsql|https?|wss?):/i.test(target);
 }

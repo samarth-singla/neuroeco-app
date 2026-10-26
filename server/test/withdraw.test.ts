@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { basicAuth, makeApp } from './helpers';
+import { get } from '../src/db';
 
 describe('data withdrawal (debrief)', () => {
   it('marks the participant withdrawn and excludes them from every export', async () => {
-    const { app, db } = makeApp();
+    const { app, db } = await makeApp();
     const keep = (await request(app).post('/api/participants').send({ consented: true })).body;
     const leave = (await request(app).post('/api/participants').send({ consented: true })).body;
     for (const p of [keep, leave]) {
@@ -22,9 +23,11 @@ describe('data withdrawal (debrief)', () => {
     }
 
     await request(app).post(`/api/participants/${leave.participant_id}/withdraw`).expect(200);
-    const row = db
-      .prepare('SELECT withdrawn FROM participants WHERE participant_id = ?')
-      .get(leave.participant_id) as { withdrawn: number };
+    const row = (await get<{ withdrawn: number }>(
+      db,
+      'SELECT withdrawn FROM participants WHERE participant_id = ?',
+      [leave.participant_id],
+    ))!;
     expect(row.withdrawn).toBe(1);
 
     for (const file of ['participants', 'events', 'responses']) {
@@ -43,7 +46,7 @@ describe('data withdrawal (debrief)', () => {
   });
 
   it('returns 404 for unknown participants', async () => {
-    const { app } = makeApp();
+    const { app } = await makeApp();
     await request(app)
       .post('/api/participants/00000000-0000-0000-0000-000000000000/withdraw')
       .expect(404);

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { basicAuth, makeApp } from './helpers';
+import { all } from '../src/db';
 
 /** Splits one CSV line, respecting quoted fields (stake_order contains commas). */
 function cells(line: string): string[] {
@@ -38,7 +39,7 @@ function valueOf(csv: string, participantId: string, column: string): string {
 
 describe('pilot mode (?pilot=1)', () => {
   it('tags pilot participants and exports the flag', async () => {
-    const { app } = makeApp();
+    const { app } = await makeApp();
     const pilot = (
       await request(app).post('/api/participants').send({ consented: true, pilot: true })
     ).body;
@@ -64,18 +65,17 @@ describe('pilot mode (?pilot=1)', () => {
   });
 
   it('does not let pilot participants unbalance the real sample', async () => {
-    const { app, db } = makeApp();
+    const { app, db } = await makeApp();
     for (let i = 0; i < 7; i++) {
       await request(app).post('/api/participants').send({ consented: true, pilot: true });
     }
     for (let i = 0; i < 10; i++) {
       await request(app).post('/api/participants').send({ consented: true });
     }
-    const rows = db
-      .prepare(
-        'SELECT app_version, COUNT(*) AS n FROM participants WHERE is_pilot = 0 GROUP BY app_version',
-      )
-      .all() as { app_version: string; n: number }[];
+    const rows = await all<{ app_version: string; n: number }>(
+      db,
+      'SELECT app_version, COUNT(*) AS n FROM participants WHERE is_pilot = 0 GROUP BY app_version',
+    );
     expect(rows.map((r) => r.n)).toEqual([5, 5]);
   });
 });

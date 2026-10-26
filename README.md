@@ -28,8 +28,8 @@ npm install
 cp .env.example .env      # then set ADMIN_PASSWORD
 ```
 
-`better-sqlite3` ships prebuilt binaries for common platforms; if `npm install` tries to compile it, install
-the platform build tools (Windows: "Desktop development with C++"; Linux: `build-essential`, `python3`).
+Data is stored with the libSQL client: in a local SQLite file by default, or in a
+[Turso](https://turso.tech) database when `TURSO_DATABASE_URL` is set (see [Deploy](#deploy-as-one-node-service)).
 
 ## Run in development
 
@@ -57,27 +57,56 @@ over `.env`.
 | --- | --- | --- |
 | `PORT` | `3001` | Port the server listens on |
 | `ADMIN_PASSWORD` | *(empty)* | Password for `/admin` and the CSV exports. If empty, admin is disabled. Use a long random string. |
-| `DB_PATH` | `./data/neuroeco.db` | SQLite file. Relative paths are resolved from the repo root. The folder is created if needed. |
+| `DB_PATH` | `./data/neuroeco.db` | Local SQLite file (used when `TURSO_DATABASE_URL` is not set). Relative paths are resolved from the repo root. The folder is created if needed. |
+| `TURSO_DATABASE_URL` | *(empty)* | Turso database URL, e.g. `libsql://neuroeco-yourname.turso.io`. When set, data goes to Turso instead of the local file. |
+| `TURSO_AUTH_TOKEN` | *(empty)* | Turso database token (needed with `TURSO_DATABASE_URL`). Keep it secret. |
 
 ## Deploy as one Node service
 
-The whole study is a single Node app with a single SQLite file. On any host:
+The whole study is a single Node app. Its data must live somewhere that survives restarts: either
+**Turso** (works on free hosts with no disk) or a local file on a **persistent disk**.
 
-- **Build command:** `npm install && npm run build`
-- **Start command:** `npm start`
-- **Environment:** `ADMIN_PASSWORD` (required), `DB_PATH` pointing at **persistent storage**, `PORT` if the
-  host does not set it.
+### Render (free plan) + Turso — recommended
 
-Notes per host:
+Render's free plan has no disk and wipes local files whenever the app sleeps or redeploys, so use Turso
+for the data.
 
-- **Render:** create a *Web Service*, add a *Persistent Disk* (e.g. mounted at `/var/data`) and set
-  `DB_PATH=/var/data/neuroeco.db`. Without a disk the database is wiped on every deploy.
-- **Railway:** add a *Volume* (e.g. at `/data`) and set `DB_PATH=/data/neuroeco.db`.
-- **VPS:** clone, `npm install && npm run build`, run `npm start` under a process manager (systemd or
-  `pm2`) behind HTTPS (e.g. Caddy or nginx). Keep `data/` out of the web root (it already is).
+1. **Turso:** create a database and copy its **URL** (`libsql://…turso.io`) and a **token**
+   (dashboard: *Databases → your database → Create token*; or CLI: `turso db show <name> --url` and
+   `turso db tokens create <name>`). The app creates its tables on first start.
+2. **Render:** *New → Web Service* → connect the GitHub repo, then:
+   - **Runtime:** Node · **Branch:** `main` · **Instance type:** Free
+   - **Build command:** `npm install --include=dev && npm run build`
+   - **Start command:** `npm start`
+3. **Environment variables** (same page under *Environment*, or later in the service's **Environment**
+   tab → *Add Environment Variable*):
 
-Use HTTPS in production: the admin password is sent with HTTP Basic auth. Run a single instance (SQLite is
-a local file). Free hosting tiers that sleep may make the first page load slow.
+   | Key | Value |
+   | --- | --- |
+   | `TURSO_DATABASE_URL` | your `libsql://…turso.io` URL |
+   | `TURSO_AUTH_TOKEN` | your Turso token |
+   | `ADMIN_PASSWORD` | a long password of your choice |
+   | `NODE_VERSION` | `22` |
+
+   Do not set `PORT` (Render sets it) or `DB_PATH` (ignored when Turso is set).
+4. **Deploy.** When the log shows `Server listening … (database: Turso …)`, open the `onrender.com` URL.
+   Check `/admin` with your password. If the log says `Could not start the server`, re-check the Turso URL
+   and token. Changing an environment variable later triggers a redeploy automatically.
+
+Free Render services sleep after about 15 minutes without visitors; the next visit takes up to a minute to
+wake. During data collection, a free uptime monitor (e.g. UptimeRobot) that requests
+`https://<your-app>.onrender.com/api/health` every 10 minutes keeps it awake.
+
+### Other hosts
+
+- **Build command:** `npm install --include=dev && npm run build` · **Start command:** `npm start`
+- **Data:** set the two Turso variables, **or** point `DB_PATH` at persistent storage (Render paid disk at
+  `/var/data` → `DB_PATH=/var/data/neuroeco.db`; Railway volume at `/data` → `DB_PATH=/data/neuroeco.db`).
+- **VPS:** clone, build, run `npm start` under a process manager (systemd or `pm2`) behind HTTPS (Caddy or
+  nginx). The local file in `data/` is fine there.
+
+Use HTTPS in production: the admin password is sent with HTTP Basic auth. Run a **single instance** of the
+server: sign-ups are queued in the server process to keep the groups balanced.
 
 ## Study links and pilot mode
 
@@ -108,11 +137,12 @@ computed by the server at download time (overconfidence uses z-scores over the d
 Test runs (including `npm run smoke`) create real rows. Before collecting real data:
 
 1. Download anything you want to keep from `/admin`.
-2. Stop the server.
-3. Run `npm run db:reset -- --yes` (deletes the file at `DB_PATH`), or delete the file by hand.
-4. Start the server again — it creates a fresh, empty database.
-
-On a host, run the same command in the host's shell, or delete the database file on the persistent disk.
+2. **Local file:** stop the server, run `npm run db:reset -- --yes` (deletes the file at `DB_PATH`), start
+   the server again — it creates a fresh, empty database.
+3. **Turso (e.g. the Render deployment):** on your own computer, put the same `TURSO_DATABASE_URL` and
+   `TURSO_AUTH_TOKEN` in `.env` and run `npm run db:reset -- --yes`. It deletes every participant, event and
+   response in Turso (the tables stay). No redeploy is needed. Remove the Turso lines from `.env` afterwards
+   if you want local development to use the local file again.
 
 ## Testing
 

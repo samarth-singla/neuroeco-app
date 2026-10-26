@@ -26,18 +26,18 @@ export function apiRouter(db: DB): Router {
   const r = Router();
 
   // Created only after consent; no record exists for people who do not agree.
-  r.post('/participants', (req, res) => {
+  r.post('/participants', async (req, res) => {
     const body = isObject(req.body) ? req.body : {};
     if (body.consented !== true) {
       res.status(400).json({ error: 'consent required' });
       return;
     }
-    const p = createParticipant(db, Math.random, body.pilot === true);
+    const p = await createParticipant(db, Math.random, body.pilot === true);
     res.status(201).json(publicParticipant(p));
   });
 
-  r.get('/participants/:id', (req, res) => {
-    const p = ID_RE.test(req.params.id) ? getParticipant(db, req.params.id) : undefined;
+  r.get('/participants/:id', async (req, res) => {
+    const p = ID_RE.test(req.params.id) ? await getParticipant(db, req.params.id) : undefined;
     if (!p) {
       res.status(404).json({ error: 'not found' });
       return;
@@ -45,32 +45,32 @@ export function apiRouter(db: DB): Router {
     res.json(publicParticipant(p));
   });
 
-  r.post('/participants/:id/step', (req, res) => {
+  r.post('/participants/:id/step', async (req, res) => {
     const id = req.params.id;
     const step = isObject(req.body) ? req.body.step : undefined;
     if (typeof step !== 'string' || !STEP_RE.test(step)) {
       res.status(400).json({ error: 'invalid step' });
       return;
     }
-    if (!ID_RE.test(id) || !getParticipant(db, id)) {
+    if (!ID_RE.test(id) || !(await getParticipant(db, id))) {
       res.status(404).json({ error: 'not found' });
       return;
     }
-    setStep(db, id, step);
+    await setStep(db, id, step);
     res.json({ ok: true });
   });
 
-  r.post('/participants/:id/withdraw', (req, res) => {
+  r.post('/participants/:id/withdraw', async (req, res) => {
     const id = req.params.id;
-    if (!ID_RE.test(id) || !getParticipant(db, id)) {
+    if (!ID_RE.test(id) || !(await getParticipant(db, id))) {
       res.status(404).json({ error: 'not found' });
       return;
     }
-    withdrawParticipant(db, id);
+    await withdrawParticipant(db, id);
     res.json({ ok: true });
   });
 
-  r.post('/events', (req, res) => {
+  r.post('/events', async (req, res) => {
     const body = isObject(req.body) ? req.body : {};
     const id = body.participant_id;
     const list = body.events;
@@ -106,14 +106,14 @@ export function apiRouter(db: DB): Router {
         payload: e.payload,
       });
     }
-    if (!getParticipant(db, id)) {
+    if (!(await getParticipant(db, id))) {
       res.status(404).json({ error: 'participant not found' });
       return;
     }
-    res.json({ saved: insertEvents(db, id, events) });
+    res.json({ saved: await insertEvents(db, id, events) });
   });
 
-  r.post('/responses', (req, res) => {
+  r.post('/responses', async (req, res) => {
     const body = isObject(req.body) ? req.body : {};
     const id = body.participant_id;
     const list = body.responses;
@@ -140,11 +140,11 @@ export function apiRouter(db: DB): Router {
       }
       responses.push({ item_id: item.item_id, value: v as ResponseInput['value'] });
     }
-    if (!getParticipant(db, id)) {
+    if (!(await getParticipant(db, id))) {
       res.status(404).json({ error: 'participant not found' });
       return;
     }
-    res.json({ saved: upsertResponses(db, id, responses) });
+    res.json({ saved: await upsertResponses(db, id, responses) });
   });
 
   return r;

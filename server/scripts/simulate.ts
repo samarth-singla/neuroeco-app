@@ -10,7 +10,7 @@
 import path from 'node:path';
 import type { AddressInfo } from 'node:net';
 import { fileURLToPath } from 'node:url';
-import { openDb } from '../src/db';
+import { all, openDb } from '../src/db';
 import { createApp } from '../src/app';
 import { wideColumns } from '../src/wide';
 import {
@@ -205,7 +205,7 @@ export interface SimulationResult {
 
 export async function runSimulation(n = 40, seed = 2026): Promise<SimulationResult> {
   const rng = mulberry32(seed);
-  const db = openDb(':memory:');
+  const db = await openDb(':memory:');
   const server = createApp({ db, adminPassword: PASSWORD }).listen(0);
   await new Promise<void>((r) => server.once('listening', () => r()));
   const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
@@ -357,9 +357,10 @@ export async function runSimulation(n = 40, seed = 2026): Promise<SimulationResu
       'referral_source',
       'money_source',
     ]) {
-      const counts = db
-        .prepare(`SELECT ${f} AS level, COUNT(*) AS c FROM participants GROUP BY ${f}`)
-        .all() as { level: string; c: number }[];
+      const counts = await all<{ level: string; c: number }>(
+        db,
+        `SELECT ${f} AS level, COUNT(*) AS c FROM participants GROUP BY ${f}`,
+      );
       const values = counts.map((x) => x.c);
       if (values.length !== 2 || Math.abs(values[0] - values[1]) > 1) {
         errors.push(`factor ${f} unbalanced: ${JSON.stringify(counts)}`);

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { basicAuth, makeApp } from './helpers';
+import { all, get } from '../src/db';
 
-async function newParticipant(app: ReturnType<typeof makeApp>['app']) {
+async function newParticipant(app: Awaited<ReturnType<typeof makeApp>>['app']) {
   const res = await request(app).post('/api/participants').send({ consented: true });
   expect(res.status).toBe(201);
   return res.body as {
@@ -14,14 +15,14 @@ async function newParticipant(app: ReturnType<typeof makeApp>['app']) {
 
 describe('participants', () => {
   it('requires consent and creates no record without it', async () => {
-    const { app, db } = makeApp();
+    const { app, db } = await makeApp();
     const res = await request(app).post('/api/participants').send({ consented: false });
     expect(res.status).toBe(400);
-    expect((db.prepare('SELECT COUNT(*) AS n FROM participants').get() as { n: number }).n).toBe(0);
+    expect((await get<{ n: number }>(db, 'SELECT COUNT(*) AS n FROM participants'))!.n).toBe(0);
   });
 
   it('creates a participant with all assignments', async () => {
-    const { app } = makeApp();
+    const { app } = await makeApp();
     const p = await newParticipant(app);
     expect(p.participant_id).toMatch(/^[0-9a-f-]{36}$/);
     expect(p.current_step).toBe('app:A1');
@@ -34,7 +35,7 @@ describe('participants', () => {
   });
 
   it('resumes and updates the current step', async () => {
-    const { app } = makeApp();
+    const { app } = await makeApp();
     const p = await newParticipant(app);
     await request(app)
       .post(`/api/participants/${p.participant_id}/step`)
@@ -47,20 +48,22 @@ describe('participants', () => {
   });
 
   it('marks completion when the debrief step is reached', async () => {
-    const { app, db } = makeApp();
+    const { app, db } = await makeApp();
     const p = await newParticipant(app);
     await request(app)
       .post(`/api/participants/${p.participant_id}/step`)
       .send({ step: 'debrief' })
       .expect(200);
-    const row = db
-      .prepare('SELECT completed_at FROM participants WHERE participant_id = ?')
-      .get(p.participant_id) as { completed_at: string | null };
+    const row = (await get<{ completed_at: string | null }>(
+      db,
+      'SELECT completed_at FROM participants WHERE participant_id = ?',
+      [p.participant_id],
+    ))!;
     expect(row.completed_at).not.toBeNull();
   });
 
   it('returns 404 for unknown participants', async () => {
-    const { app } = makeApp();
+    const { app } = await makeApp();
     await request(app).get('/api/participants/00000000-0000-0000-0000-000000000000').expect(404);
     await request(app).get('/api/participants/not-a-uuid').expect(404);
   });
@@ -68,7 +71,7 @@ describe('participants', () => {
 
 describe('events and responses', () => {
   it('stores a batch of events with server timestamps', async () => {
-    const { app, db } = makeApp();
+    const { app, db } = await makeApp();
     const p = await newParticipant(app);
     const res = await request(app)
       .post('/api/events')
@@ -86,18 +89,18 @@ describe('events and responses', () => {
       })
       .expect(200);
     expect(res.body.saved).toBe(2);
-    const rows = db.prepare('SELECT * FROM events ORDER BY id').all() as {
+    const rows = await all<{
       ts: number;
       payload: string | null;
       event_type: string;
-    }[];
+    }>(db, 'SELECT * FROM events ORDER BY id');
     expect(rows.map((r) => r.event_type)).toEqual(['screen_view', 'invest_click']);
     expect(rows[0].ts).toBeGreaterThan(0);
     expect(JSON.parse(rows[1].payload!)).toEqual({ plan_id: 'growth' });
   });
 
   it('accepts sendBeacon-style text/plain JSON', async () => {
-    const { app } = makeApp();
+    const { app } = await makeApp();
     const p = await newParticipant(app);
     await request(app)
       .post('/api/events')
@@ -112,7 +115,7 @@ describe('events and responses', () => {
   });
 
   it('rejects bad events', async () => {
-    const { app } = makeApp();
+    const { app } = await makeApp();
     const p = await newParticipant(app);
     await request(app)
       .post('/api/events')
@@ -131,7 +134,7 @@ describe('events and responses', () => {
   });
 
   it('upserts responses (latest answer wins)', async () => {
-    const { app, db } = makeApp();
+    const { app, db } = await makeApp();
     const p = await newParticipant(app);
     const post = (value: unknown) =>
       request(app)
@@ -140,14 +143,14 @@ describe('events and responses', () => {
         .expect(200);
     await post(10);
     await post(5);
-    const rows = db.prepare('SELECT item_id, value FROM responses').all();
+    const rows = await all(db, 'SELECT item_id, value FROM responses');
     expect(rows).toEqual([{ item_id: 'crt_1', value: '5' }]);
   });
 });
 
 describe('admin and export', () => {
   it('requires the admin password', async () => {
-    const { app } = makeApp();
+    const { app } = await makeApp();
     await request(app).get('/admin').expect(401);
     await request(app).get('/admin').set('Authorization', basicAuth('wrong')).expect(401);
     await request(app).get('/api/export/participants.csv').expect(401);
@@ -156,7 +159,7 @@ describe('admin and export', () => {
   });
 
   it('exports raw CSVs', async () => {
-    const { app } = makeApp();
+    const { app } = await makeApp();
     const p = await newParticipant(app);
     const res = await request(app)
       .get('/api/export/participants.csv')

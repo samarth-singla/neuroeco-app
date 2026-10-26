@@ -357,3 +357,36 @@ most worth a look before piloting:
 **Still to do by the team.** Run `docs/qa-checklist.md` on a real phone; pilot with a few people
 (`?pilot=1`); reset the database before real collection. Commits so far are authored as "Your Real Name"
 (the local git `user.name`); set your real name with `git config user.name` for future commits.
+
+---
+
+## Follow-up — Free deployment with Turso (after Phase 10)
+
+**Status:** done
+
+**Why:** the team will host on Render's free plan, which has no persistent disk (local files are wiped when the
+service sleeps or redeploys), so a local SQLite file would lose data.
+
+**Built**
+- Database access moved from `better-sqlite3` to the libSQL client (`@libsql/client`). The same code uses a local
+  SQLite file (default, `DB_PATH`) or a Turso database when `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN` are set.
+  All database calls are now async (`server/src/db.ts` helpers `all`, `get`, `run`). Existing local files still
+  open (same SQLite format).
+- Event and response batches are written with one `batch` call (one round trip to Turso).
+- `npm run db:reset -- --yes` deletes the local file, or deletes every row when Turso is configured.
+- Clear start-up error when the Turso URL/token is wrong.
+- README: step-by-step Render (free) + Turso deployment and environment variables; `.env.example` lists the
+  Turso variables.
+- New test: 40 simultaneous sign-ups still split 20/20 on every factor. 42 server + 40 client tests pass; the
+  simulation and the browser smoke test (against the production build) pass.
+
+**Decisions**
+- `// DECISION:` Deviation from the plan's stack table ("SQLite via better-sqlite3"): libSQL is SQLite-compatible
+  and is needed for Turso. Local development still uses a plain SQLite file.
+- `// DECISION:` The randomization's count-then-insert is protected by an in-process sign-up queue instead of a
+  database transaction, so the server must run as a single instance (documented in the README).
+
+**Open**
+- The real Turso connection was not tested from here (no credentials in this environment); the remote path uses
+  the same client and SQL as the local tests. The first Render deploy log should show
+  `Server listening … (database: Turso …)`.

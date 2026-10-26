@@ -12,9 +12,15 @@ function resolveFromRoot(p: string): string {
   return path.isAbsolute(p) ? p : path.resolve(ROOT_DIR, p);
 }
 
+const tursoUrl = (process.env.TURSO_DATABASE_URL ?? '').trim();
+
 export const config = {
   port: Number(process.env.PORT ?? 3001),
   adminPassword: process.env.ADMIN_PASSWORD ?? '',
   dbPath: resolveFromRoot(process.env.DB_PATH ?? './data/neuroeco.db'),
+  /** Where data is stored: the Turso URL if set, otherwise the local SQLite file. */
+  dbTarget: tursoUrl || resolveFromRoot(process.env.DB_PATH ?? './data/neuroeco.db'),
+  dbAuthToken: (process.env.TURSO_AUTH_TOKEN ?? '').trim(),
+  usingTurso: tursoUrl !== '',
   clientDist: path.join(ROOT_DIR, 'client', 'dist'),
 };
