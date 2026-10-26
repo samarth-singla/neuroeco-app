@@ -3,7 +3,7 @@ import { StudyLayout } from './components/AppShell';
 import { Button, ScreenTitle } from './components/ui';
 import { StudyProvider, useBootstrap, useStudy } from './state/study';
 import type { AppScreen } from './types';
-import { uiuxPages } from './config/survey';
+import { surveyPages, uiuxPages } from './config/survey';
 import { SurveyPage } from './screens/SurveyPage';
 import { FeaturePreview } from './features/FeaturePreview';
 import { A1Welcome } from './screens/app/A1Welcome';
@@ -80,6 +80,23 @@ function UiuxStep({ index }: { index: number }) {
   );
 }
 
+/** General survey (Phase 6): pages depend on the participant's survey conditions. */
+function SurveyStep({ index }: { index: number }) {
+  const { state } = useStudy();
+  const pages = surveyPages(state.assignment);
+  const i = Math.min(Math.max(0, index || 0), pages.length - 1);
+  const last = i === pages.length - 1;
+  return (
+    <SurveyPage
+      page={pages[i]}
+      index={i}
+      total={pages.length}
+      section="General questions"
+      next={last ? 'debrief' : `survey:${i + 1}`}
+    />
+  );
+}
+
 function Router() {
   const { state } = useStudy();
   const step = state.step;
@@ -89,6 +106,9 @@ function Router() {
     return <Screen key={step} />;
   }
   if (step.startsWith('uiux:')) return <UiuxStep key={step} index={Number(step.slice(5))} />;
+  if (step.startsWith('survey:')) {
+    return <SurveyStep key={step} index={Number(step.slice(7))} />;
+  }
   return (
     <StudyLayout>
       <ScreenTitle title="Survey" subtitle={`Coming in a later phase (${step})`} />

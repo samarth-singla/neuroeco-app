@@ -48,7 +48,7 @@ describe('UI/UX survey', () => {
         await answerPage((page % 7) + 1);
       }
 
-      await screen.findByText(/Coming in a later phase \(survey:0\)/);
+      await screen.findByText('Three quick puzzles');
       expect(Object.keys(api.responses).sort()).toEqual([...UIUX_ITEM_IDS].sort());
       expect(api.responses.uiux_timer_urgency).toBe(1);
       expect(api.responses.uiux_overall_trust).toBe(1);

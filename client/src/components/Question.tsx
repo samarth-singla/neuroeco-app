@@ -129,7 +129,7 @@ export function Question({
           <div className="mt-1 flex justify-between text-xs text-gray-400">
             <span>{formatINR(item.min)}</span>
             <span className="text-base font-semibold text-white">
-              {set ? formatINR(Number(value)) : 'Move the slider'}
+              {set ? formatINR(Number(value)) : 'Tap or move the slider'}
             </span>
             <span>{formatINR(item.max)}</span>
           </div>

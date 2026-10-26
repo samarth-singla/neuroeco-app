@@ -143,3 +143,30 @@ Tracks the build of `IMPLEMENTATION_PLAN.md`, phase by phase.
 - `// DECISION:` Survey pages have no Back button, so answers are given once in a fixed order.
 - `// DECISION:` Feature page titles use neutral names (e.g. "Mentor chat", "Withdrawal processing tax"), not
   evaluative ones, so the debrief framing is not revealed early.
+
+## Phase 6 — General survey
+
+**Status:** done
+
+**Built**
+- All general-survey text in `client/src/config/survey.ts`; 13 pages with progress bar, all answers required
+  except the free-text comment:
+  CRT (3 numeric items) → loss-aversion gambles (lose ₹100 vs win ₹50…₹300) → H3 stake scenarios (₹500 /
+  ₹5,000 / ₹50,000, one page each, in the participant's randomized `stake_order`) → H5 referral scenario
+  (assigned `referral_source` only) → herd/FOMO (5 items) → H7 money-source scenario (assigned `money_source`
+  only; willingness + ₹0–2,000 slider) → self-rated literacy → Big Three literacy → susceptibility (5 items) →
+  experience & exposure (4 items) → demographics (age, gender, family income band, field of study) + optional
+  comment.
+- Item ids are identical across conditions (exported as `SURVEY_ITEM_IDS`; also `ALL_ITEMS` with blocks for the
+  server export).
+- Tests: same ids in all conditions, every planned block present, full run-through for two condition sets
+  (variant texts shown, stake order respected, validation of empty / out-of-range answers, all required ids saved,
+  ends at `debrief`). Checked in Edge at 360px.
+
+**Decisions**
+- `// DECISION:` CRT bat-and-ball item uses rupees (₹110 total, ₹100 more → correct answer 5).
+- `// DECISION:` Self-rated literacy is asked before the Big Three quiz, so the quiz cannot shift the self-rating.
+- `// DECISION:` Scenario "verify first" questions ask about checking registration with "the official regulator"
+  (no regulator named, per plan rule 3).
+- Scores (CRT, λ, literacy, overconfidence, herd, susceptibility) are not computed in the browser; they are
+  computed server-side at export (Phase 8).
