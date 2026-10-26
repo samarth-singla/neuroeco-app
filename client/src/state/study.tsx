@@ -17,6 +17,8 @@ import type { Answers, AppVersion, Assignment, Step } from '../types';
 /** Choices made during the app session that later screens need (also logged as events). */
 export interface SessionData {
   planId?: string;
+  /** Set when the participant withdrew their data on the debrief screen */
+  dataWithdrawn?: boolean;
   r1?: number;
   r2?: number;
   r3?: number;

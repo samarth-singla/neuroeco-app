@@ -28,6 +28,7 @@ export function adminCounts(db: DB) {
   return {
     total: one('SELECT COUNT(*) AS n FROM participants'),
     completed: one('SELECT COUNT(*) AS n FROM participants WHERE completed_at IS NOT NULL'),
+    withdrawn: one('SELECT COUNT(*) AS n FROM participants WHERE withdrawn = 1'),
     factors,
   };
 }
@@ -53,6 +54,7 @@ a.btn{display:inline-block;margin:.25rem .5rem .25rem 0;padding:.5rem .9rem;back
 <table>
 <tr><th>Total participants</th><td><b>${c.total}</b></td></tr>
 <tr><th>Completed</th><td><b>${c.completed}</b></td></tr>
+<tr><th>Withdrawn (excluded from exports)</th><td><b>${c.withdrawn}</b></td></tr>
 ${factorRows}
 </table>
 <h2>Exports</h2>

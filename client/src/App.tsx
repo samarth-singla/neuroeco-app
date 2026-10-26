@@ -1,11 +1,12 @@
-import { useState, type ComponentType } from 'react';
+import type { ComponentType } from 'react';
 import { StudyLayout } from './components/AppShell';
-import { Button, ScreenTitle } from './components/ui';
 import { StudyProvider, useBootstrap, useStudy } from './state/study';
 import type { AppScreen } from './types';
 import { surveyPages, uiuxPages } from './config/survey';
 import { SurveyPage } from './screens/SurveyPage';
 import { FeaturePreview } from './features/FeaturePreview';
+import { Consent } from './screens/Consent';
+import { Debrief, Thanks } from './screens/Debrief';
 import { A1Welcome } from './screens/app/A1Welcome';
 import { A2Plans } from './screens/app/A2Plans';
 import { DepositScreen } from './screens/app/DepositScreen';
@@ -31,25 +32,6 @@ const APP_SCREENS: Record<AppScreen, ComponentType> = {
   A9: A9FinalWithdrawal,
   A10: A10End,
 };
-
-// Temporary start screen (replaced by the consent screen in Phase 7)
-function Start({ onStart }: { onStart: () => Promise<void> }) {
-  const [busy, setBusy] = useState(false);
-  return (
-    <StudyLayout>
-      <ScreenTitle title="Research study" subtitle="Placeholder start screen" />
-      <Button
-        disabled={busy}
-        onClick={() => {
-          setBusy(true);
-          onStart().finally(() => setBusy(false));
-        }}
-      >
-        Start
-      </Button>
-    </StudyLayout>
-  );
-}
 
 /** UI/UX survey: one page per design feature + an overall page (Phase 5). */
 function UiuxStep({ index }: { index: number }) {
@@ -109,17 +91,14 @@ function Router() {
   if (step.startsWith('survey:')) {
     return <SurveyStep key={step} index={Number(step.slice(7))} />;
   }
-  return (
-    <StudyLayout>
-      <ScreenTitle title="Survey" subtitle={`Coming in a later phase (${step})`} />
-    </StudyLayout>
-  );
+  if (step === 'debrief') return <Debrief />;
+  return <Thanks />;
 }
 
 export default function App() {
   const { status, initial, start } = useBootstrap();
   if (status === 'loading') return <StudyLayout>Loading…</StudyLayout>;
-  if (!initial) return <Start onStart={() => start(isPilotLink())} />;
+  if (!initial) return <Consent onAgree={() => start(isPilotLink())} />;
   return (
     <StudyProvider initial={initial}>
       <Router />

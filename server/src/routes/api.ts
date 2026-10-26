@@ -6,6 +6,7 @@ import {
   insertEvents,
   publicParticipant,
   setStep,
+  withdrawParticipant,
   upsertResponses,
   type EventInput,
   type ResponseInput,
@@ -56,6 +57,16 @@ export function apiRouter(db: DB): Router {
       return;
     }
     setStep(db, id, step);
+    res.json({ ok: true });
+  });
+
+  r.post('/participants/:id/withdraw', (req, res) => {
+    const id = req.params.id;
+    if (!ID_RE.test(id) || !getParticipant(db, id)) {
+      res.status(404).json({ error: 'not found' });
+      return;
+    }
+    withdrawParticipant(db, id);
     res.json({ ok: true });
   });
 

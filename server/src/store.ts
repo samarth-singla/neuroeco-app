@@ -17,6 +17,7 @@ export interface ParticipantRow extends Assignment {
   stake_order: string;
   current_step: string;
   completed_at: string | null;
+  withdrawn: number;
 }
 
 export interface EventInput {
@@ -58,6 +59,7 @@ export function createParticipant(db: DB, rng: Rng = Math.random): ParticipantRo
       stake_order: shuffledStakes(rng).join(','),
       current_step: 'app:A1',
       completed_at: null,
+      withdrawn: 0,
     };
     db.prepare(
       `INSERT INTO participants (participant_id, created_at, consented, app_version, round1_outcome,
@@ -73,6 +75,11 @@ export function createParticipant(db: DB, rng: Rng = Math.random): ParticipantRo
 export function getParticipant(db: DB, id: string): ParticipantRow | undefined {
   return db.prepare('SELECT * FROM participants WHERE participant_id = ?').get(id) as
     ParticipantRow | undefined;
+}
+
+/** Debrief "withdraw my data": the participant is kept but excluded from all exports. */
+export function withdrawParticipant(db: DB, id: string): void {
+  db.prepare('UPDATE participants SET withdrawn = 1 WHERE participant_id = ?').run(id);
 }
 
 export function setStep(db: DB, id: string, step: string): void {

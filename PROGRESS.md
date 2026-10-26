@@ -170,3 +170,32 @@ Tracks the build of `IMPLEMENTATION_PLAN.md`, phase by phase.
   (no regulator named, per plan rule 3).
 - Scores (CRT, λ, literacy, overconfidence, herd, susceptibility) are not computed in the browser; they are
   computed server-side at export (Phase 8).
+
+## Phase 7 — Consent and debrief
+
+**Status:** done
+
+**Built**
+- Consent screen (`client/src/screens/Consent.tsx`, text in `client/src/config/study.ts`): "a study of how people
+  use investment apps" (no fraud framing), ~15 min, voluntary, stop anytime, no real money, no identifying data,
+  course-project use only; "I am 18+" and "I agree" checkboxes. The participant record (and randomization) is
+  created only on "Agree and start"; declining shows a polite end screen and sends nothing to the server.
+- Debrief (`screens/Debrief.tsx`) after the general survey: reveals the simulated fraud app, lists the
+  manipulative features (timer, fake scarcity, bonus lock, VIP tiers, fake regulator badge/certificate, fake
+  ticker/testimonials, mentor chat, withdrawal "tax"), explains the scripted outcomes, gives protection tips
+  (verify registration on the official regulator's website, never pay a fee to withdraw, beware guaranteed
+  returns, report at cybercrime.gov.in / 1930) and offers "Withdraw my data" (with confirmation).
+- Thank-you screen (different text after a withdrawal).
+- Server: `participants.withdrawn` column (added to old DB files via `ensureColumn`),
+  `POST /api/participants/:id/withdraw`; withdrawn participants are excluded from all CSV exports and counted
+  on `/admin`.
+- Tests: consent hides the fraud framing, both boxes required, declining creates no record; debrief text per
+  version, withdrawal flow, normal finish (client); withdrawal + export exclusion (server). Checked in Edge.
+
+**Decisions**
+- `// DECISION:` The debrief adapts to the version: fraud participants are told these were the features they saw;
+  plain participants are told other participants saw them.
+- `// DECISION:` Debrief tips refer to "the official securities regulator" without naming it (plan rule 3 bans
+  real regulator names). The team can name it in `client/src/config/study.ts` if the instructor agrees.
+- `// DECISION:` Withdrawal keeps the rows in the database (flag only) and excludes them from every export, as the
+  plan says; "reset the database" in the README removes everything.

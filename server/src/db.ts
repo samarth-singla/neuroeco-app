@@ -53,5 +53,7 @@ export function openDb(file: string): DB {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   db.exec(SCHEMA);
+  // Phase 7: participants can withdraw their data on the debrief screen (excluded from every export)
+  ensureColumn(db, 'participants', 'withdrawn', 'INTEGER NOT NULL DEFAULT 0');
   return db;
 }

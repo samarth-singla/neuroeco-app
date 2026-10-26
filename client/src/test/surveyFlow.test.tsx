@@ -111,7 +111,7 @@ describe('general survey flow', () => {
         clickNext();
       }
 
-      await screen.findByText(/debrief/i);
+      await screen.findByText('About this study');
       expect(stakeTitlesSeen).toEqual(a.stake_order);
       const required = SURVEY_ITEM_IDS.filter((id) => !OPTIONAL_ITEM_IDS.includes(id));
       for (const id of required) expect(api.responses, id).toHaveProperty(id);

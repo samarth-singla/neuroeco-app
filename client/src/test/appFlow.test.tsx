@@ -16,14 +16,16 @@ function typeAmount(value: string) {
   fireEvent.change(screen.getByLabelText(/Amount/), { target: { value } });
 }
 
+/** Ticks both consent boxes and agrees. */
+async function consent() {
+  await findBtn('Agree and start');
+  for (const box of screen.getAllByRole('checkbox')) fireEvent.click(box);
+  fireEvent.click(btn('Agree and start'));
+}
+
 async function startStudy() {
   render(<App />);
-  // Consent / start screen (the consent screen replaces this in Phase 7)
-  const agree = screen.queryByRole('checkbox');
-  if (agree) {
-    for (const box of screen.getAllByRole('checkbox')) fireEvent.click(box);
-  }
-  fireEvent.click(await findBtn(/^(Start|I agree|Agree and start)/i));
+  await consent();
   await findBtn('Continue');
 }
 
@@ -194,7 +196,7 @@ describe('refresh resume', () => {
   it('resumes at the same screen with the same wallet', async () => {
     installFakeApi(makeAssignment({ app_version: 'plain' }));
     const { unmount } = render(<App />);
-    fireEvent.click(await findBtn(/^(Start|I agree|Agree and start)/i));
+    await consent();
     fireEvent.click(await findBtn('Continue'));
     fireEvent.click(btn(/Starter/));
     fireEvent.click(btn('Invest in this plan'));
