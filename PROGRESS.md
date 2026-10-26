@@ -259,3 +259,101 @@ Tracks the build of `IMPLEMENTATION_PLAN.md`, phase by phase.
 
 **Open**
 - The manual checklist in `docs/qa-checklist.md` still needs to be run on a real phone by the team.
+
+## Phase 10 — Documentation and deployment prep
+
+**Status:** done
+
+**Built**
+- Pilot mode: `?pilot=1` on the link → `participants.is_pilot = 1` (column added to old DB files), included in
+  all exports with the flag, counted separately on `/admin`.
+- `README.md`: install, run, build, environment variables, deploying as one Node service (Render / Railway /
+  VPS, with persistent storage for SQLite), study and pilot links, exporting data, resetting the database, tests,
+  where to change texts.
+- `npm run db:reset -- --yes` (`server/scripts/reset-db.ts`) deletes the database; refuses without `--yes`.
+- `docs/screens.md`: every screen, what each version shows, what is logged and which hypothesis it serves.
+- `docs/data-dictionary.md` (generated, Phase 8) and `docs/qa-checklist.md` (Phase 9).
+- Checked the production path: `npm run build && npm start` serves the client, deep links, API and `/admin` from
+  one process; the browser smoke test passes against the built app.
+- Tests: pilot flag in exports and admin, pilot participants do not unbalance the real sample (server);
+  `?pilot=1` sends the flag (client). 41 server + 40 client tests pass.
+
+**Decisions**
+- `// DECISION:` Pilot and real participants are balanced separately in the randomization, and the `/admin`
+  factor table shows real participants only.
+
+---
+
+## Final checklist
+
+- [x] All screens in both versions work end to end — client flow tests (8 condition combinations + never-invest
+      paths) and the real-browser smoke test (dev server and production build).
+- [x] All randomized factors assigned and balanced — balanced randomization tests (100 participants, 48–52 per
+      level) and the 40-participant simulation (every factor within 1).
+- [x] Every DV listed in `hypothesis-report.md` for H1–H7 is logged or asked (see mapping below).
+- [x] Survey covers the measures for H3, H5, H7, H8, H9.
+- [x] Export produces `wide.csv` matching the data dictionary (test compares header and the committed doc).
+- [x] Tests pass (`npm test`: 41 server + 40 client), lint and typecheck clean.
+- [x] No real payment, credential or identity fields anywhere (scanned; the consent text only says they are not
+      collected).
+- [x] Every phase committed and pushed; `git status` clean; no `.env` or `.db` files in history.
+- [x] Final summary written (below).
+
+### DV coverage (hypothesis-report.md → wide.csv)
+
+| Hypothesis | DVs / IVs in the report | Where |
+| --- | --- | --- |
+| H1 | decision time, invested, amount, verification click, urgency & trust ratings; CRT moderator; controls age, gender, investing experience, trading-app use | `a2_decision_time_s`, `invested`, `r1_amount` (+ `total_deposited`), `verify_click`, `uiux_overall_urgency`, `uiux_overall_trust`, `crt_score`, `demo_age`, `demo_gender`, `exp_investing`, `exp_trading_app` |
+| H1a–H1g | feature-level urgency, trust, temptation (plain vs fraud) | `uiux_<feature>_<urgency\|trust\|temptation>`; behaviour: H1b `invested`, H1c `r1_amount`/`plan`, H1d `verify_click`, H1f `chat_open`/`r2_amount`, H1g `fee_paid` |
+| H2 | round-2 amount, escalation ratio | `r2_amount`, `escalation_ratio` (IV `round1_outcome`) |
+| H3 | willingness (1–7) and verify-first at ₹500 / ₹5,000 / ₹50,000 | `h3_stake_<stake>_willing`, `h3_stake_<stake>_verify`, `stake_order` |
+| H4 | λ; post-loss top-up (y/n) and amount; controls app version, investing experience | `loss_aversion_lambda`, `topup`, `topup_amount`, `app_version`, `exp_investing` |
+| H5 | willingness to join, verify first; herd/FOMO moderator | `h5_join_willing`, `h5_verify`, `herd_score` (IV `referral_source`) |
+| H6 | deposit after the withdrawal stage, trust rating | `post_withdrawal_deposit`, `uiux_overall_trust` (IV `withdrawal_offer`) |
+| H7 | willingness to reinvest, amount reinvested | `h7_reinvest_willing`, `h7_reinvest_amount` (IV `money_source`) |
+| H8 | literacy, overconfidence, prior financial education → susceptibility index; controls age, gender, income, experience | `literacy_score`, `overconfidence`, `exp_fin_edu`, `susceptibility_index`, `demo_*`, `exp_investing` |
+| H9 | bias scores × demographic group | `loss_aversion_lambda`, `herd_score`, `overconfidence`, `crt_score` × `demo_gender` / `demo_age` / `demo_income` |
+
+### Plan vs hypothesis report — differences noted
+
+1. **H1d wording.** The report describes real fraud apps using "SEBI registered" badges. Plan rule 3 forbids
+   real regulator names, so the app uses the fictional "National Digital Investment Authority" ("NDIA
+   Certified"). The manipulation (an official-looking badge and certificate) is the same.
+2. **H8 victimization (yes/no)** comes from the *online dataset* in the report; the app cannot collect it. The
+   survey's `exp_scam` (never / targeted / lost money) is available as a self-reported proxy.
+3. **H9** says the survey can test gender only; the survey still collects age and income band as the plan asks.
+4. **VIP tiers vs "same returns".** The report's H1c says bigger deposits unlock higher returns; the plan says
+   both versions have the same returns. Resolved by showing VIP perks as promises only — the scripted outcomes
+   are identical in both versions, as in real scam apps.
+
+## Summary for the team
+
+**What was built.** A mobile-first research web app (React + Vite + Tailwind client, Express + SQLite server)
+that runs the full participant journey: consent → balanced random assignment → ~10-minute simulated investment
+app (plain or fraud-style, screens A1–A10) → UI/UX feature ratings → general survey → debrief with data
+withdrawal → thank-you. Every click that matters is logged; `/admin` shows counts and downloads four CSVs, and
+`wide.csv` has one analysis-ready row per participant with all scores.
+
+**How to run it.** `npm install`, copy `.env.example` to `.env` and set `ADMIN_PASSWORD`, then `npm run dev`
+(app on http://localhost:5173). For deployment: `npm run build && npm start` as one Node service with `DB_PATH`
+on persistent storage (details in the README).
+
+**How to export data.** Open `/admin`, enter `ADMIN_PASSWORD`, download `wide.csv` (documented column by column
+in `docs/data-dictionary.md`). Pilot runs use `?pilot=1` and are flagged `is_pilot = 1`. Run
+`npm run db:reset -- --yes` (server stopped) before real data collection.
+
+**Open decisions for the team** (all marked `// DECISION:` in the code and listed per phase above). The ones
+most worth a look before piloting:
+- λ rule: smallest accepted gain ÷ ₹100; reject-all top-coded to 3.5; inconsistent switchers get a blank λ.
+- Plans differ only in stated return; VIP perks are display-only; all plans get the same scripted outcome.
+- Self-rated literacy is asked before the Big Three quiz.
+- CRT bat-and-ball uses rupees (₹110 / ₹100 → ₹5).
+- Debrief tips do not name the real regulator (plan rule 3); add it in `client/src/config/study.ts` if the
+  instructor agrees.
+- `withdrew` is blank for `not_offered`; `fee_paid` is blank when the fee screen was not shown.
+- Pilot participants are randomized separately from real ones.
+- Survey pages have no Back button.
+
+**Still to do by the team.** Run `docs/qa-checklist.md` on a real phone; pilot with a few people
+(`?pilot=1`); reset the database before real collection. Commits so far are authored as "Your Real Name"
+(the local git `user.name`); set your real name with `git config user.name` for future commits.

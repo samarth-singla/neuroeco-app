@@ -10,7 +10,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "simulate": "tsx scripts/simulate.ts",
-    "docs:dictionary": "tsx scripts/data-dictionary.ts"
+    "docs:dictionary": "tsx scripts/data-dictionary.ts",
+    "db:reset": "tsx scripts/reset-db.ts"
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",

@@ -55,5 +55,7 @@ export function openDb(file: string): DB {
   db.exec(SCHEMA);
   // Phase 7: participants can withdraw their data on the debrief screen (excluded from every export)
   ensureColumn(db, 'participants', 'withdrawn', 'INTEGER NOT NULL DEFAULT 0');
+  // Phase 10: participants who came through a ?pilot=1 link (excluded from analysis)
+  ensureColumn(db, 'participants', 'is_pilot', 'INTEGER NOT NULL DEFAULT 0');
   return db;
 }

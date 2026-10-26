@@ -22,7 +22,7 @@ const COMPLETE = 'completed_at IS NOT NULL AND withdrawn = 0';
 
 export function adminCounts(db: DB) {
   const one = (sql: string) => (db.prepare(sql).get() as { n: number }).n;
-  // Per level: all participants, and completed non-withdrawn ones (= rows in wide.csv)
+  // Per level (real participants only, pilots excluded): all, and completed non-withdrawn
   const factors: Record<string, Record<string, { all: number; complete: number }>> = {};
   for (const f of Object.keys(FACTORS) as FactorName[]) {
     factors[f] = Object.fromEntries(FACTORS[f].map((l) => [l, { all: 0, complete: 0 }]));
@@ -30,7 +30,7 @@ export function adminCounts(db: DB) {
       .prepare(
         `SELECT ${f} AS level, COUNT(*) AS n,
            SUM(CASE WHEN ${COMPLETE} THEN 1 ELSE 0 END) AS c
-         FROM participants GROUP BY ${f}`,
+         FROM participants WHERE is_pilot = 0 GROUP BY ${f}`,
       )
       .all() as { level: string; n: number; c: number }[];
     for (const r of rows) factors[f][r.level] = { all: r.n, complete: r.c };
@@ -40,6 +40,7 @@ export function adminCounts(db: DB) {
     completed: one('SELECT COUNT(*) AS n FROM participants WHERE completed_at IS NOT NULL'),
     withdrawn: one('SELECT COUNT(*) AS n FROM participants WHERE withdrawn = 1'),
     inWide: one(`SELECT COUNT(*) AS n FROM participants WHERE ${COMPLETE}`),
+    pilot: one('SELECT COUNT(*) AS n FROM participants WHERE is_pilot = 1'),
     factors,
   };
 }
@@ -71,8 +72,9 @@ small{color:#555}
 <tr><th>Completed the survey</th><td><b>${c.completed}</b></td></tr>
 <tr><th>Withdrawn (excluded from exports)</th><td><b>${c.withdrawn}</b></td></tr>
 <tr><th>Rows in wide.csv (completed, not withdrawn)</th><td><b>${c.inWide}</b></td></tr>
+<tr><th>Pilot participants (?pilot=1, included in exports with is_pilot = 1)</th><td><b>${c.pilot}</b></td></tr>
 </table>
-<h2>Randomized factors</h2>
+<h2>Randomized factors (real participants, pilots excluded)</h2>
 <table>
 <tr><th>Factor</th><th>Level</th><th>All</th><th>Completed, not withdrawn</th></tr>
 ${factorRows}

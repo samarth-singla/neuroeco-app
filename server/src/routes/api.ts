@@ -32,7 +32,7 @@ export function apiRouter(db: DB): Router {
       res.status(400).json({ error: 'consent required' });
       return;
     }
-    const p = createParticipant(db);
+    const p = createParticipant(db, Math.random, body.pilot === true);
     res.status(201).json(publicParticipant(p));
   });
 

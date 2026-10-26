@@ -18,6 +18,7 @@ export interface ParticipantRow extends Assignment {
   current_step: string;
   completed_at: string | null;
   withdrawn: number;
+  is_pilot: number;
 }
 
 export interface EventInput {
@@ -35,22 +36,26 @@ export interface ResponseInput {
 /** Steps that mean the participant has finished all data collection (survey done). */
 export const COMPLETED_STEPS = new Set(['debrief', 'thanks']);
 
-function levelCounts(db: DB): LevelCounts {
+// DECISION: pilot and real participants are balanced separately, so pilot runs never
+// unbalance the real sample.
+function levelCounts(db: DB, isPilot: number): LevelCounts {
   const counts: LevelCounts = {};
   for (const factor of Object.keys(FACTORS) as FactorName[]) {
     // factor names are fixed constants, never user input
     const rows = db
-      .prepare(`SELECT ${factor} AS level, COUNT(*) AS n FROM participants GROUP BY ${factor}`)
-      .all() as { level: string; n: number }[];
+      .prepare(
+        `SELECT ${factor} AS level, COUNT(*) AS n FROM participants WHERE is_pilot = ? GROUP BY ${factor}`,
+      )
+      .all(isPilot) as { level: string; n: number }[];
     counts[factor] = Object.fromEntries(rows.map((r) => [r.level, r.n]));
   }
   return counts;
 }
 
-export function createParticipant(db: DB, rng: Rng = Math.random): ParticipantRow {
+export function createParticipant(db: DB, rng: Rng = Math.random, pilot = false): ParticipantRow {
   // A transaction makes count + insert atomic, so parallel sign-ups cannot unbalance groups.
   const tx = db.transaction(() => {
-    const assignment = assignFactors(levelCounts(db), rng);
+    const assignment = assignFactors(levelCounts(db, pilot ? 1 : 0), rng);
     const row: ParticipantRow = {
       participant_id: randomUUID(),
       created_at: new Date().toISOString(),
@@ -60,12 +65,13 @@ export function createParticipant(db: DB, rng: Rng = Math.random): ParticipantRo
       current_step: 'app:A1',
       completed_at: null,
       withdrawn: 0,
+      is_pilot: pilot ? 1 : 0,
     };
     db.prepare(
       `INSERT INTO participants (participant_id, created_at, consented, app_version, round1_outcome,
-         withdrawal_offer, referral_source, money_source, stake_order, current_step, completed_at)
+         withdrawal_offer, referral_source, money_source, stake_order, current_step, completed_at, is_pilot)
        VALUES (@participant_id, @created_at, @consented, @app_version, @round1_outcome,
-         @withdrawal_offer, @referral_source, @money_source, @stake_order, @current_step, @completed_at)`,
+         @withdrawal_offer, @referral_source, @money_source, @stake_order, @current_step, @completed_at, @is_pilot)`,
     ).run(row);
     return row;
   });
