@@ -16,7 +16,7 @@ export type Skin = 'plain' | 'fraud';
  * set to true to make the game the default (the old survey flow is then only reachable with
  * `?game=0`).
  */
-export const GAME_IS_DEFAULT = false;
+export const GAME_IS_DEFAULT = true;
 
 export const APP_NAME: Record<Skin, string> = { fraud: 'ZenTrade X', plain: 'ZenTrade' };
 export const APP_TAGLINE: Record<Skin, string> = {

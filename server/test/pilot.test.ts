@@ -47,7 +47,7 @@ describe('pilot mode (?pilot=1)', () => {
     for (const p of [pilot, real]) {
       await request(app)
         .post(`/api/participants/${p.participant_id}/step`)
-        .send({ step: 'debrief' });
+        .send({ step: 'g:report' });
     }
     const get = async (file: string) =>
       (await request(app).get(`/api/export/${file}`).set('Authorization', basicAuth())).text;

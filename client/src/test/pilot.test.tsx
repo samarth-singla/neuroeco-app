@@ -26,12 +26,12 @@ beforeEach(() => {
 });
 afterEach(() => {
   vi.unstubAllGlobals();
-  window.history.replaceState({}, '', '/');
+  window.history.replaceState({}, '', '/?game=0');
 });
 
 describe('pilot link', () => {
   it('?pilot=1 creates a pilot participant', async () => {
-    window.history.replaceState({}, '', '/?pilot=1');
+    window.history.replaceState({}, '', '/?pilot=1&game=0');
     installFakeApi(makeAssignment());
     expect(await agree()).toEqual({ consented: true, pilot: true });
   });

@@ -575,3 +575,45 @@ service sleeps or redeploys), so a local SQLite file would lose data.
 - `// DECISION:` Prize-draw code = "ZT-" + first 8 hex characters of the participant id, so no extra data is stored
   and the team can match codes to rows.
 - `// DECISION:` Withdrawing data on the report card goes straight to the end screen (no share prompt).
+
+## Redesign Phase 6 — Logging and export
+
+**Status:** done
+
+**Built**
+- `server/src/wide.ts` rewritten for the game: one row per player who reached the report card (S14), not withdrawn
+  (106 columns). Assignments (skin, round-1 outcome, pool source, test withdrawal, reinvest framing, deal and spin
+  order); behaviour recomputed from the event log — `decision_time_first_invest`, `s3_choice`, `plan`,
+  `verify_any`/`verify_count`, `total_deposited`, `vip_upgrade`/`vip_taps`, `r1…r6_amount`, `escalation_ratio`,
+  `chat_open`, `chat_deposit`, `deal_invest_/deal_details_/deal_time_{500,3000,8000}`, `pool_join`/`pool_details`/
+  `pool_time`, `withdrew`, `post_withdrawal_deposit`, `reinvest_accept`/`reinvest_amount`, `crash_loss`,
+  `crash_topup`/`crash_topup_amount`/`crash_time`, `tax_shown`/`tax_paid`, `brain_correct`, `spin_net`,
+  `final_balance`; `trap_score`, `trap_possible` and one flag per trap (same shared function as the report card);
+  all 39 response items; derived `crt_score`, `lambda` (+ `la_consistent`, `la_accepted`), `literacy_score`,
+  `self_rated_literacy`, `overconfidence`, `feature_push_count`, `fomo_score`.
+- Scoring keys now come from the game config (answer key, spin gains); v1 λ / CRT / literacy / overconfidence
+  formulas unchanged.
+- `docs/data-dictionary.md` regenerated (grouped: assignments, behaviour, traps, response items, derived scores),
+  every column mapped to H1–H9.
+- `/admin`: factors shown with their game names (skin, pool invite source, reinvest framing…); "completed" = reached
+  the report card; "rows in wide.csv" uses the same filter as the export.
+- `server/scripts/simulate.ts` rewritten for the game: 40 headless players through the real API (every 10th stops at
+  the crash, some withdraw) — columns match the dictionary, no missing required values, conditional blanks exactly
+  where expected, trap score / round-1 stake / final balance match each player's own game state, factors balanced.
+- **The game is now the default flow** (`GAME_IS_DEFAULT = true`); the original survey flow is reachable only with
+  `?game=0` until it is removed in Phase 7.
+- Tests: new `wide.test.ts` (every derived column from a hand-built event log, honest-skin blanks, exclusions,
+  dictionary up to date). 46 server + 119 client tests pass; browser playthrough data exports correctly.
+
+**Decisions**
+- `// DECISION:` `wide.csv` contains game players only (current step `g:…`); any data from the original survey flow
+  remains in the raw `participants` / `events` / `responses` exports.
+- `// DECISION:` `trap_score` is recomputed from the raw events, never copied from the client's `report_shown` log;
+  `final_balance` and `spin_net` are taken from `report_shown` (descriptive only).
+- `// DECISION:` `deal_details_*` = details opened before deciding, for invested and skipped deals alike.
+- `// DECISION:` Column names in the database keep their v1 names (`app_version`, `referral_source`,
+  `money_source`); `wide.csv` uses the game names (`skin` honest/fraud, `pool_source`, `reinvest_framing` profit/main).
+
+**Open**
+- A player who was mid-way through the old survey flow when this deploys will see the game's consent screen after a
+  refresh (their partial v1 data stays in the raw exports).

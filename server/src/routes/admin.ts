@@ -18,6 +18,15 @@ function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
 
+/** Game names of the balanced factors (column names kept for older data) */
+const FACTOR_LABELS: Record<string, string> = {
+  app_version: 'Skin (plain = honest ZenTrade, fraud = ZenTrade X) — H1',
+  round1_outcome: 'Round-1 outcome — H2',
+  withdrawal_offer: 'Test withdrawal — H6',
+  referral_source: 'Pool invite source — H5',
+  money_source: 'Reinvest framing (profit / own = main wallet) — H7',
+};
+
 const COMPLETE = 'completed_at IS NOT NULL AND withdrawn = 0';
 
 export async function adminCounts(db: DB) {
@@ -38,7 +47,9 @@ export async function adminCounts(db: DB) {
     total: await one('SELECT COUNT(*) AS n FROM participants'),
     completed: await one('SELECT COUNT(*) AS n FROM participants WHERE completed_at IS NOT NULL'),
     withdrawn: await one('SELECT COUNT(*) AS n FROM participants WHERE withdrawn = 1'),
-    inWide: await one(`SELECT COUNT(*) AS n FROM participants WHERE ${COMPLETE}`),
+    inWide: await one(
+      `SELECT COUNT(*) AS n FROM participants WHERE ${COMPLETE} AND current_step LIKE 'g:%'`,
+    ),
     pilot: await one('SELECT COUNT(*) AS n FROM participants WHERE is_pilot = 1'),
     factors,
   };
@@ -51,7 +62,7 @@ async function adminPage(db: DB): Promise<string> {
       Object.entries(levels)
         .map(
           ([l, n], i) =>
-            `<tr>${i === 0 ? `<th rowspan="${Object.keys(levels).length}">${escapeHtml(f)}</th>` : ''}` +
+            `<tr>${i === 0 ? `<th rowspan="${Object.keys(levels).length}">${escapeHtml(FACTOR_LABELS[f] ?? f)}</th>` : ''}` +
             `<td>${escapeHtml(l)}</td><td>${n.all}</td><td>${n.complete}</td></tr>`,
         )
         .join(''),
@@ -68,7 +79,7 @@ small{color:#555}
 <h1>Study admin</h1>
 <table>
 <tr><th>Total participants (consented)</th><td><b>${c.total}</b></td></tr>
-<tr><th>Completed the survey</th><td><b>${c.completed}</b></td></tr>
+<tr><th>Completed (reached the report card)</th><td><b>${c.completed}</b></td></tr>
 <tr><th>Withdrawn (excluded from exports)</th><td><b>${c.withdrawn}</b></td></tr>
 <tr><th>Rows in wide.csv (completed, not withdrawn)</th><td><b>${c.inWide}</b></td></tr>
 <tr><th>Pilot participants (?pilot=1, included in exports with is_pilot = 1)</th><td><b>${c.pilot}</b></td></tr>
@@ -85,8 +96,8 @@ ${factorRows}
 <a class="btn" href="/api/export/events.csv">events.csv</a>
 <a class="btn" href="/api/export/responses.csv">responses.csv</a>
 </p>
-<p><small>wide.csv: one row per completed participant with derived scores (see docs/data-dictionary.md).
-The raw files include incomplete participants. Withdrawn participants are left out of every file.</small></p>
+<p><small>wide.csv: one row per game player who reached the report card, with derived scores (see docs/data-dictionary.md).
+The raw files include unfinished players and any data from the original survey flow. Withdrawn participants are left out of every file.</small></p>
 </body></html>`;
 }
 

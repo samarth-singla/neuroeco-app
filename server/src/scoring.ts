@@ -2,7 +2,11 @@
  * Derived scores, computed at export time (never in the browser).
  * Inputs are the raw `responses` values (strings) keyed by item id.
  */
-import { GAMBLE_GAINS, GAMBLE_LOSS } from '../../client/src/config/survey';
+import { ANSWER_KEY, SPINS } from '../../client/src/config/game';
+
+// Game bonus spins (S2): 50% lose ₹100 vs 50% win ₹50…₹300 — the v1 gamble task, same λ formula
+const GAMBLE_GAINS = SPINS.gains;
+const GAMBLE_LOSS = SPINS.loss;
 
 export type Answers = Record<string, string | undefined>;
 
@@ -13,7 +17,7 @@ function num(v: string | undefined): number | null {
 }
 
 /** Correct CRT answers (₹ version of bat-and-ball; machines; lily pads). */
-export const CRT_KEY: Record<string, number> = { crt_1: 5, crt_2: 5, crt_3: 47 };
+export const CRT_KEY: Record<string, number> = ANSWER_KEY.crt;
 
 /** CRT score 0–3; null if any item is missing. */
 export function crtScore(a: Answers): number | null {
@@ -58,11 +62,7 @@ export function lossAversion(a: Answers): LossAversion {
 }
 
 /** Correct Big Three answers. */
-export const LITERACY_KEY: Record<string, string> = {
-  lit_interest: 'more',
-  lit_inflation: 'less',
-  lit_diversification: 'false',
-};
+export const LITERACY_KEY: Record<string, string> = ANSWER_KEY.literacy;
 
 /** Literacy score 0–3 ("don't know" counts as wrong); null if any item is missing. */
 export function literacyScore(a: Answers): number | null {
