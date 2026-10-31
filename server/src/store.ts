@@ -3,6 +3,8 @@ import { all, get, run, type DB } from './db';
 import {
   assignFactors,
   FACTORS,
+  shuffledDeals,
+  shuffledSpins,
   shuffledStakes,
   type Assignment,
   type FactorName,
@@ -19,6 +21,8 @@ export interface ParticipantRow extends Assignment {
   completed_at: string | null;
   withdrawn: number;
   is_pilot: number;
+  deal_order: string;
+  spin_order: string;
 }
 
 export interface EventInput {
@@ -34,7 +38,7 @@ export interface ResponseInput {
 }
 
 /** Steps that mean the participant has finished all data collection (survey done). */
-export const COMPLETED_STEPS = new Set(['debrief', 'thanks']);
+export const COMPLETED_STEPS = new Set(['debrief', 'thanks', 'g:report', 'g:share', 'g:end']);
 
 // DECISION: pilot and real participants are balanced separately, so pilot runs never
 // unbalance the real sample.
@@ -80,12 +84,15 @@ export function createParticipant(
       completed_at: null,
       withdrawn: 0,
       is_pilot: pilot ? 1 : 0,
+      deal_order: shuffledDeals(rng).join(','),
+      spin_order: shuffledSpins(rng).join(','),
     };
     await run(
       db,
       `INSERT INTO participants (participant_id, created_at, consented, app_version, round1_outcome,
-         withdrawal_offer, referral_source, money_source, stake_order, current_step, completed_at, is_pilot)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         withdrawal_offer, referral_source, money_source, stake_order, current_step, completed_at, is_pilot,
+         deal_order, spin_order)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         row.participant_id,
         row.created_at,
@@ -99,6 +106,8 @@ export function createParticipant(
         row.current_step,
         row.completed_at,
         row.is_pilot,
+        row.deal_order,
+        row.spin_order,
       ],
     );
     return row;
@@ -171,6 +180,10 @@ export async function upsertResponses(
   return responses.length;
 }
 
+function toNumbers(csv: string | null | undefined): number[] {
+  return csv ? csv.split(',').map(Number) : [];
+}
+
 /** What the client needs to (re)start a participant. */
 export function publicParticipant(p: ParticipantRow) {
   return {
@@ -184,6 +197,8 @@ export function publicParticipant(p: ParticipantRow) {
       referral_source: p.referral_source,
       money_source: p.money_source,
       stake_order: p.stake_order.split(',').map(Number),
+      deal_order: toNumbers(p.deal_order),
+      spin_order: toNumbers(p.spin_order),
     },
   };
 }

@@ -390,3 +390,64 @@ service sleeps or redeploys), so a local SQLite file would lose data.
 - The real Turso connection was not tested from here (no credentials in this environment); the remote path uses
   the same client and SQL as the local tests. The first Render deploy log should show
   `Server listening … (database: Turso …)`.
+
+---
+
+# Redesign (REDESIGN_PLAN.md) — immersive game "ZenTrade"
+
+## Redesign Phase 1 — Game engine and economy
+
+**Status:** done
+
+**Built**
+- `client/src/config/game.ts`: every number, timing, text and list of the game (economy, rates, VIP ladder,
+  deals, pool, chat, toasts, ticker, profile / brain-bonus / quick-reaction items, answer key, trap texts, safety
+  tips, `PRIZE_DRAW` flag). Pure data, also imported by the server.
+- `client/src/game/economy.ts`: wallets (Main, Profit, Portfolio, Cashed out, locked bonus, tax paid), trades,
+  lock-ins, crash, cash-out, tax, VIP levels, spin results, final balance.
+- `client/src/game/steps.ts`: the fixed step sequence (S1 profile ×8 → S2 spins ×6 → S3 home → rounds 1–3 →
+  S5 brain ×6 → round 4 → S6 chat → rounds 5–6 → S7 deals ×3 → S8 pool → S9 withdrawal → S10 reinvest → S11
+  crash → S12 cash-out → S13 reactions ×12 → S14 report → S15 share → end). Step ids (`g:<stage>:<n>`) are the
+  participant's `current_step`, so a refresh resumes on the same screen.
+- `client/src/game/reducer.ts`: one pure reducer for every player action. Each action returns the new state and
+  the events to log, so the UI and the headless player log identical events. Repeated actions (refresh) are
+  ignored.
+- `client/src/game/traps.ts`: trap score (0–10; tax trap fraud-only, so honest max is 9) computed from "facts";
+  facts come from the game state (report card) or from the event log (export) — the same function.
+- `client/src/game/sim.ts`: seeded headless player used by tests (and later the server simulation).
+- Server: new per-participant order factors `deal_order` (₹500/3,000/8,000) and `spin_order` (₹50…300) — new
+  columns added with `ensureColumn`, returned in the assignment; `g:report` / `g:share` / `g:end` mark completion.
+  The five balanced factors are unchanged (skin = `app_version` plain/fraud, round-1 outcome, test withdrawal,
+  pool invite source = `referral_source`, reinvest framing = `money_source`).
+- Tests: economy rules, step order, a headless run through every stage for all 32 factor combinations × 15 random
+  players (wallets never negative, every deal affordable, both H7 framings can fund ₹2,000, all items answered,
+  report-card trap score = event-log trap score), refresh guards, 60-second chat-deposit window; server: order
+  permutations, assignment fields, completion at `g:report`. 45 server + 84 client tests pass.
+
+**Decisions**
+- `// DECISION:` The skin is stored in the existing `app_version` column: `plain` = honest "ZenTrade",
+  `fraud` = "ZenTrade X" (the column has a CHECK constraint that cannot be changed in SQLite).
+- `// DECISION:` Economy: round stakes and flash deals are trades (stake stays in Main, gain → Profit, loss comes
+  off Main), so every deal is affordable whatever was done before (no balance confound for H3). The pool, the
+  post-withdrawal deposit, the Gold Plan and the Loss Shield top-up lock money in the Portfolio.
+- `// DECISION:` A fixed ₹2,000 "6-round streak reward" goes to Profit after round 6 in both skins, so the
+  profit framing of the H7 offer is always fundable; the post-withdrawal deposit is capped at ₹5,000 so the
+  main-wallet framing is always fundable too.
+- `// DECISION:` The crash takes 40% off Main and Portfolio (not Profit), so every player experiences a loss (H4).
+- `// DECISION:` Test withdrawal comes from Main. Final balance = Main + Profit + Portfolio + Cashed out − tax paid
+  + spin results; money frozen by the fraud skin's withdrawal block still counts, so the optional prize draw
+  depends on choices only.
+- `// DECISION:` Total deposited counts every amount invested (round stakes, deals, pool, deposits, Gold Plan,
+  top-up). VIP 2 = ₹5,000 total, as in the plan.
+- `// DECISION:` Traps 8–10 ("plus 3 more"): never opened any T&C/details/badge; deposited right after the
+  withdrawal stage; accepted the Gold Plan offer. Trap 1 ("locked-bonus deposit") = deposited in round 1, so it is
+  measurable in both skins.
+- `// DECISION:` Prior financial education (H8 IV) is kept as a 7th profile tap; the "ever scammed" question is
+  dropped (asking it before the game would prime suspicion).
+- `// DECISION:` Bonus-spin choices are also stored in `responses` as `la_gain_<X>` so the v1 λ formula is reused.
+- `// DECISION:` While the game is being built, the live site keeps the current study as the default; the game
+  runs only with `?game=1` until the export is switched over (Redesign Phase 6). Render deploys every push, so
+  this avoids showing a half-built game to participants.
+
+**Open**
+- UI for all stages: Redesign Phases 2–5.

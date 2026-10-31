@@ -97,6 +97,9 @@ export async function openDb(target: string, authToken?: string): Promise<DB> {
   await ensureColumn(db, 'participants', 'withdrawn', 'INTEGER NOT NULL DEFAULT 0');
   // Phase 10: participants who came through a ?pilot=1 link (excluded from analysis)
   await ensureColumn(db, 'participants', 'is_pilot', 'INTEGER NOT NULL DEFAULT 0');
+  // Redesign: game order factors (comma-separated amounts in the order shown)
+  await ensureColumn(db, 'participants', 'deal_order', "TEXT NOT NULL DEFAULT ''");
+  await ensureColumn(db, 'participants', 'spin_order', "TEXT NOT NULL DEFAULT ''");
   return db;
 }
 
