@@ -119,7 +119,7 @@ function PlanCard({
       className={
         fraud
           ? `rounded-2xl border p-3 transition ${selected ? 'border-gold-400 bg-gold-400/10 shadow-[0_0_25px_rgba(251,191,36,0.35)]' : 'border-white/10 bg-white/5'}`
-          : `rounded-xl border p-3 ${selected ? 'border-slate-900 bg-white ring-2 ring-slate-900' : 'border-slate-200 bg-white'}`
+          : `rounded-xl border p-3 ${selected ? 'border-blue-700 bg-white ring-2 ring-blue-700' : 'border-slate-200 bg-white'}`
       }
     >
       <button type="button" onClick={onSelect} aria-pressed={selected} className="w-full text-left">
@@ -174,7 +174,6 @@ export function Home() {
 
   const actions = (
     <>
-      {!fraud && <p className="pb-1 text-xs text-slate-600">{TERMS.text}</p>}
       <CtaButton skin={skin} disabled={!planId} onClick={() => choose('invest')}>
         {planId ? (fraud ? 'INVEST NOW 🚀' : 'Invest in this plan') : 'Select a plan'}
       </CtaButton>
@@ -194,9 +193,33 @@ export function Home() {
             <div className="mt-1 text-xs text-neon-300">▲ +312% average monthly return</div>
           </div>
         ) : (
-          <Title skin={skin} sub="Pick a plan to trade with in the next rounds, or skip.">
-            Your practice account
-          </Title>
+          <>
+            <Title skin={skin} sub="Pick a plan to trade with in the next rounds, or skip.">
+              Your practice account
+            </Title>
+            <Panel skin={skin}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs text-slate-500">Practice market today</div>
+                  <div className="text-lg font-semibold text-slate-900">ZenTrade index</div>
+                </div>
+                <div className="rounded-full bg-green-50 px-2.5 py-1 text-sm font-semibold text-green-700">
+                  ▲ 0.6%
+                </div>
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs text-slate-600">
+                <div className="rounded-lg bg-slate-50 py-1.5">
+                  <div className="font-semibold text-slate-900">6</div>rounds
+                </div>
+                <div className="rounded-lg bg-slate-50 py-1.5">
+                  <div className="font-semibold text-slate-900">3</div>plans
+                </div>
+                <div className="rounded-lg bg-slate-50 py-1.5">
+                  <div className="font-semibold text-slate-900">₹0</div>fees
+                </div>
+              </div>
+            </Panel>
+          </>
         )}
 
         {fraud ? (

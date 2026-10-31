@@ -86,7 +86,8 @@ export function simulateGame(
     return opts.length ? pick(opts) : 0;
   };
   const act = (action: GameAction) => {
-    at += 500 + Math.floor(rng() * 4000);
+    // fixed step so both skins (same seed) make identical random choices
+    at += 2500;
     const r = reduce(s, action, a);
     s = r.state;
     for (const e of r.events) events.push({ ...e, at });
@@ -124,7 +125,8 @@ export function simulateGame(
         break;
       case 'round': {
         const round = i;
-        if (a.app_version === 'fraud' && chance(0.2)) act({ type: 'vip_tap' });
+        const tap = chance(0.2); // drawn in both skins so the random sequence stays aligned
+        if (a.app_version === 'fraud' && tap) act({ type: 'vip_tap' });
         if (chance(policy.invest)) {
           act({ type: 'round_invest', round, amount: amount(s.wallets.main), at: at + 1000 });
         } else act({ type: 'round_skip', round });

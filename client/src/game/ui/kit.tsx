@@ -38,7 +38,7 @@ export function CtaButton({
       className={
         fraud
           ? `w-full rounded-2xl bg-linear-to-r from-gold-500 via-gold-300 to-gold-500 px-4 py-4 text-lg font-black tracking-wide text-black uppercase disabled:animate-none disabled:opacity-40 ${disabled ? '' : 'animate-pulse-cta'} ${className}`
-          : `w-full rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white hover:bg-slate-800 disabled:opacity-40 ${className}`
+          : `w-full rounded-xl bg-blue-700 px-4 py-3 text-base font-semibold text-white hover:bg-blue-800 disabled:opacity-40 ${className}`
       }
       {...rest}
     >
@@ -464,7 +464,7 @@ export function AmountPicker({
         className={
           fraud
             ? 'mt-1 flex items-center rounded-2xl border border-neon-400/30 bg-black/40 px-3 focus-within:border-neon-400'
-            : 'mt-1 flex items-center rounded-xl border border-slate-300 bg-white px-3 focus-within:border-slate-900'
+            : 'mt-1 flex items-center rounded-xl border border-slate-300 bg-white px-3 focus-within:border-blue-700'
         }
       >
         <span className={fraud ? 'text-xl text-neon-400' : 'text-lg text-slate-500'}>₹</span>
@@ -490,7 +490,7 @@ export function AmountPicker({
             className={
               fraud
                 ? `rounded-full border px-3 py-1.5 text-sm font-bold ${value === q ? 'border-gold-400 bg-gold-400 text-black' : 'border-white/15 bg-white/5 text-white'}`
-                : `rounded-full border px-3 py-1.5 text-sm ${value === q ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-300 bg-white text-slate-700'}`
+                : `rounded-full border px-3 py-1.5 text-sm ${value === q ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-700'}`
             }
           >
             {q === cap && q === max && q > 0

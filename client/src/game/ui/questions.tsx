@@ -27,7 +27,7 @@ export function ChoiceList({
           className={
             fraud
               ? `w-full rounded-2xl border px-4 py-3.5 text-left text-base font-bold transition ${value === o.value ? 'border-neon-400 bg-neon-500/20 text-white' : 'border-white/10 bg-white/5 text-white hover:border-neon-400/50'}`
-              : `w-full rounded-xl border px-4 py-3 text-left text-base transition ${value === o.value ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-300 bg-white text-slate-800 hover:border-slate-500'}`
+              : `w-full rounded-xl border px-4 py-3 text-left text-base transition ${value === o.value ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-800 hover:border-slate-500'}`
           }
         >
           {o.label}
@@ -68,7 +68,7 @@ export function Scale7({
             className={
               fraud
                 ? `h-12 rounded-xl border text-lg font-black ${value === n ? 'border-gold-400 bg-gold-400 text-black' : 'border-white/10 bg-white/5 text-white'}`
-                : `h-12 rounded-lg border text-base font-semibold ${value === n ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-300 bg-white text-slate-800'}`
+                : `h-12 rounded-lg border text-base font-semibold ${value === n ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-800'}`
             }
           >
             {n}
@@ -130,7 +130,7 @@ export function NumberAnswer({
         className={
           fraud
             ? 'mt-3 w-full rounded-2xl bg-neon-500 px-4 py-3 text-base font-black text-black disabled:opacity-40'
-            : 'mt-3 w-full rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white disabled:opacity-40'
+            : 'mt-3 w-full rounded-xl bg-blue-700 px-4 py-3 text-base font-semibold text-white disabled:opacity-40'
         }
       >
         Submit answer

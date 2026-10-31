@@ -113,7 +113,7 @@ export function Profile() {
         className={`mt-6 h-1.5 overflow-hidden rounded-full ${fraud ? 'bg-white/10' : 'bg-slate-200'}`}
       >
         <div
-          className={fraud ? 'h-full bg-gold-400' : 'h-full bg-slate-900'}
+          className={fraud ? 'h-full bg-gold-400' : 'h-full bg-blue-700'}
           style={{ width: `${Math.round((i / PROFILE.length) * 100)}%` }}
         />
       </div>

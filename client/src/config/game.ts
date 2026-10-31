@@ -214,6 +214,10 @@ export const TRUST = {
   ],
 };
 
+/** Honest skin: readable risk line right above the buttons on every money screen */
+export const RISK_WARNING =
+  'Returns are not guaranteed. You can lose some or all of the money you invest.';
+
 export const TERMS = {
   short: 'T&C',
   text: 'Returns are not guaranteed. Past results do not predict future results. You may lose some or all of the money you invest. Deposits may be locked. Withdrawals may be subject to processing fees and verification.',

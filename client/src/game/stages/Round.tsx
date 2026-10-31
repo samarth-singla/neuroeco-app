@@ -184,7 +184,20 @@ export function Round() {
       )}
 
       {showResult && (
-        <div className="mt-4 text-center" data-testid="round-result">
+        <div
+          className={
+            fraud
+              ? 'mt-4 text-center'
+              : 'animate-pop mt-4 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm'
+          }
+          data-testid="round-result"
+        >
+          {!fraud && (
+            <div className="mb-1 text-xs font-semibold tracking-wide text-slate-500 uppercase">
+              Round {round} result ·{' '}
+              {settled.amount > 0 ? `invested ${formatINR(settled.amount)}` : 'not invested'}
+            </div>
+          )}
           {settled.amount > 0 ? (
             settled.gain > 0 ? (
               fraud ? (

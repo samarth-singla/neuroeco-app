@@ -493,3 +493,29 @@ service sleeps or redeploys), so a local SQLite file would lose data.
 
 **Open**
 - Honest skin polish (Phase 3), swipe cards and full mini-game polish (Phase 4), report card and share (Phase 5).
+
+## Redesign Phase 3 — Honest skin UI
+
+**Status:** done
+
+**Built**
+- Every stage renders the honest "ZenTrade" skin from the same components (`skin` prop): clean light theme with a
+  fintech blue accent, normal-size numbers, returns as plain ranges with a risk label, Invest and Skip buttons of
+  equal size and weight, readable risk line ("Returns are not guaranteed…") right above the buttons on every money
+  screen, readable "Terms and risks" / "Details" links, "About" page instead of the badge, Help & FAQ card instead
+  of the mentor chat, a calm "practice market today" card, result cards that pop in. No toasts, ticker, countdowns,
+  scarcity, badges, testimonials, VIP ladder or confetti.
+- `client/src/game/skinParity.test.ts`: the same player (same seed → same choices) is run through both skins for
+  all 16 non-skin condition combinations × 12 players and compared screen by screen — identical step order, Main,
+  Portfolio, Cashed-out and Profit(+locked bonus) balances, round and deal payoffs, crash loss, total deposited,
+  spins and brain-bonus results. Also checks that all timings and amounts are single, skin-independent numbers.
+- Played end to end in Edge at 360 px: no errors, no covered buttons, no horizontal scroll. 61 game tests pass.
+
+**Decisions**
+- `// DECISION:` The honest skin keeps gentle, non-manipulative feedback (animated counters, live chart, result
+  cards popping in) so it is not duller than the fraud skin (plan rule 7); only the dark-design layer differs.
+- `// DECISION:` The only allowed skin differences in the economy are the manipulations themselves: the ₹500 bonus
+  is locked until the first deposit in the fraud skin (honest: credited at once) and the fraud skin blocks the
+  final withdrawal with a tax.
+- The headless player now advances its clock by a fixed step and draws the fraud-only "VIP tap" in both skins, so the
+  same seed gives the same choices in both skins.

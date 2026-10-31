@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { APP_NAME, APP_TAGLINE, TICKER, TIMING, TOASTS, TRUST, type Skin } from '../../config/game';
+import {
+  APP_NAME,
+  APP_TAGLINE,
+  RISK_WARNING,
+  TICKER,
+  TIMING,
+  TOASTS,
+  TRUST,
+  type Skin,
+} from '../../config/game';
 import { RESEARCH_FOOTER } from '../../config/session';
 import { logEvent } from '../../lib/logger';
 import { toNextVip, vipLevel } from '../economy';
@@ -30,7 +39,7 @@ const STAGE_NAMES = [
 function Logo({ skin, size = 30 }: { skin: Skin; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
-      <rect width="64" height="64" rx="16" fill={skin === 'fraud' ? '#0c1a14' : '#0f172a'} />
+      <rect width="64" height="64" rx="16" fill={skin === 'fraud' ? '#0c1a14' : '#1d4ed8'} />
       <path
         d="M14 46 L28 30 L36 38 L50 18"
         fill="none"
@@ -223,7 +232,7 @@ function LevelBar({ step, skin }: { step: string; skin: Skin }) {
         className={`mt-1 h-1.5 overflow-hidden rounded-full ${fraud ? 'bg-white/10' : 'bg-slate-200'}`}
       >
         <div
-          className={`h-full rounded-full transition-all duration-500 ${fraud ? 'bg-linear-to-r from-neon-500 to-gold-400' : 'bg-slate-900'}`}
+          className={`h-full rounded-full transition-all duration-500 ${fraud ? 'bg-linear-to-r from-neon-500 to-gold-400' : 'bg-blue-700'}`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -315,7 +324,16 @@ export function GameShell({
           data-sticky="bottom"
           className={`sticky bottom-0 z-20 ${fraud ? 'bg-void-950/95 backdrop-blur' : 'border-t border-slate-200 bg-white'}`}
         >
-          {actions && <div className="space-y-1 px-4 pt-3 pb-2">{actions}</div>}
+          {actions && (
+            <div className="space-y-1 px-4 pt-3 pb-2">
+              {!fraud && market && (
+                <p className="pb-1 text-xs text-slate-600" data-testid="risk-warning">
+                  ⚠️ {RISK_WARNING}
+                </p>
+              )}
+              {actions}
+            </div>
+          )}
           <div
             className={`px-3 py-1 text-center text-[10px] ${fraud ? 'text-white/30' : 'text-slate-400'}`}
           >

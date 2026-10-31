@@ -215,7 +215,7 @@ export function Reinvest() {
           step={ECONOMY.reinvest.step}
           value={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
-          className={`mt-2 w-full ${fraud ? 'accent-amber-400' : 'accent-slate-900'}`}
+          className={`mt-2 w-full ${fraud ? 'accent-amber-400' : 'accent-blue-700'}`}
         />
         <div
           className={`flex justify-between text-xs ${fraud ? 'text-white/40' : 'text-slate-500'}`}
