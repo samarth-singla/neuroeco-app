@@ -519,3 +519,6 @@ service sleeps or redeploys), so a local SQLite file would lose data.
   final withdrawal with a tax.
 - The headless player now advances its clock by a fixed step and draws the fraud-only "VIP tap" in both skins, so the
   same seed gives the same choices in both skins.
+- Note: one client test failed once during the Phase 3 commit run and passed in every rerun (6 runs). The only
+  timing-sensitive client test (real-time countdown) now has more headroom, and the client suite's per-test timeout
+  is 15 s. Committed as a follow-up fix.

@@ -36,13 +36,13 @@ describe('countdown timer (H1a)', () => {
 
   it(
     'never blocks progress: both A2 choices still work after the timer runs out',
-    { timeout: 10000 },
+    { timeout: 20000 },
     async () => {
       URGENCY.timerSeconds = 2; // run out quickly, in real time
       const api = installFakeApi(makeAssignment({ app_version: 'fraud' }));
       seedAt('app:A2', makeAssignment({ app_version: 'fraud' }));
       render(<App />);
-      await screen.findByText(URGENCY.resetLabel, {}, { timeout: 4000 });
+      await screen.findByText(URGENCY.resetLabel, {}, { timeout: 9000 });
       expect(screen.getByRole('button', { name: 'Continue without investing' })).toBeEnabled();
       fireEvent.click(screen.getByRole('button', { name: /Growth/ }));
       expect(screen.getByRole('button', { name: 'Invest in this plan' })).toBeEnabled();

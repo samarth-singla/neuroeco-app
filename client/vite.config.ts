@@ -18,5 +18,7 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}'],
     setupFiles: ['src/test/setup.ts'],
+    // jsdom flow tests are heavy; a generous limit keeps them from failing on a busy machine
+    testTimeout: 15000,
   },
 });
