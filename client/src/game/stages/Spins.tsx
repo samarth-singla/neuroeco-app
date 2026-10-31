@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { SPINS } from '../../config/game';
+import { SPINS, TIMING } from '../../config/game';
 import { clientNow } from '../../lib/logger';
 import { useLog } from '../../lib/useLog';
 import { formatINR } from '../economy';
@@ -7,8 +7,6 @@ import { useGame } from '../GameProvider';
 import { nextStep, stepIndex } from '../steps';
 import { GameShell } from '../ui/GameShell';
 import { CtaButton, SkipButton } from '../ui/kit';
-
-const SPIN_MS = 1100;
 
 function Wheel({ spinning }: { spinning: boolean }) {
   const colors = [
@@ -36,7 +34,7 @@ function Wheel({ spinning }: { spinning: boolean }) {
         viewBox="0 0 100 100"
         className="h-full w-full drop-shadow-[0_0_25px_rgba(251,191,36,0.45)]"
         style={{
-          transition: `transform ${SPIN_MS}ms cubic-bezier(.2,.8,.2,1)`,
+          transition: `transform ${TIMING.spinMs}ms cubic-bezier(.2,.8,.2,1)`,
           transform: spinning ? 'rotate(1440deg)' : 'rotate(0deg)',
         }}
       >
@@ -65,7 +63,7 @@ export function Spins() {
 
   useEffect(() => {
     if (!busy) return;
-    const id = setTimeout(() => go(nextStep(step)), SPIN_MS + 300);
+    const id = setTimeout(() => go(nextStep(step)), TIMING.spinMs + 300);
     return () => clearTimeout(id);
   }, [busy, go, step]);
 

@@ -522,3 +522,27 @@ service sleeps or redeploys), so a local SQLite file would lose data.
 - Note: one client test failed once during the Phase 3 commit run and passed in every rerun (6 runs). The only
   timing-sensitive client test (real-time countdown) now has more headroom, and the client suite's per-test timeout
   is 15 s. Committed as a follow-up fix.
+
+## Redesign Phase 4 — Mini-games and quick reactions
+
+**Status:** done
+
+**Built**
+- S2 bonus spins: wheel animation (fraud) / coin card (honest), accept or skip each of six "50% lose ₹100 / 50% win
+  ₹X" offers in the player's `spin_order`; the outcome is drawn at once but only revealed on the report card. Choices
+  stored as `la_gain_<X>` = accept / reject. Spin duration in `TIMING.spinMs`.
+- S5 brain bonus: 3 CRT puzzles (number entry) then the Big Three literacy questions (choices), one per screen; a
+  correct answer adds ₹100 to Profit; fraud skin shows a timer ring (visual only, restarts); time per answer logged.
+- S13 quick reactions (`ui/SwipeCard.tsx`, `ui/FeatureMini.tsx`): 7 swipe cards "Did this push you to invest?",
+  each showing a small re-render of the feature as the player saw it in their own skin (fraud element or honest
+  counterpart); drag right = Yes, left = No, or tap the buttons (method logged). Then a trust slider and an urgency
+  slider (1–7, must be touched before Next), then 3 FOMO statements as agree / disagree swipe cards.
+- Tests (`client/src/test/miniGames.test.tsx`, both skins): profile + spins, brain bonus and reactions played in
+  jsdom against a fake API — every one of the 39 game response items arrives in `responses`; spin outcomes are never
+  shown before the report card; correct brain answers pay ₹100 each; sliders cannot be skipped. Played in Edge at
+  360 px including a real swipe gesture: no errors, no covered buttons. 45 server + 107 client tests pass.
+
+**Decisions**
+- `// DECISION:` Swipe is optional — every card also has two buttons, so the task works with keyboard and screen
+  readers, and the answer method (swipe / tap) is logged.
+- `// DECISION:` FOMO score = number of "agree" answers (0–3).

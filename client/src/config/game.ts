@@ -111,6 +111,8 @@ export const TIMING = {
   toastVisibleMs: 3200,
   /** Mentor chat typing delay per message */
   chatTypingMs: 1100,
+  /** Bonus-spin wheel animation before moving on */
+  spinMs: 1100,
   /** Brain-bonus timer ring (visual only, restarts) */
   brainRingSec: 20,
 };
