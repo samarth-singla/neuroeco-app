@@ -11,6 +11,13 @@
 
 export type Skin = 'plain' | 'fraud';
 
+/**
+ * Which flow a normal study link runs. While the game is being built it is reached with `?game=1`;
+ * set to true to make the game the default (the old survey flow is then only reachable with
+ * `?game=0`).
+ */
+export const GAME_IS_DEFAULT = false;
+
 export const APP_NAME: Record<Skin, string> = { fraud: 'ZenTrade X', plain: 'ZenTrade' };
 export const APP_TAGLINE: Record<Skin, string> = {
   fraud: 'India’s #1 smart earning app',

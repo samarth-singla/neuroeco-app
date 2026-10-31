@@ -7,6 +7,9 @@ import { SurveyPage } from './screens/SurveyPage';
 import { FeaturePreview } from './features/FeaturePreview';
 import { Consent } from './screens/Consent';
 import { Debrief, Thanks } from './screens/Debrief';
+import { GameApp } from './game/GameApp';
+import { loadSavedGame } from './game/GameProvider';
+import { GAME_IS_DEFAULT } from './config/game';
 import { A1Welcome } from './screens/app/A1Welcome';
 import { A2Plans } from './screens/app/A2Plans';
 import { DepositScreen } from './screens/app/DepositScreen';
@@ -95,7 +98,19 @@ function Router() {
   return <Thanks />;
 }
 
+/** Game (redesign) or the original survey flow. A started game always resumes as a game. */
+function useGameFlow(): boolean {
+  const flag = new URLSearchParams(window.location.search).get('game');
+  if (flag === '1') return true;
+  if (flag === '0') return false;
+  return GAME_IS_DEFAULT || loadSavedGame() !== null;
+}
+
 export default function App() {
+  return useGameFlow() ? <GameApp /> : <SurveyApp />;
+}
+
+function SurveyApp() {
   const { status, initial, start } = useBootstrap();
   if (status === 'loading') return <StudyLayout>Loading…</StudyLayout>;
   if (!initial) return <Consent onAgree={() => start(isPilotLink())} />;

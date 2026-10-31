@@ -451,3 +451,45 @@ service sleeps or redeploys), so a local SQLite file would lose data.
 
 **Open**
 - UI for all stages: Redesign Phases 2–5.
+
+## Redesign Phase 2 — Fraud skin UI
+
+**Status:** done
+
+**Built**
+- `client/src/game/GameProvider.tsx`: game state on top of the Phase 1 reducer — logs the reducer's events exactly
+  once, sends the step to the server, saves to sessionStorage (also right after consent), and queues answers for
+  `responses` in the background with retries.
+- `client/src/game/GameApp.tsx`: consent (existing screen) → new player → stage router; resumes after refresh.
+  Reached with `?game=1` while `GAME_IS_DEFAULT` (in `config/game.ts`) is false.
+- UI kit (`client/src/game/ui/`): `GameShell` (header with ★ 4.9 · 10 lakh+ users and a tappable "NDIA Certified"
+  badge → certificate, scrolling withdrawal ticker, winner toasts every 4–7 s, a "LIVE · traders online" line between
+  toasts, wallets Main/Profit/Portfolio with locked bonus and VIP chip, level bar, sticky action bar, research
+  footer), giant pulsing gold INVEST NOW with vibration, tiny grey "skip" and T&C links, animated counters,
+  confetti + coins on wins, greyed quick loss results, resetting countdowns, live chart that draws the scripted
+  result, typing chat, timer ring, optional synthesized sounds (off by default, mute toggle).
+- All stages in the fraud skin: S1 profile (+ avatar picker, "Profile 100% complete!"), S2 spin wheel, S3
+  dashboard (live "members earned today", locked ₹500 bonus, countdown + "only 3 slots left", plan cards with huge
+  returns, VIP ladder, WhatsApp-style testimonials, T&C), S4 six rounds (VIP "Upgrade" shortcut, unlock-bonus nudge,
+  streak reward), S5 brain bonus, S6 "Rohit Sir" chat with typing, S7 flashing flash deals with details sheets,
+  S8 pool invite (friend message / sponsored ad), S9 test withdrawal ("Money sent!") or lock + deposit offer,
+  S10 Gold Plan with slider, S11 crash (red flash, shake, "recover in 10 minutes"), S12 tax block (freeze warning,
+  support message, Pay tax / Don't pay), S13 quick reactions, basic S14 report / S15 share (finished in Phases 4–5).
+- Checked in Edge at 360 px with a scripted playthrough: whole game completes, no page errors, no horizontal
+  scroll, and a hit-test on every visible button on every screen (including while toasts, confetti and the chat are
+  showing) finds nothing covering any button.
+
+**Decisions**
+- `// DECISION:` Toasts sit in a reserved lane in the header (part of the layout, not floating), and confetti,
+  coins and the crash flash are confined to the content area under the sticky header and action bar — so no
+  overlay can cover a button or amount field.
+- `// DECISION:` Ticker and toasts appear only on "in-app" money screens (S3–S12), not on the profile, spins,
+  brain bonus, reactions or report card.
+- `// DECISION:` Both choices on a round (invest or skip) play the same chart animation, so skipping is not faster.
+- `// DECISION:` The "withdrawals locked" message names the VIP level above the player's own (round stakes count
+  toward VIP, so most players are already VIP 2 by then).
+- `// DECISION:` Flash deals settle immediately (+5%) and show the result, so each deal starts with the same Main
+  balance (no affordability confound for H3).
+
+**Open**
+- Honest skin polish (Phase 3), swipe cards and full mini-game polish (Phase 4), report card and share (Phase 5).

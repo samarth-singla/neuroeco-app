@@ -12,6 +12,174 @@
   --color-gold-300: #fcd34d;
   --color-gold-400: #fbbf24;
   --color-gold-500: #f59e0b;
+
+  /* Fraud skin ("ZenTrade X") */
+  --color-neon-300: #6dffb0;
+  --color-neon-400: #22ff88;
+  --color-neon-500: #00e676;
+  --color-void-950: #030806;
+  --color-void-900: #07110d;
+  --color-void-800: #0c1a14;
+  --color-void-700: #12261d;
+
+  --animate-pulse-cta: pulse-cta 1.4s ease-in-out infinite;
+  --animate-marquee: marquee 28s linear infinite;
+  --animate-toast-in: toast-in 0.35s ease-out both;
+  --animate-flash-red: flash-red 0.9s ease-out both;
+  --animate-shake: shake 0.5s ease-in-out both;
+  --animate-blink: blink 1s steps(2, start) infinite;
+  --animate-glow: glow 2.4s ease-in-out infinite;
+  --animate-pop: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  --animate-shimmer: shimmer 2.2s linear infinite;
+  --animate-spin-slow: spin 3s linear infinite;
+}
+
+@keyframes pulse-cta {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 0 rgba(251, 191, 36, 0.55),
+      0 8px 30px rgba(251, 191, 36, 0.35);
+  }
+  50% {
+    transform: scale(1.035);
+    box-shadow:
+      0 0 0 10px rgba(251, 191, 36, 0),
+      0 8px 40px rgba(251, 191, 36, 0.6);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-120%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes flash-red {
+  0% {
+    background-color: rgba(239, 68, 68, 0.75);
+  }
+  100% {
+    background-color: rgba(239, 68, 68, 0);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 18px rgba(34, 255, 136, 0.18);
+  }
+  50% {
+    box-shadow: 0 0 34px rgba(34, 255, 136, 0.42);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--dx, 0), 105vh, 0) rotate(720deg);
+    opacity: 0.9;
+  }
+}
+
+@keyframes coin-up {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx, 0), -160px) scale(1.1);
+    opacity: 0;
+  }
+}
+
+@keyframes typing {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 html,
@@ -32,4 +200,39 @@ body {
     Roboto,
     sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.fraud-bg {
+  background:
+    radial-gradient(120% 60% at 0% 0%, rgba(34, 255, 136, 0.12), transparent 60%),
+    radial-gradient(90% 50% at 100% 10%, rgba(251, 191, 36, 0.12), transparent 60%),
+    radial-gradient(80% 60% at 50% 100%, rgba(0, 230, 118, 0.08), transparent 60%), #030806;
+}
+
+.gold-text {
+  background: linear-gradient(90deg, #fde68a, #fbbf24, #f59e0b, #fde68a);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+.neon-text {
+  color: #22ff88;
+  text-shadow: 0 0 18px rgba(34, 255, 136, 0.55);
+}
+
+.glow-card {
+  position: relative;
+  border: 1px solid rgba(34, 255, 136, 0.25);
+  background: linear-gradient(160deg, rgba(18, 38, 29, 0.95), rgba(7, 17, 13, 0.95));
+}
+
+.typing-dot {
+  animation: typing 1.2s infinite;
 }
