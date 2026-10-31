@@ -27,6 +27,8 @@ export interface SavedGame {
   game: GameState;
   /** Answers not yet confirmed by the server (retried in the background) */
   pending: { item_id: string; value: string | number }[];
+  /** Set when the player withdrew their data on the report card */
+  withdrawn?: boolean;
 }
 
 const KEY = 'neuroeco:game:v1';
@@ -101,6 +103,9 @@ interface GameApi {
   go: (step: string) => void;
   /** Store a response item (sent to the server in the background, retried until saved). */
   respond: (itemId: string, value: string | number) => void;
+  /** True after the player withdrew their data on the report card */
+  withdrawn: boolean;
+  setWithdrawn: () => void;
 }
 
 const Ctx = createContext<GameApi | null>(null);
@@ -188,6 +193,10 @@ export function GameProvider({ initial, children }: { initial: SavedGame; childr
     api.setStep(saved.participantId, saved.game.step).catch(() => undefined);
   }, [saved.participantId, saved.game.step]);
 
+  const setWithdrawn = useCallback(() => {
+    commit({ ...ref.current, withdrawn: true });
+  }, [commit]);
+
   const value = useMemo<GameApi>(
     () => ({
       game: saved.game,
@@ -197,8 +206,10 @@ export function GameProvider({ initial, children }: { initial: SavedGame; childr
       dispatch,
       go,
       respond,
+      withdrawn: !!saved.withdrawn,
+      setWithdrawn,
     }),
-    [saved, dispatch, go, respond],
+    [saved, dispatch, go, respond, setWithdrawn],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import App from '../App';
 import { _resetLogger } from '../lib/logger';
 import { DEBRIEF, THANKS } from '../config/study';
@@ -80,7 +80,7 @@ describe('debrief', () => {
     fireEvent.click(btn(DEBRIEF.withdrawYes));
     expect(await screen.findByText(THANKS.withdrawnBody)).toBeInTheDocument();
     expect(api.withdrawn).toBe(true);
-    expect(api.steps.at(-1)).toBe('thanks');
+    await waitFor(() => expect(api.steps.at(-1)).toBe('thanks'));
   });
 
   it('finishing without withdrawing shows the normal thank-you', async () => {

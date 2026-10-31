@@ -7,7 +7,14 @@ import { Button, Card } from '../components/ui';
  * Shown before anything else. No participant record exists until the person agrees;
  * declining ends the study politely without creating a record.
  */
-export function Consent({ onAgree }: { onAgree: () => Promise<void> }) {
+export function Consent({
+  onAgree,
+  notice,
+}: {
+  onAgree: () => Promise<void>;
+  /** Extra consent point, e.g. the optional prize-draw rules */
+  notice?: string;
+}) {
   const [age, setAge] = useState(false);
   const [agree, setAgree] = useState(false);
   const [declined, setDeclined] = useState(false);
@@ -43,6 +50,7 @@ export function Consent({ onAgree }: { onAgree: () => Promise<void> }) {
           {CONSENT.points.map((p) => (
             <li key={p}>{p}</li>
           ))}
+          {notice && <li className="font-semibold text-white">{notice}</li>}
         </ul>
       </Card>
 

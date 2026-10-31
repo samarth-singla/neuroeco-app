@@ -3,7 +3,7 @@
  * every combination of round1_outcome and withdrawal_offer, and the logged events arrive.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import App from '../App';
 import { flush, _resetLogger } from '../lib/logger';
 import type { Assignment } from '../types';
@@ -159,7 +159,7 @@ describe('app session — investing path', () => {
       const invest = api.events.find((e) => e.event_type === 'invest_click')!;
       expect(invest.payload).toMatchObject({ plan_id: 'growth', first_decision: true });
       expect(typeof invest.payload!.decision_ms).toBe('number');
-      expect(api.steps.at(-1)).toBe('uiux:0');
+      await waitFor(() => expect(api.steps.at(-1)).toBe('uiux:0'));
     });
   }
 });
@@ -187,7 +187,7 @@ describe('app session — never investing is a valid path (no dead ends)', () =>
       expect(types).toContain('exit_click');
       expect(types).toContain('topup_decline');
       expect(types).not.toContain('fee_shown');
-      expect(api.steps.at(-1)).toBe('uiux:0');
+      await waitFor(() => expect(api.steps.at(-1)).toBe('uiux:0'));
     });
   }
 });

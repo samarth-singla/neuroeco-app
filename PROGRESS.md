@@ -546,3 +546,32 @@ service sleeps or redeploys), so a local SQLite file would lose data.
 - `// DECISION:` Swipe is optional — every card also has two buttons, so the task works with keyboard and screen
   readers, and the answer method (swipe / tap) is logged.
 - `// DECISION:` FOMO score = number of "agree" answers (0–3).
+
+## Redesign Phase 5 — Report card, debrief and sharing
+
+**Status:** done
+
+**Built**
+- S14 Scam Report Card (`client/src/game/stages/Report.tsx`), in a neutral design once the fiction is revealed:
+  reveal text per skin (fraud: "ZenTrade X was a simulated scam app"; honest: "you played the honest version,
+  others got a scam version"), trap score out of 10 (9 for honest) with a colour gauge, each trap fallen for with a
+  tip, traps avoided, the six bonus spins finally revealed with their total, final-balance breakdown (Main + Profit
+  + Portfolio + Cashed out − tax + spins), a note on what a real scam would have kept, how each manipulation worked,
+  pre-set results, how to spot a real scam (official regulator's register, never pay to withdraw, red flags,
+  cybercrime.gov.in / 1930), and "Withdraw my data" (existing endpoint, with confirmation).
+- S15 Share: native share sheet or copy link (site root, no personal data); tap logged. End screen (different text
+  after a data withdrawal).
+- Optional `PRIZE_DRAW` (off by default): when on, consent lists the rules, and the report card shows tickets
+  (1 per ₹1,000 of final balance) and a code derived from the participant id (no contact details).
+- `report_shown` event logs trap score, possible score, trap ids, spin total and final balance.
+- Tests (`client/src/test/reportCard.test.tsx`): for 8 simulated players (both skins) the on-screen trap score equals
+  the score computed from the raw event log (what the export uses) and the final balance matches; spins revealed;
+  `report_shown` logs the same score; withdrawal, share and prize draw work. Checked in Edge.
+- Fixed four racy test assertions (checked async results synchronously; failed only on a busy machine) to wait
+  properly. Full suite passes twice in a row: 45 server + 119 client.
+
+**Decisions**
+- `// DECISION:` Report, share and end screens use one neutral light design for both skins (the app is revealed).
+- `// DECISION:` Prize-draw code = "ZT-" + first 8 hex characters of the participant id, so no extra data is stored
+  and the team can match codes to rows.
+- `// DECISION:` Withdrawing data on the report card goes straight to the end screen (no share prompt).

@@ -1,5 +1,6 @@
 import { useEffect, useState, type ComponentType } from 'react';
 import { StudyLayout } from '../components/AppShell';
+import { PRIZE_DRAW } from '../config/game';
 import { api } from '../lib/api';
 import { Consent } from '../screens/Consent';
 import {
@@ -77,6 +78,7 @@ export function GameApp() {
   if (!saved) {
     return (
       <Consent
+        notice={PRIZE_DRAW.enabled ? PRIZE_DRAW.rules : undefined}
         onAgree={async () => {
           const info = await api.createParticipant(isPilotLink());
           setSaved(newSavedGame(info));

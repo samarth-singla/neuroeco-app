@@ -142,7 +142,7 @@ for (const skin of ['fraud', 'plain'] as const) {
       let i = 0;
       for (const f of FEATURES) {
         await waitForStep(`g:react:${i++}`);
-        expect(screen.getAllByText(f.label[skin]).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText(f.label[skin])).length).toBeGreaterThan(0);
         fireEvent.click(await screen.findByRole('button', { name: i % 2 ? /Yes/ : /No/ }));
       }
       for (const q of SLIDERS) {

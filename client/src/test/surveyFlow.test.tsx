@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import App from '../App';
 import { _resetLogger } from '../lib/logger';
 import {
@@ -117,7 +117,7 @@ describe('general survey flow', () => {
       for (const id of required) expect(api.responses, id).toHaveProperty(id);
       expect(api.responses).not.toHaveProperty('comments');
       expect(api.responses.h7_reinvest_amount).toBe(1000);
-      expect(api.steps.at(-1)).toBe('debrief');
+      await waitFor(() => expect(api.steps.at(-1)).toBe('debrief'));
     });
   }
 });

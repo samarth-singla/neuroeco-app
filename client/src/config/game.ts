@@ -620,3 +620,89 @@ export const SAFETY_TIPS = [
   'Be careful with “mentors”, Telegram/WhatsApp groups and referral links — even from friends.',
   'Victim of fraud? Report at cybercrime.gov.in or call 1930.',
 ];
+
+// ---------------------------------------------------------------------------------------------
+// Report card (S14), debrief and share (S15)
+// ---------------------------------------------------------------------------------------------
+
+export const REPORT = {
+  title: 'Your Scam Report Card',
+  revealFraud:
+    'ZenTrade X was a simulated scam app, built for a university study on how investment-fraud apps manipulate people. No real money was involved.',
+  revealPlain:
+    'This was a university study on investment-fraud apps. You played the honest version of the app (ZenTrade). Other players got a scam version (ZenTrade X) with the same returns but manipulative design. No real money was involved.',
+  scripted:
+    'All market results were pre-set, not real: the round results, the flash deals and the 40% crash were decided in advance. Different players saw slightly different versions of some screens.',
+  trapsTitle: 'Traps you fell for',
+  avoidedTitle: 'Traps you avoided',
+  spinsTitle: 'Your bonus spins',
+  balanceTitle: 'Final balance',
+  explainTitle: 'How the scam version tricked people',
+  tipsTitle: 'How to spot a real scam',
+};
+
+/** What each manipulation in the fraud skin was (shown to everyone on the report card). */
+export const FEATURE_EXPLAINERS: { name: string; what: string }[] = [
+  {
+    name: 'Countdown & “only 3 slots left”',
+    what: 'Fake urgency and scarcity. The clock simply restarted at zero.',
+  },
+  {
+    name: 'Locked ₹500 bonus',
+    what: 'Bait: the bonus only unlocked after you deposited your own money.',
+  },
+  {
+    name: 'VIP ladder',
+    what: 'Promised bigger returns for bigger deposits. Real returns were identical for everyone.',
+  },
+  {
+    name: '“NDIA Certified” badge, 4.9★, 10 lakh+ users',
+    what: 'NDIA does not exist. Badges inside an app prove nothing.',
+  },
+  {
+    name: 'Winner pop-ups, ticker & screenshots',
+    what: 'All made up, to make you feel everyone else is winning.',
+  },
+  {
+    name: '“Rohit Sir, Senior Advisor”',
+    what: 'A scripted “mentor” whose only job is to make you deposit more.',
+  },
+  {
+    name: 'Flash deals & Diamond Pool',
+    what: 'Pressure to act without reading the terms; pools paid by new members are Ponzi schemes.',
+  },
+  {
+    name: 'Withdrawal “tax” & freeze warning',
+    what: 'The classic final trap: you pay, and the money still never comes out.',
+  },
+];
+
+export const SHARE = {
+  title: 'Think your friends would do better?',
+  body: 'Challenge them to spot the traps. The link has no personal data in it.',
+  shareText:
+    'Can you spot the scam? Try this 10-minute investment-app challenge from a university study.',
+  button: 'Share the challenge',
+  copied: 'Link copied!',
+  finish: 'Finish',
+};
+
+export const END = {
+  title: 'Thank you for playing!',
+  body: 'Your participation is complete. You can close this page now.',
+  withdrawn: 'Your data has been withdrawn and will not be used. Thank you for your time.',
+};
+
+/** Report card: how each trap reads when the player avoided it */
+export const TRAP_AVOIDED: Record<string, string> = {
+  hook: 'You did not rush into round 1',
+  vip: 'You did not chase VIP levels',
+  chat: 'You did not invest right after the advisor / help message',
+  deal_no_details: 'You never grabbed a flash deal without reading its details',
+  pool_no_details: 'You did not join the pool without checking it',
+  crash_topup: 'You did not chase your loss after the crash',
+  tax_paid: 'You refused to pay the withdrawal “tax”',
+  no_verify: 'You opened the T&C, details or badge / About page',
+  trust_after_withdrawal: 'You did not deposit more after the withdrawal stage',
+  reinvest: 'You turned down the Gold Plan offer',
+};
