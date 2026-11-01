@@ -119,7 +119,7 @@ function PlanCard({
       className={
         fraud
           ? `rounded-2xl border p-3 transition ${selected ? 'border-gold-400 bg-gold-400/10 shadow-[0_0_25px_rgba(251,191,36,0.35)]' : 'border-white/10 bg-white/5'}`
-          : `rounded-xl border p-3 ${selected ? 'border-blue-700 bg-white ring-2 ring-blue-700' : 'border-slate-200 bg-white'}`
+          : `rounded-xl border p-3 ${selected ? 'border-blue-500 bg-slate-800 ring-2 ring-blue-500' : 'border-slate-700 bg-slate-800'}`
       }
     >
       <button type="button" onClick={onSelect} aria-pressed={selected} className="w-full text-left">
@@ -130,10 +130,10 @@ function PlanCard({
               MOST POPULAR
             </span>
           )}
-          {!fraud && <span className="text-xs text-slate-500">{plan.risk}</span>}
+          {!fraud && <span className="text-xs text-slate-400">{plan.risk}</span>}
         </div>
         <div
-          className={fraud ? 'neon-text mt-1 text-3xl font-black' : 'mt-1 text-sm text-slate-700'}
+          className={fraud ? 'neon-text mt-1 text-3xl font-black' : 'mt-1 text-sm text-slate-200'}
         >
           {plan.claim[skin]}
         </div>
@@ -200,22 +200,22 @@ export function Home() {
             <Panel skin={skin}>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs text-slate-500">Practice market today</div>
-                  <div className="text-lg font-semibold text-slate-900">ZenTrade index</div>
+                  <div className="text-xs text-slate-400">Practice market today</div>
+                  <div className="text-lg font-semibold text-slate-50">ZenTrade index</div>
                 </div>
-                <div className="rounded-full bg-green-50 px-2.5 py-1 text-sm font-semibold text-green-700">
+                <div className="rounded-full bg-green-900/40 px-2.5 py-1 text-sm font-semibold text-green-400">
                   ▲ 0.6%
                 </div>
               </div>
-              <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs text-slate-600">
-                <div className="rounded-lg bg-slate-50 py-1.5">
-                  <div className="font-semibold text-slate-900">6</div>rounds
+              <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs text-slate-300">
+                <div className="rounded-lg bg-slate-900 py-1.5">
+                  <div className="font-semibold text-slate-50">{ECONOMY.rounds.count}</div>rounds
                 </div>
-                <div className="rounded-lg bg-slate-50 py-1.5">
-                  <div className="font-semibold text-slate-900">3</div>plans
+                <div className="rounded-lg bg-slate-900 py-1.5">
+                  <div className="font-semibold text-slate-50">3</div>plans
                 </div>
-                <div className="rounded-lg bg-slate-50 py-1.5">
-                  <div className="font-semibold text-slate-900">₹0</div>fees
+                <div className="rounded-lg bg-slate-900 py-1.5">
+                  <div className="font-semibold text-slate-50">₹0</div>fees
                 </div>
               </div>
             </Panel>
@@ -249,7 +249,7 @@ export function Home() {
           className={
             fraud
               ? 'rounded-2xl bg-black/30 p-2'
-              : 'rounded-xl border border-slate-200 bg-white p-2'
+              : 'rounded-xl border border-slate-700 bg-slate-800 p-2'
           }
         >
           <LiveChart skin={skin} rate={0.06} seed={7} ms={0} running={false} height={90} />

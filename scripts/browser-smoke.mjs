@@ -117,7 +117,7 @@ async function runOnce(browser, wanted) {
       await tap(btn(/Open chat|Open Help/));
       await page.waitForTimeout(4000);
       await check(`${step} (open)`);
-      await tap(btn(/Continue to round 5/));
+      await tap(btn(/Continue to round/));
     } else if (kind === 'deal') {
       if (i === 0) {
         await tap(btn('View plan details'));
@@ -137,8 +137,8 @@ async function runOnce(browser, wanted) {
       await tap(btn(/DEPOSIT|^Deposit/));
     } else if (kind === 'reinvest') {
       await page.locator('#reinvest').focus();
-    await page.keyboard.press('End');
-    await tap(btn(/^Reinvest|^Add/));
+      await page.keyboard.press('End');
+      await tap(btn(/^Reinvest|^Add/));
     } else if (kind === 'crash') {
       await page.getByLabel(/Top-up amount/).fill('500');
       await tap(btn(/TOP UP|Top up/));

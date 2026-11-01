@@ -49,7 +49,7 @@ export function Profile() {
             <>
               <div className="text-4xl">✓</div>
               <div className="mt-2 text-xl font-bold">Profile saved</div>
-              <p className="mt-1 text-slate-600">
+              <p className="mt-1 text-slate-300">
                 Next: a few bonus offers, then the trading game.
               </p>
             </>
@@ -62,7 +62,7 @@ export function Profile() {
   return (
     <GameShell market={false}>
       {i === 0 && (
-        <p className={`mb-3 text-sm ${fraud ? 'text-white/70' : 'text-slate-600'}`}>
+        <p className={`mb-3 text-sm ${fraud ? 'text-white/70' : 'text-slate-300'}`}>
           {fraud
             ? 'Set up your trader profile — 30 seconds ⚡'
             : 'Set up your trader profile (8 quick questions).'}
@@ -110,7 +110,7 @@ export function Profile() {
         />
       )}
       <div
-        className={`mt-6 h-1.5 overflow-hidden rounded-full ${fraud ? 'bg-white/10' : 'bg-slate-200'}`}
+        className={`mt-6 h-1.5 overflow-hidden rounded-full ${fraud ? 'bg-white/10' : 'bg-slate-700'}`}
       >
         <div
           className={fraud ? 'h-full bg-gold-400' : 'h-full bg-blue-700'}

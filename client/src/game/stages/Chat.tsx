@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CHAT, TIMING } from '../../config/game';
+import { CHAT, ECONOMY, TIMING } from '../../config/game';
 import { useLog } from '../../lib/useLog';
 import { useGame } from '../GameProvider';
 import { nextStep } from '../steps';
@@ -45,7 +45,7 @@ function ChatThread() {
 }
 
 /**
- * S6 — After round 4. Fraud: "Rohit Sir, Senior Advisor" messages you (H1f). Honest: a static
+ * S6 — After round 3. Fraud: "Rohit Sir, Senior Advisor" messages you (H1f). Honest: a static
  * Help & FAQ card. A deposit within 60 s of this screen counts as a chat deposit.
  */
 export function Chat() {
@@ -72,7 +72,11 @@ export function Chat() {
         </CtaButton>
       )}
       <SecondaryButton skin={skin} onClick={() => go(nextStep(step))}>
-        {open ? 'Continue to round 5 →' : fraud ? 'Later' : 'Continue'}
+        {open
+          ? `Continue to round ${ECONOMY.rounds.chatAfterRound + 1} →`
+          : fraud
+            ? 'Later'
+            : 'Continue'}
       </SecondaryButton>
     </>
   );
@@ -112,12 +116,12 @@ export function Chat() {
               {CHAT.help.items.map((f) => (
                 <div key={f.q}>
                   <dt className="font-semibold">{f.q}</dt>
-                  <dd className="text-slate-600">{f.a}</dd>
+                  <dd className="text-slate-300">{f.a}</dd>
                 </div>
               ))}
             </dl>
           ) : (
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm text-slate-300">
               Questions before the next rounds? Open Help & FAQ.
             </p>
           )}

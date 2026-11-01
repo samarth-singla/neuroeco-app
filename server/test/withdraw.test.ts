@@ -1,10 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { basicAuth, makeApp } from './helpers';
-import { get } from '../src/db';
+import { get, run } from '../src/db';
 
-describe('data withdrawal (debrief)', () => {
-  it('marks the participant withdrawn and excludes them from every export', async () => {
+/**
+ * The app no longer offers "withdraw my data". The `withdrawn` column stays (default 0) so rows
+ * withdrawn before the option was removed are still left out of every export.
+ */
+describe('legacy data-withdrawal flag', () => {
+  it('new participants start with withdrawn = 0', async () => {
+    const { app, db } = await makeApp();
+    const p = (await request(app).post('/api/participants').send({ consented: true })).body;
+    const row = (await get<{ withdrawn: number }>(
+      db,
+      'SELECT withdrawn FROM participants WHERE participant_id = ?',
+      [p.participant_id],
+    ))!;
+    expect(row.withdrawn).toBe(0);
+  });
+
+  it('rows flagged withdrawn are excluded from every export', async () => {
     const { app, db } = await makeApp();
     const keep = (await request(app).post('/api/participants').send({ consented: true })).body;
     const leave = (await request(app).post('/api/participants').send({ consented: true })).body;
@@ -13,7 +28,7 @@ describe('data withdrawal (debrief)', () => {
         .post('/api/events')
         .send({
           participant_id: p.participant_id,
-          events: [{ screen: 'A1', event_type: 'screen_view' }],
+          events: [{ screen: 'g:home', event_type: 'screen_view' }],
         })
         .expect(200);
       await request(app)
@@ -21,14 +36,9 @@ describe('data withdrawal (debrief)', () => {
         .send({ participant_id: p.participant_id, responses: [{ item_id: 'crt_1', value: 5 }] })
         .expect(200);
     }
-
-    await request(app).post(`/api/participants/${leave.participant_id}/withdraw`).expect(200);
-    const row = (await get<{ withdrawn: number }>(
-      db,
-      'SELECT withdrawn FROM participants WHERE participant_id = ?',
-      [leave.participant_id],
-    ))!;
-    expect(row.withdrawn).toBe(1);
+    await run(db, 'UPDATE participants SET withdrawn = 1 WHERE participant_id = ?', [
+      leave.participant_id,
+    ]);
 
     for (const file of ['participants', 'events', 'responses']) {
       const csv = (
@@ -45,10 +55,9 @@ describe('data withdrawal (debrief)', () => {
     expect(admin.text).toContain('Withdrawn');
   });
 
-  it('returns 404 for unknown participants', async () => {
+  it('participants can no longer withdraw through the API', async () => {
     const { app } = await makeApp();
-    await request(app)
-      .post('/api/participants/00000000-0000-0000-0000-000000000000/withdraw')
-      .expect(404);
+    const p = (await request(app).post('/api/participants').send({ consented: true })).body;
+    await request(app).post(`/api/participants/${p.participant_id}/withdraw`).expect(404);
   });
 });

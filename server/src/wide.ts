@@ -21,7 +21,14 @@ import {
   type Skin,
 } from '../../client/src/config/game';
 import { factsFromEvents, TRAPS, trapResult } from '../../client/src/game/traps';
-import { crtScore, literacyScore, lossAversion, overconfidence, type Answers } from './scoring';
+import {
+  crtScore,
+  LAMBDA_REJECT_ALL,
+  literacyScore,
+  lossAversion,
+  overconfidence,
+  type Answers,
+} from './scoring';
 
 export interface Column {
   name: string;
@@ -42,6 +49,7 @@ const cols = (group: Column['group'], defs: Def[]): Column[] =>
 const DEALS = ECONOMY.deals.sizes;
 const inr = (n: number) => `₹${n.toLocaleString('en-IN')}`;
 const vip2 = ECONOMY.vipTiers.find((t) => t.level === ECONOMY.vipUpgradeLevel)!;
+const ROUNDS = Array.from({ length: ECONOMY.rounds.count }, (_, i) => i + 1);
 
 const ASSIGNMENT_COLUMNS = cols('Identifiers & assignments', [
   ['participant_id', 'Random UUID created at consent', '—'],
@@ -98,7 +106,7 @@ const BEHAVIOUR_COLUMNS = cols('App behaviour (event log)', [
     'H1c',
   ],
   ['vip_taps', 'Times the VIP "Upgrade" shortcut was tapped (fraud skin only)', 'H1c'],
-  ...[1, 2, 3, 4, 5, 6].map((r): Def => [
+  ...ROUNDS.map((r): Def => [
     `r${r}_amount`,
     `Round ${r} stake, ₹ (0 if skipped)`,
     r <= 2 ? 'H1, H2' : 'H1',
@@ -209,7 +217,7 @@ const DERIVED_COLUMNS = cols('Derived scores', [
   ['crt_score', 'Cognitive Reflection Test score 0–3 (correct: 5, 5, 47)', 'H1 (moderator)'],
   [
     'lambda',
-    'Loss aversion λ from the bonus spins = smallest accepted gain ÷ ₹100 (0.5–3.0); 3.5 if all rejected; blank if inconsistent',
+    `Loss aversion λ from the bonus spins = smallest accepted win ÷ ₹${SPINS.loss} (${SPINS.gains.map((g) => g / SPINS.loss).join(', ')}); ${LAMBDA_REJECT_ALL} if all rejected; blank if inconsistent (accepts a win, then rejects a larger one)`,
     'H4, H8, H9',
   ],
   [
@@ -217,7 +225,11 @@ const DERIVED_COLUMNS = cols('Derived scores', [
     '1 = spin choices switch at most once (reject → accept), 0 = inconsistent',
     'H4',
   ],
-  ['la_accepted', 'Number of the six spins accepted (0–6)', 'H4'],
+  [
+    'la_accepted',
+    `Number of the ${SPINS.gains.length} spins accepted (0–${SPINS.gains.length})`,
+    'H4',
+  ],
   ['literacy_score', 'Big Three financial literacy score 0–3 ("don\'t know" = wrong)', 'H8'],
   ['self_rated_literacy', 'Self-rated "How good are you with money?" 1–7 (= `lit_self`)', 'H8'],
   [
@@ -299,8 +311,6 @@ export function behaviour(events: Ev[], skin: Skin, withdrawalOffer: string): Re
     r2_amount: r2,
     r3_amount: round(3),
     r4_amount: round(4),
-    r5_amount: round(5),
-    r6_amount: round(6),
     escalation_ratio: r1 > 0 ? Math.round((r2 / r1) * 10000) / 10000 : null,
     chat_open: yes(of('chat_open').length > 0),
     chat_deposit: yes(facts.chatDeposit),

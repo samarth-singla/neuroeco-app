@@ -46,7 +46,7 @@ export function Reactions() {
           right={{ value: 'yes', label: 'Yes' }}
           onAnswer={(v, m) => answer(id, v, m)}
         >
-          <div className={`mb-2 text-center text-xs ${fraud ? 'text-white/50' : 'text-slate-500'}`}>
+          <div className={`mb-2 text-center text-xs ${fraud ? 'text-white/50' : 'text-slate-400'}`}>
             You saw: <b>{f.label[skin]}</b>
           </div>
           <FeatureMini id={f.id} skin={skin} total={game.totalDeposited} />
@@ -68,7 +68,7 @@ export function Reactions() {
           onAnswer={(v, m) => answer(q.id, v, m)}
         >
           <p
-            className={`py-6 text-center text-lg leading-snug ${fraud ? 'font-bold' : 'text-slate-900'}`}
+            className={`py-6 text-center text-lg leading-snug ${fraud ? 'font-bold' : 'text-slate-50'}`}
           >
             “{q.text}”
           </p>
@@ -80,7 +80,7 @@ export function Reactions() {
   return (
     <GameShell market={false}>
       <div
-        className={`mb-3 text-xs font-bold tracking-widest uppercase ${fraud ? 'text-gold-300' : 'text-slate-500'}`}
+        className={`mb-3 text-xs font-bold tracking-widest uppercase ${fraud ? 'text-gold-300' : 'text-slate-400'}`}
       >
         Quick reactions · {i + 1}/{REACTION_COUNT}
       </div>

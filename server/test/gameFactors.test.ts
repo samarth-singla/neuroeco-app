@@ -27,7 +27,7 @@ describe('game order factors', () => {
       firstSpins.add(p.assignment.spin_order[0]);
     }
     expect(firstDeals.size).toBe(3);
-    expect(firstSpins.size).toBeGreaterThanOrEqual(5);
+    expect(firstSpins.size).toBe(SPINS.gains.length);
     const rows = await all<{ deal_order: string }>(db, 'SELECT deal_order FROM participants');
     expect(rows.every((r) => r.deal_order.split(',').length === 3)).toBe(true);
   });

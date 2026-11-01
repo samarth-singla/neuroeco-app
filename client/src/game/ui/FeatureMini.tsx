@@ -25,12 +25,12 @@ export function FeatureMini({ id, skin, total }: { id: string; skin: Skin; total
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-200 p-3">
+        <div className="rounded-xl border border-slate-700 p-3">
           <div className="flex justify-between">
             <span className="font-semibold">{plan.name}</span>
-            <span className="text-xs text-slate-500">{plan.risk}</span>
+            <span className="text-xs text-slate-400">{plan.risk}</span>
           </div>
-          <div className="text-sm text-slate-700">{plan.claim.plain}</div>
+          <div className="text-sm text-slate-200">{plan.claim.plain}</div>
         </div>
       );
     case 'bonus':
@@ -45,7 +45,7 @@ export function FeatureMini({ id, skin, total }: { id: string; skin: Skin; total
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-200 p-3 text-sm">
+        <div className="rounded-xl border border-slate-700 p-3 text-sm">
           <b>₹{ECONOMY.signupBonus} welcome bonus</b> has been added to your Profit wallet.
         </div>
       );
@@ -63,8 +63,8 @@ export function FeatureMini({ id, skin, total }: { id: string; skin: Skin; total
           ))}
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-200 p-3 text-sm">
-          <div className="text-xs text-slate-500">Total invested so far</div>
+        <div className="rounded-xl border border-slate-700 p-3 text-sm">
+          <div className="text-xs text-slate-400">Total invested so far</div>
           <div className="text-xl font-semibold">{formatINR(total)}</div>
         </div>
       );
@@ -77,13 +77,13 @@ export function FeatureMini({ id, skin, total }: { id: string; skin: Skin; total
           <div className="mt-2 text-xs text-gold-300">
             ★ {TRUST.rating} · {TRUST.users}
           </div>
-          <div className="mx-auto mt-2 w-40 rounded-lg border-2 border-gold-400/70 bg-amber-50 p-2 text-[10px] text-slate-900">
+          <div className="mx-auto mt-2 w-40 rounded-lg border-2 border-gold-400/70 bg-amber-50 p-2 text-[10px] text-stone-900">
             <div className="font-black">Certificate of Registration</div>
             <div>{TRUST.certificateNo}</div>
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-200 p-3 text-sm text-slate-700">
+        <div className="rounded-xl border border-slate-700 p-3 text-sm text-slate-200">
           {TRUST.honestAbout[0]}
         </div>
       );
@@ -101,7 +101,7 @@ export function FeatureMini({ id, skin, total }: { id: string; skin: Skin; total
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-200 p-2">
+        <div className="rounded-xl border border-slate-700 p-2">
           <LiveChart skin="plain" rate={0.06} seed={7} ms={0} running={false} height={70} />
         </div>
       );
@@ -121,9 +121,9 @@ export function FeatureMini({ id, skin, total }: { id: string; skin: Skin; total
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-200 p-3 text-sm">
+        <div className="rounded-xl border border-slate-700 p-3 text-sm">
           <div className="font-semibold">{CHAT.help.items[0].q}</div>
-          <div className="text-slate-600">{CHAT.help.items[0].a}</div>
+          <div className="text-slate-300">{CHAT.help.items[0].a}</div>
         </div>
       );
     case 'tax':
@@ -133,7 +133,7 @@ export function FeatureMini({ id, skin, total }: { id: string; skin: Skin; total
           <div className="text-sm">Pay 10% processing tax to unlock your balance</div>
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-200 p-3 text-center text-sm">
+        <div className="rounded-xl border border-slate-700 p-3 text-center text-sm">
           <div className="text-2xl">✅</div>
           Withdrawal processed
         </div>

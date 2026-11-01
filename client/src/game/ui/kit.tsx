@@ -1,7 +1,7 @@
 /**
  * Shared game UI. Every component takes the skin:
  * - fraud: neon/gold, huge numbers, pulsing CTA, animations
- * - plain (honest): clean light theme, normal sizes, equal-weight buttons
+ * - plain (honest): clean dark slate theme, normal sizes, equal-weight buttons
  */
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { ECONOMY, type Skin } from '../../config/game';
@@ -38,7 +38,7 @@ export function CtaButton({
       className={
         fraud
           ? `w-full rounded-2xl bg-linear-to-r from-gold-500 via-gold-300 to-gold-500 px-4 py-4 text-lg font-black tracking-wide text-black uppercase disabled:animate-none disabled:opacity-40 ${disabled ? '' : 'animate-pulse-cta'} ${className}`
-          : `w-full rounded-xl bg-blue-700 px-4 py-3 text-base font-semibold text-white hover:bg-blue-800 disabled:opacity-40 ${className}`
+          : `w-full rounded-xl bg-blue-700 px-4 py-3 text-base font-semibold text-white hover:bg-blue-600 disabled:opacity-40 ${className}`
       }
       {...rest}
     >
@@ -58,7 +58,7 @@ export function SkipButton({ skin, className = '', children, ...rest }: BtnProps
       className={
         skin === 'fraud'
           ? `mx-auto block px-3 py-2 text-xs text-white/35 hover:text-white/60 ${className}`
-          : `w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base font-semibold text-slate-800 hover:bg-slate-50 ${className}`
+          : `w-full rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-base font-semibold text-slate-100 hover:bg-slate-700 ${className}`
       }
       {...rest}
     >
@@ -75,7 +75,7 @@ export function SecondaryButton({ skin, className = '', children, ...rest }: Btn
       className={
         skin === 'fraud'
           ? `w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-base font-semibold text-white hover:bg-white/10 ${className}`
-          : `w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base font-semibold text-slate-800 hover:bg-slate-50 ${className}`
+          : `w-full rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-base font-semibold text-slate-100 hover:bg-slate-700 ${className}`
       }
       {...rest}
     >
@@ -92,7 +92,7 @@ export function InfoLink({ skin, className = '', children, ...rest }: BtnProps) 
       className={
         skin === 'fraud'
           ? `text-[10px] text-white/30 underline underline-offset-2 ${className}`
-          : `text-sm font-medium text-blue-700 underline underline-offset-4 ${className}`
+          : `text-sm font-medium text-blue-300 underline underline-offset-4 ${className}`
       }
       {...rest}
     >
@@ -121,7 +121,7 @@ export function Panel({
       className={
         skin === 'fraud'
           ? `glow-card rounded-2xl p-4 ${glow ? 'animate-glow' : ''} ${className}`
-          : `rounded-xl border border-slate-200 bg-white p-4 shadow-sm ${className}`
+          : `rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-sm ${className}`
       }
     >
       {children}
@@ -144,7 +144,7 @@ export function Title({
         className={
           skin === 'fraud'
             ? 'text-2xl leading-tight font-black text-white'
-            : 'text-xl font-bold text-slate-900'
+            : 'text-xl font-bold text-slate-50'
         }
       >
         {children}
@@ -152,7 +152,7 @@ export function Title({
       {sub && (
         <p
           className={
-            skin === 'fraud' ? 'mt-1 text-sm text-white/60' : 'mt-1 text-sm text-slate-600'
+            skin === 'fraud' ? 'mt-1 text-sm text-white/60' : 'mt-1 text-sm text-slate-300'
           }
         >
           {sub}
@@ -187,7 +187,7 @@ export function Sheet({
         className={
           skin === 'fraud'
             ? 'max-h-[85dvh] w-full max-w-[420px] overflow-y-auto rounded-t-3xl border-t border-neon-400/30 bg-void-900 p-5 text-white'
-            : 'max-h-[85dvh] w-full max-w-[420px] overflow-y-auto rounded-t-2xl bg-white p-5 text-slate-800'
+            : 'max-h-[85dvh] w-full max-w-[420px] overflow-y-auto rounded-t-2xl bg-slate-800 p-5 text-slate-100'
         }
       >
         <div className="mb-3 flex items-center justify-between gap-3">
@@ -198,7 +198,7 @@ export function Sheet({
             className={
               skin === 'fraud'
                 ? 'rounded-full bg-white/10 px-3 py-1 text-sm'
-                : 'rounded-full bg-slate-100 px-3 py-1 text-sm'
+                : 'rounded-full bg-slate-700 px-3 py-1 text-sm'
             }
           >
             Close
@@ -453,7 +453,7 @@ export function AmountPicker({
   return (
     <div>
       <div
-        className={`flex items-baseline justify-between text-xs ${fraud ? 'text-white/50' : 'text-slate-500'}`}
+        className={`flex items-baseline justify-between text-xs ${fraud ? 'text-white/50' : 'text-slate-400'}`}
       >
         <label htmlFor="amount">{label}</label>
         <span>
@@ -464,10 +464,10 @@ export function AmountPicker({
         className={
           fraud
             ? 'mt-1 flex items-center rounded-2xl border border-neon-400/30 bg-black/40 px-3 focus-within:border-neon-400'
-            : 'mt-1 flex items-center rounded-xl border border-slate-300 bg-white px-3 focus-within:border-blue-700'
+            : 'mt-1 flex items-center rounded-xl border border-slate-600 bg-slate-800 px-3 focus-within:border-blue-400'
         }
       >
-        <span className={fraud ? 'text-xl text-neon-400' : 'text-lg text-slate-500'}>₹</span>
+        <span className={fraud ? 'text-xl text-neon-400' : 'text-lg text-slate-400'}>₹</span>
         <input
           id="amount"
           inputMode="numeric"
@@ -478,7 +478,7 @@ export function AmountPicker({
             const n = Number(e.target.value.replace(/\D/g, '').slice(0, 7) || 0);
             onChange(Math.min(n, cap));
           }}
-          className={`tabular w-full bg-transparent px-2 py-3 outline-none ${fraud ? 'text-3xl font-black text-white' : 'text-2xl font-semibold text-slate-900'}`}
+          className={`tabular w-full bg-transparent px-2 py-3 outline-none ${fraud ? 'text-3xl font-black text-white' : 'text-2xl font-semibold text-slate-50'}`}
         />
       </div>
       <div className="mt-2 flex flex-wrap gap-2">
@@ -490,7 +490,7 @@ export function AmountPicker({
             className={
               fraud
                 ? `rounded-full border px-3 py-1.5 text-sm font-bold ${value === q ? 'border-gold-400 bg-gold-400 text-black' : 'border-white/15 bg-white/5 text-white'}`
-                : `rounded-full border px-3 py-1.5 text-sm ${value === q ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-700'}`
+                : `rounded-full border px-3 py-1.5 text-sm ${value === q ? 'border-blue-500 bg-blue-700 text-white' : 'border-slate-600 bg-slate-800 text-slate-200'}`
             }
           >
             {q === cap && q === max && q > 0
@@ -502,7 +502,7 @@ export function AmountPicker({
         ))}
       </div>
       {cap < ECONOMY.minInvest && (
-        <p className={`mt-2 text-xs ${fraud ? 'text-white/50' : 'text-slate-500'}`}>
+        <p className={`mt-2 text-xs ${fraud ? 'text-white/50' : 'text-slate-400'}`}>
           Not enough in your {source}. Add funds from Main wallet, or skip.
         </p>
       )}

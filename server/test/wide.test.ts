@@ -86,12 +86,11 @@ describe('wide.csv (game)', () => {
           ev('g:home', 's3_invest', { plan_id: 'growth', decision_ms: 12345 }),
           ev('g:round:1', 'round_invest', { round: 1, amount: 1000, since_chat_ms: null }),
           ev('g:round:2', 'round_invest', { round: 2, amount: 2500, since_chat_ms: null }),
-          ev('g:round:3', 'round_skip', { round: 3 }),
-          ev('g:round:4', 'vip_upgrade_tap', {}),
-          ev('g:round:4', 'round_invest', { round: 4, amount: 2000, since_chat_ms: null }),
+          ev('g:round:3', 'vip_upgrade_tap', {}),
+          ev('g:round:3', 'round_invest', { round: 3, amount: 2000, since_chat_ms: null }),
           ev('g:chat', 'chat_shown', { kind: 'mentor' }),
           ev('g:chat', 'chat_open', { kind: 'mentor' }),
-          ev('g:round:5', 'round_invest', { round: 5, amount: 500, since_chat_ms: 30000 }),
+          ev('g:round:4', 'round_invest', { round: 4, amount: 500, since_chat_ms: 30000 }),
           ev('g:deal:0', 'deal_skip', { size: 8000, details_before: true, decision_ms: 9000 }),
           ev('g:deal:1', 'deal_invest', {
             size: 500,
@@ -127,11 +126,9 @@ describe('wide.csv (game)', () => {
       lit_inflation: 'less',
       lit_diversification: 'true',
       lit_self: 6,
-      la_gain_50: 'reject',
       la_gain_100: 'reject',
       la_gain_150: 'reject',
       la_gain_200: 'accept',
-      la_gain_250: 'accept',
       la_gain_300: 'accept',
       fomo_1: 'agree',
       fomo_2: 'disagree',
@@ -171,7 +168,8 @@ describe('wide.csv (game)', () => {
       verify_count: '1',
       r1_amount: '1000',
       r2_amount: '2500',
-      r3_amount: '0',
+      r3_amount: '2000',
+      r4_amount: '500',
       escalation_ratio: '2.5',
       vip_upgrade: '1',
       vip_taps: '1',
@@ -249,7 +247,7 @@ describe('wide.csv (game)', () => {
     await request(app).post(`/api/participants/${done}/step`).send({ step: 'g:report' });
     await request(app).post(`/api/participants/${unfinished}/step`).send({ step: 'g:crash' });
     await request(app).post(`/api/participants/${gone}/step`).send({ step: 'g:report' });
-    await request(app).post(`/api/participants/${gone}/withdraw`);
+    await run(db, 'UPDATE participants SET withdrawn = 1 WHERE participant_id = ?', [gone]); // legacy flag
     await request(app).post(`/api/participants/${v1}/step`).send({ step: 'debrief' });
     const { rows } = await wide(app);
     expect(rows.map((r) => r.participant_id)).toEqual([done]);

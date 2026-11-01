@@ -1,7 +1,7 @@
 # Neuroeco research app
 
 Research prototype for the course project *Analyzing the Behavioral Mechanics of App-Based Investment
-Frauds*. Participants play a 10-minute trading game, **ZenTrade**, that follows a real scam lifecycle (hook →
+Frauds*. Participants play a ~8-minute trading game, **ZenTrade**, that follows a real scam lifecycle (hook →
 deposit → escalate → trap). Half get the **fraud skin** ("ZenTrade X": countdowns, fake badges, winner
 pop-ups, a "mentor", a withdrawal tax…), half the **honest skin**, with identical mechanics and payoffs. Almost
 every hypothesis is measured through behaviour inside the game; the game ends with a personal **Scam Report
@@ -127,12 +127,12 @@ per-level counts for every randomized factor and four downloads:
 
 | File | Contents |
 | --- | --- |
-| `wide.csv` | **Use this for analysis.** One row per player who reached the report card and did not withdraw: assignments, behaviour measures recomputed from the event log, trap score and per-trap flags, every in-game answer and derived scores (CRT, λ from the bonus spins, literacy, overconfidence, FOMO). Columns are documented in [`docs/data-dictionary.md`](docs/data-dictionary.md). |
+| `wide.csv` | **Use this for analysis.** One row per player who reached the report card (earlier withdrawn rows excluded): assignments, behaviour measures recomputed from the event log, trap score and per-trap flags, every in-game answer and derived scores (CRT, λ from the bonus spins, literacy, overconfidence, FOMO). Columns are documented in [`docs/data-dictionary.md`](docs/data-dictionary.md). |
 | `participants.csv` | One row per consented participant (including unfinished) |
 | `events.csv` | Raw behaviour log (one row per event) |
 | `responses.csv` | Raw answers (profile, spins, brain bonus, quick reactions; one row per participant × item) |
 
-Players who withdrew their data on the report card are excluded from all four files. Scores are computed by the
+The game no longer offers data withdrawal; rows withdrawn earlier (`withdrawn = 1`) stay excluded from all four files. Scores are computed by the
 server at download time (overconfidence uses z-scores over the downloaded sample). Data from the original
 survey flow (before the game) remains only in the three raw files.
 

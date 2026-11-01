@@ -159,10 +159,10 @@ function Wallets() {
   const fraud = skin === 'fraud';
   const vip = vipLevel(game.totalDeposited);
   const next = toNextVip(game.totalDeposited);
-  const cell = fraud ? 'rounded-xl bg-white/5 px-2 py-1.5' : 'rounded-lg bg-slate-100 px-2 py-1.5';
+  const cell = fraud ? 'rounded-xl bg-white/5 px-2 py-1.5' : 'rounded-lg bg-slate-800 px-2 py-1.5';
   const label = fraud
     ? 'text-[10px] tracking-wide text-white/50 uppercase'
-    : 'text-[10px] text-slate-500 uppercase';
+    : 'text-[10px] text-slate-400 uppercase';
   return (
     <div className="px-3 pb-2" data-testid="wallets">
       <div className="grid grid-cols-3 gap-1.5">
@@ -171,7 +171,7 @@ function Wallets() {
           <Money
             value={w.main}
             className={
-              fraud ? 'text-sm font-black text-white' : 'text-sm font-semibold text-slate-900'
+              fraud ? 'text-sm font-black text-white' : 'text-sm font-semibold text-slate-50'
             }
           />
         </div>
@@ -180,7 +180,7 @@ function Wallets() {
           <Money
             value={w.profit}
             className={
-              fraud ? 'neon-text text-sm font-black' : 'text-sm font-semibold text-green-700'
+              fraud ? 'neon-text text-sm font-black' : 'text-sm font-semibold text-green-400'
             }
           />
         </div>
@@ -189,7 +189,7 @@ function Wallets() {
           <Money
             value={w.portfolio}
             className={
-              fraud ? 'text-sm font-black text-gold-300' : 'text-sm font-semibold text-slate-900'
+              fraud ? 'text-sm font-black text-gold-300' : 'text-sm font-semibold text-slate-50'
             }
           />
         </div>
@@ -221,7 +221,7 @@ function LevelBar({ step, skin }: { step: string; skin: Skin }) {
   return (
     <div className="px-3 pb-2">
       <div
-        className={`flex justify-between text-[10px] font-bold tracking-wide uppercase ${fraud ? 'text-white/50' : 'text-slate-500'}`}
+        className={`flex justify-between text-[10px] font-bold tracking-wide uppercase ${fraud ? 'text-white/50' : 'text-slate-400'}`}
       >
         <span>
           Level {stage}/15 · {STAGE_NAMES[stage]}
@@ -229,7 +229,7 @@ function LevelBar({ step, skin }: { step: string; skin: Skin }) {
         <span>{pct}%</span>
       </div>
       <div
-        className={`mt-1 h-1.5 overflow-hidden rounded-full ${fraud ? 'bg-white/10' : 'bg-slate-200'}`}
+        className={`mt-1 h-1.5 overflow-hidden rounded-full ${fraud ? 'bg-white/10' : 'bg-slate-700'}`}
       >
         <div
           className={`h-full rounded-full transition-all duration-500 ${fraud ? 'bg-linear-to-r from-neon-500 to-gold-400' : 'bg-blue-700'}`}
@@ -261,26 +261,26 @@ export function GameShell({
 
   return (
     <div
-      className={`flex min-h-dvh justify-center ${fraud ? 'fraud-bg text-white' : 'bg-slate-100 text-slate-900'}`}
+      className={`flex min-h-dvh justify-center ${fraud ? 'fraud-bg text-white' : 'bg-slate-950 text-slate-50'}`}
     >
       <div
-        className={`relative flex min-h-dvh w-full max-w-[420px] flex-col ${fraud ? '' : 'bg-slate-50'}`}
+        className={`relative flex min-h-dvh w-full max-w-[420px] flex-col ${fraud ? '' : 'bg-slate-900'}`}
       >
         <header
           data-sticky="top"
-          className={`sticky top-0 z-20 ${fraud ? 'bg-void-950/90 backdrop-blur' : 'border-b border-slate-200 bg-white'}`}
+          className={`sticky top-0 z-20 ${fraud ? 'bg-void-950/90 backdrop-blur' : 'border-b border-slate-700 bg-slate-900'}`}
         >
           <div className="flex items-center gap-2 px-3 py-2">
             <Logo skin={skin} />
             <div className="min-w-0 flex-1 leading-tight">
               <div
                 className={
-                  fraud ? 'font-black tracking-tight text-white' : 'font-bold text-slate-900'
+                  fraud ? 'font-black tracking-tight text-white' : 'font-bold text-slate-50'
                 }
               >
                 {APP_NAME[skin]}
               </div>
-              <div className={`truncate text-[10px] ${fraud ? 'text-gold-300' : 'text-slate-500'}`}>
+              <div className={`truncate text-[10px] ${fraud ? 'text-gold-300' : 'text-slate-400'}`}>
                 {fraud ? `★ ${TRUST.rating} · ${TRUST.users}` : APP_TAGLINE.plain}
               </div>
             </div>
@@ -306,7 +306,7 @@ export function GameShell({
                   setCert(true);
                   dispatch({ type: 'verify', what: 'about' });
                 }}
-                className="text-xs font-medium text-blue-700 underline underline-offset-4"
+                className="text-xs font-medium text-blue-300 underline underline-offset-4"
               >
                 About
               </button>
@@ -322,12 +322,12 @@ export function GameShell({
 
         <div
           data-sticky="bottom"
-          className={`sticky bottom-0 z-20 ${fraud ? 'bg-void-950/95 backdrop-blur' : 'border-t border-slate-200 bg-white'}`}
+          className={`sticky bottom-0 z-20 ${fraud ? 'bg-void-950/95 backdrop-blur' : 'border-t border-slate-700 bg-slate-900'}`}
         >
           {actions && (
             <div className="space-y-1 px-4 pt-3 pb-2">
               {!fraud && market && (
-                <p className="pb-1 text-xs text-slate-600" data-testid="risk-warning">
+                <p className="pb-1 text-xs text-slate-300" data-testid="risk-warning">
                   ⚠️ {RISK_WARNING}
                 </p>
               )}
@@ -357,7 +357,7 @@ export function GameShell({
 export function Certificate() {
   return (
     <div className="space-y-3">
-      <div className="rounded-xl border-2 border-gold-400/70 bg-linear-to-b from-amber-50 to-amber-100 p-4 text-center text-slate-900">
+      <div className="rounded-xl border-2 border-gold-400/70 bg-linear-to-b from-amber-50 to-amber-100 p-4 text-center text-stone-900">
         <div className="text-[10px] tracking-[0.2em] text-amber-800 uppercase">
           {TRUST.regulator}
         </div>

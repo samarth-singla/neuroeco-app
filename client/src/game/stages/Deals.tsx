@@ -53,7 +53,7 @@ export function Deal() {
           ⚡ FLASH DEAL ⚡
         </div>
       ) : (
-        <div className="mb-3 text-xs font-semibold tracking-wide text-slate-500 uppercase">
+        <div className="mb-3 text-xs font-semibold tracking-wide text-slate-400 uppercase">
           Deal {i + 1} of {ECONOMY.deals.sizes.length}
         </div>
       )}
@@ -66,7 +66,7 @@ export function Deal() {
           </div>
         </div>
         <div
-          className={fraud ? 'neon-text mt-2 text-4xl font-black' : 'mt-2 text-base text-slate-700'}
+          className={fraud ? 'neon-text mt-2 text-4xl font-black' : 'mt-2 text-base text-slate-200'}
         >
           {deal.claim[skin]}
         </div>
@@ -79,7 +79,7 @@ export function Deal() {
             <span className="text-xs">🔥 {7 + i * 4} people viewing</span>
           </div>
         )}
-        {!fraud && <p className="mt-3 text-xs text-slate-600">{DEAL_DETAILS}</p>}
+        {!fraud && <p className="mt-3 text-xs text-slate-300">{DEAL_DETAILS}</p>}
         <div className="mt-3">
           <InfoLink
             skin={skin}
@@ -94,7 +94,7 @@ export function Deal() {
       </Panel>
 
       {!affordable && !done && (
-        <p className={`mt-3 text-sm ${fraud ? 'text-white/60' : 'text-slate-600'}`}>
+        <p className={`mt-3 text-sm ${fraud ? 'text-white/60' : 'text-slate-300'}`}>
           Not enough in your Main wallet for this deal.
         </p>
       )}
@@ -106,13 +106,13 @@ export function Deal() {
               className={
                 fraud
                   ? 'animate-pop neon-text text-4xl font-black'
-                  : 'text-xl font-bold text-green-700'
+                  : 'text-xl font-bold text-green-400'
               }
             >
               Deal settled +{formatINR(done.gain)}
             </div>
           ) : (
-            <div className={fraud ? 'text-white/60' : 'text-slate-600'}>Deal skipped.</div>
+            <div className={fraud ? 'text-white/60' : 'text-slate-300'}>Deal skipped.</div>
           )}
         </div>
       )}
@@ -169,7 +169,7 @@ export function Pool() {
   return (
     <GameShell actions={actions}>
       <div
-        className={`mb-2 text-xs font-bold tracking-wide uppercase ${fraud ? 'text-white/50' : 'text-slate-500'}`}
+        className={`mb-2 text-xs font-bold tracking-wide uppercase ${fraud ? 'text-white/50' : 'text-slate-400'}`}
       >
         {friend ? 'New message' : 'Sponsored'}
       </div>
@@ -178,19 +178,19 @@ export function Pool() {
           className={
             fraud
               ? 'rounded-2xl border border-white/10 bg-[#0b141a] p-3'
-              : 'rounded-xl border border-slate-200 bg-white p-3'
+              : 'rounded-xl border border-slate-700 bg-slate-800 p-3'
           }
         >
           <div className="flex items-center gap-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sky-500 font-black text-white">
               R
             </span>
-            <div className={`text-sm font-bold ${fraud ? '' : 'text-slate-900'}`}>
+            <div className={`text-sm font-bold ${fraud ? '' : 'text-slate-50'}`}>
               {POOL.friend.from}
             </div>
           </div>
           <div
-            className={`mt-2 rounded-2xl rounded-tl-none px-3 py-2 text-base ${fraud ? 'bg-[#005c4b]' : 'bg-slate-100 text-slate-900'}`}
+            className={`mt-2 rounded-2xl rounded-tl-none px-3 py-2 text-base ${fraud ? 'bg-[#005c4b]' : 'bg-slate-700 text-slate-50'}`}
             data-testid="pool-friend"
           >
             {POOL.friend.message}
@@ -201,7 +201,7 @@ export function Pool() {
           className={
             fraud
               ? 'rounded-2xl border border-gold-400/30 bg-gold-400/5 p-3'
-              : 'rounded-xl border border-slate-200 bg-white p-3'
+              : 'rounded-xl border border-slate-700 bg-slate-800 p-3'
           }
           data-testid="pool-ad"
         >
@@ -210,7 +210,7 @@ export function Pool() {
           >
             {POOL.ad.label}
           </div>
-          <div className={`mt-1 text-base ${fraud ? 'font-bold' : 'text-slate-900'}`}>
+          <div className={`mt-1 text-base ${fraud ? 'font-bold' : 'text-slate-50'}`}>
             {POOL.ad.message}
           </div>
         </div>
@@ -220,7 +220,7 @@ export function Pool() {
         <div className={fraud ? 'text-2xl font-black' : 'text-lg font-semibold'}>
           💎 {POOL.name}
         </div>
-        <div className={fraud ? 'mt-1 text-sm text-white/70' : 'mt-1 text-sm text-slate-600'}>
+        <div className={fraud ? 'mt-1 text-sm text-white/70' : 'mt-1 text-sm text-slate-300'}>
           Entry {formatINR(ECONOMY.poolEntry)} from your Main wallet
         </div>
         <div className="mt-3">

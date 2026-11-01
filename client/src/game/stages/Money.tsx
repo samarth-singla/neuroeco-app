@@ -98,14 +98,14 @@ export function Withdraw() {
               >
                 {fraud ? 'Money sent!' : 'Withdrawal processed'}
               </div>
-              <div className={fraud ? 'text-sm text-white/70' : 'text-sm text-slate-600'}>
+              <div className={fraud ? 'text-sm text-white/70' : 'text-sm text-slate-300'}>
                 {formatINR(ECONOMY.testWithdrawal)} is on its way to your bank account (simulated).
               </div>
             </div>
           ) : game.withdrawTest === 'skipped' ? (
-            <div className={fraud ? 'text-white/70' : 'text-slate-600'}>No withdrawal made.</div>
+            <div className={fraud ? 'text-white/70' : 'text-slate-300'}>No withdrawal made.</div>
           ) : (
-            <div className={fraud ? 'text-white/80' : 'text-slate-700'}>
+            <div className={fraud ? 'text-white/80' : 'text-slate-200'}>
               Withdraw {formatINR(ECONOMY.testWithdrawal)} from your Main wallet to your bank
               (simulated).
             </div>
@@ -136,7 +136,7 @@ export function Withdraw() {
             label={`Deposit (up to ${formatINR(ECONOMY.postWithdrawalMax)})`}
           />
           {!fraud && (
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-slate-300">
               Portfolio money stays locked until you cash out.
             </p>
           )}
@@ -194,7 +194,7 @@ export function Reinvest() {
         >
           {headline}
         </div>
-        <div className={`mt-1 text-sm ${fraud ? 'text-white/60' : 'text-slate-600'}`}>
+        <div className={`mt-1 text-sm ${fraud ? 'text-white/60' : 'text-slate-300'}`}>
           {fromProfit ? 'Profit wallet' : 'Main wallet'}: {formatINR(sourceBalance)}
         </div>
       </Panel>
@@ -202,7 +202,7 @@ export function Reinvest() {
       <div className="mt-5">
         <label
           htmlFor="reinvest"
-          className={`text-sm ${fraud ? 'text-white/70' : 'text-slate-700'}`}
+          className={`text-sm ${fraud ? 'text-white/70' : 'text-slate-200'}`}
         >
           How much? <span className="tabular font-bold">{formatINR(amount)}</span>
         </label>
@@ -214,16 +214,16 @@ export function Reinvest() {
           step={ECONOMY.reinvest.step}
           value={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
-          className={`mt-2 w-full ${fraud ? 'accent-amber-400' : 'accent-blue-700'}`}
+          className={`mt-2 w-full ${fraud ? 'accent-amber-400' : 'accent-blue-500'}`}
         />
         <div
-          className={`flex justify-between text-xs ${fraud ? 'text-white/40' : 'text-slate-500'}`}
+          className={`flex justify-between text-xs ${fraud ? 'text-white/40' : 'text-slate-400'}`}
         >
           <span>₹0</span>
           <span>{formatINR(max)}</span>
         </div>
         {!fraud && (
-          <p className="mt-3 text-xs text-slate-600">
+          <p className="mt-3 text-xs text-slate-300">
             Gold Plan money stays locked until you cash out.
           </p>
         )}
@@ -281,19 +281,19 @@ export function Crash() {
           className={
             fraud
               ? 'text-sm font-black tracking-widest text-red-400 uppercase'
-              : 'text-sm font-semibold text-slate-500'
+              : 'text-sm font-semibold text-slate-400'
           }
         >
           {fraud ? '⚠️ Market correction' : 'Market correction'}
         </div>
         <div
           className={
-            fraud ? 'mt-1 text-7xl font-black text-red-500' : 'mt-1 text-4xl font-bold text-red-700'
+            fraud ? 'mt-1 text-7xl font-black text-red-500' : 'mt-1 text-4xl font-bold text-red-400'
           }
         >
           −40%
         </div>
-        <div className={fraud ? 'text-lg text-white/80' : 'text-base text-slate-700'}>
+        <div className={fraud ? 'text-lg text-white/80' : 'text-base text-slate-200'}>
           You lost <span className="font-black">{formatINR(game.crashLoss ?? 0)}</span> from Main
           and Portfolio
         </div>
@@ -323,7 +323,7 @@ export function Crash() {
           label="Top-up amount"
         />
         {!fraud && (
-          <p className="text-xs text-slate-600">
+          <p className="text-xs text-slate-300">
             Adding money does not undo the loss. Prices can fall further.
           </p>
         )}
@@ -378,14 +378,14 @@ export function Cashout() {
 
       {!blocked && !game.cashout && (
         <Panel skin={skin}>
-          <div className={fraud ? 'text-sm text-white/60' : 'text-sm text-slate-600'}>
+          <div className={fraud ? 'text-sm text-white/60' : 'text-sm text-slate-300'}>
             Available to withdraw
           </div>
           <Money
             value={total}
             className={fraud ? 'gold-text text-5xl font-black' : 'text-3xl font-bold'}
           />
-          <div className={`mt-1 text-xs ${fraud ? 'text-white/50' : 'text-slate-500'}`}>
+          <div className={`mt-1 text-xs ${fraud ? 'text-white/50' : 'text-slate-400'}`}>
             Main + Profit + Portfolio
           </div>
         </Panel>
@@ -433,7 +433,7 @@ export function Cashout() {
         <Panel skin={skin} className="text-center">
           <div className="text-3xl">✅</div>
           <div className="text-xl font-bold">Withdrawal processed</div>
-          <div className="text-sm text-slate-600">
+          <div className="text-sm text-slate-300">
             {formatINR(game.wallets.cashedOut)} sent to your bank (simulated).
           </div>
         </Panel>

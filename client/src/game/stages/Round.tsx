@@ -10,7 +10,7 @@ import { AmountPicker, Celebrate, CtaButton, Panel, SkipButton, validAmount } fr
 import { play } from '../ui/sound';
 
 /**
- * S4 — Trading round k of 6 (H2: round 1 result is randomized; H1c: VIP ladder in the fraud skin).
+ * S4 — Trading round k of 4 (H2: round 1 result is randomized; H1c: VIP ladder in the fraud skin).
  * Invest or skip → the chart animates the scripted result → result card → next.
  * Skipping shows the same chart and timing, so both choices take equally long.
  */
@@ -84,7 +84,7 @@ export function Round() {
       <CtaButton skin={skin} onClick={next}>
         {round === ECONOMY.rounds.count
           ? 'Continue'
-          : `Next ${round === 3 ? '— Brain bonus' : 'round'} →`}
+          : `Next ${round === ECONOMY.rounds.brainAfterRound ? '— Brain bonus' : 'round'} →`}
       </CtaButton>
     );
   }
@@ -105,7 +105,7 @@ export function Round() {
         {plan && (
           <span
             className={
-              fraud ? 'rounded-full bg-white/10 px-2 py-0.5 text-xs' : 'text-xs text-slate-500'
+              fraud ? 'rounded-full bg-white/10 px-2 py-0.5 text-xs' : 'text-xs text-slate-400'
             }
           >
             {plan.name} plan
@@ -114,7 +114,7 @@ export function Round() {
       </div>
 
       <div
-        className={`relative ${fraud ? 'rounded-2xl bg-black/40 p-2' : 'rounded-xl border border-slate-200 bg-white p-2'} ${showResult && settled.gain < 0 && fraud ? 'grayscale' : ''}`}
+        className={`relative ${fraud ? 'rounded-2xl bg-black/40 p-2' : 'rounded-xl border border-slate-700 bg-slate-800 p-2'} ${showResult && settled.gain < 0 && fraud ? 'grayscale' : ''}`}
       >
         <LiveChart
           skin={skin}
@@ -126,14 +126,14 @@ export function Round() {
         />
         {!settled && (
           <div
-            className={`absolute top-2 left-3 text-xs ${fraud ? 'text-neon-300' : 'text-slate-500'}`}
+            className={`absolute top-2 left-3 text-xs ${fraud ? 'text-neon-300' : 'text-slate-400'}`}
           >
             {fraud ? '● LIVE market' : 'Market'}
           </div>
         )}
         {animating && (
           <div
-            className={`absolute top-2 right-3 text-xs font-bold ${fraud ? 'animate-pulse text-gold-300' : 'text-slate-500'}`}
+            className={`absolute top-2 right-3 text-xs font-bold ${fraud ? 'animate-pulse text-gold-300' : 'text-slate-400'}`}
           >
             Trading…
           </div>
@@ -182,7 +182,7 @@ export function Round() {
             </Panel>
           )}
           {!fraud && (
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-slate-300">
               Each round can go up or down. Money you invest comes back after the round with the
               gain or loss.
             </p>
@@ -195,12 +195,12 @@ export function Round() {
           className={
             fraud
               ? 'mt-4 text-center'
-              : 'animate-pop mt-4 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm'
+              : 'animate-pop mt-4 rounded-xl border border-slate-700 bg-slate-800 p-4 text-center shadow-sm'
           }
           data-testid="round-result"
         >
           {!fraud && (
-            <div className="mb-1 text-xs font-semibold tracking-wide text-slate-500 uppercase">
+            <div className="mb-1 text-xs font-semibold tracking-wide text-slate-400 uppercase">
               Round {round} result ·{' '}
               {settled.amount > 0 ? `invested ${formatINR(settled.amount)}` : 'not invested'}
             </div>
@@ -216,16 +216,16 @@ export function Round() {
                 </>
               ) : (
                 <>
-                  <div className="text-3xl font-bold text-green-700">
+                  <div className="text-3xl font-bold text-green-400">
                     +{formatINR(settled.gain)}
                   </div>
-                  <div className="text-sm text-slate-600">
+                  <div className="text-sm text-slate-300">
                     The market moved {pct}. Gain added to Profit.
                   </div>
                 </>
               )
             ) : settled.gain < 0 ? (
-              <div className={fraud ? 'text-lg text-white/40' : 'text-2xl font-bold text-red-700'}>
+              <div className={fraud ? 'text-lg text-white/40' : 'text-2xl font-bold text-red-400'}>
                 {formatINR(settled.gain)} <span className="text-sm">({pct})</span>
               </div>
             ) : (
@@ -234,7 +234,7 @@ export function Round() {
               </div>
             )
           ) : (
-            <div className={fraud ? 'text-lg text-white/70' : 'text-lg text-slate-700'}>
+            <div className={fraud ? 'text-lg text-white/70' : 'text-lg text-slate-200'}>
               You sat this round out. The market moved {pct}.
             </div>
           )}
@@ -243,11 +243,13 @@ export function Round() {
               className={
                 fraud
                   ? 'animate-pop mt-4 rounded-2xl bg-gold-400/20 p-3 font-black text-gold-300'
-                  : 'mt-4 rounded-xl border border-slate-200 bg-white p-3 text-sm'
+                  : 'mt-4 rounded-xl border border-slate-700 bg-slate-800 p-3 text-sm'
               }
             >
-              {fraud ? '🏅 6-round streak! ' : 'All 6 rounds done: '}+
-              {formatINR(ECONOMY.streakReward)} reward goes to your Profit wallet
+              {fraud
+                ? `🏅 ${ECONOMY.rounds.count}-round streak! `
+                : `All ${ECONOMY.rounds.count} rounds done: `}
+              +{formatINR(ECONOMY.streakReward)} reward goes to your Profit wallet
             </div>
           )}
         </div>

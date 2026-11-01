@@ -711,3 +711,60 @@ overconfidence, FOMO). Column-by-column documentation in `docs/data-dictionary.m
 **Before real data collection:** play both skins on a real phone (`docs/qa-checklist.md`), run a few `?pilot=1`
 players on the live site, then reset the Turso database (`npm run db:reset -- --yes` with the Turso lines in
 `.env`). Keep the Turso lines commented out in `.env` while developing, so local tests never reach live data.
+
+---
+
+## Playtest fixes (after Redesign Phase 8)
+
+**Status:** done
+
+**Changed**
+- **No data-withdrawal option.** The report card's "Withdraw my data" section, its confirmation, the end screen's
+  withdrawn text, the client API call and the `POST /api/participants/:id/withdraw` endpoint are removed. The
+  `participants.withdrawn` column stays (default 0), and rows flagged earlier are still left out of every export and
+  counted on `/admin`, so old exports work as before.
+- **4 trading rounds instead of 6.** Round 1 stays randomized (+8% / 0%, H2) and round 2 stays +6%, so the
+  escalation ratio (round 2 ÷ round 1) is unchanged. Rounds 3–4 now pay +10% and +12%. The brain bonus comes after
+  round 2 and the mentor chat after round 3 (`ECONOMY.rounds.brainAfterRound` / `chatAfterRound`). The ₹2,000 streak
+  reward is paid after round 4. The crash is unchanged. `wide.csv` drops `r5_amount` and `r6_amount`.
+- **4 bonus spins instead of 6:** lose ₹100 vs win ₹100 / ₹150 / ₹200 / ₹300, random order, results still hidden
+  until the report card. λ = smallest accepted win ÷ 100 (1, 1.5, 2 or 3); rejecting all = 3.5; accepting a win and
+  then rejecting a larger one = inconsistent → blank. `wide.csv` drops `la_gain_50` and `la_gain_250`. 102 columns
+  now; `docs/data-dictionary.md` regenerated.
+- **Dark background in both skins.** The honest skin now uses a dark slate theme on every screen, including the report,
+  share and end screens. Text, cards, buttons, chart and gauge colours were re-tuned for contrast. Everything that makes
+  it honest is unchanged: normal-size numbers, readable risk line above the buttons, equal Invest / Skip buttons, and
+  no toasts, ticker, timers, badges or confetti. The fraud skin is unchanged. The consent screen is untouched.
+- Docs: `README.md`, `docs/screens.md`, `docs/qa-checklist.md`, and the H4 variable line in `hypothesis-report.md`
+  (spin values and λ rule; the statement is unchanged).
+- Tests: step order (brain after round 2, chat after round 3, 47 steps); round rates; a never-investing player can
+  fund both Gold Plan framings in all 32 conditions; λ for 1 / 1.5 / 2 / 3 / 3.5, inconsistent answers and spin order;
+  no withdraw option on the report or end screen (both skins); legacy `withdrawn` rows excluded from exports, and the
+  withdraw endpoint is gone; export test updated to 4 rounds and 4 spins.
+
+**Decisions**
+- `// DECISION:` Rounds 3–4 pay +10% / +12%: someone who stakes the same amount every round gets the same total gain
+  into Profit over the later rounds as before (+28% of the stake: 6 + 10 + 5 + 7 before, 6 + 10 + 12 now). The old −4%
+  dip in round 3 is dropped; the crash remains the scripted loss.
+- `// DECISION:` The ₹2,000 streak reward is kept (paid after round 4). Round gains alone cannot guarantee the profit
+  framing of the Gold Plan for players who skip every round; the reward does, in both skins.
+- `// DECISION:` Accepting all four spins gives λ = 1 (smallest accepted win ₹100 ÷ ₹100); previously the ₹50 spin
+  allowed λ = 0.5.
+- `// DECISION:` The withdraw endpoint is removed (not just hidden) so participants have no way to withdraw; the
+  simulation and tests set the legacy flag directly in the database.
+- `// DECISION:` The report, share and end screens use the same dark slate design (the app is revealed by then).
+
+**Checks**
+- Lint, typecheck, 48 server + 89 client tests, the 40-player API simulation, and `npm run smoke` (both skins at
+  360 px, refresh mid-game, no covered buttons, no horizontal scroll) all pass.
+- Played both skins end to end in Edge at 360 px with screenshots: no page errors, no covered buttons. The honest
+  skin's text and cards are readable on dark.
+
+**Length.** The game now has 47 screens (was 51). A scripted player finishes in 41–47 s (was ~52 s). With realistic
+reading and decision time (about 4 s per profile / spin / reaction tap, 12–15 s per money or brain screen, 1–2 min on
+the report card), a full play takes about 7½–8½ minutes, roughly 40 s shorter than before.
+
+**Open**
+- A player who is mid-game on round 5 or 6 when this deploys has a saved step that no longer exists. A refresh then
+  shows the consent screen and starts them as a new participant (no dead end); their partial data stays in the raw
+  exports. Deploy between sessions, and reset the database before real collection as planned.

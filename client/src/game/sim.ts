@@ -130,7 +130,7 @@ export function simulateGame(
         if (chance(policy.invest)) {
           act({ type: 'round_invest', round, amount: amount(s.wallets.main), at: at + 1000 });
         } else act({ type: 'round_skip', round });
-        if (round === 6) act({ type: 'streak_reward' });
+        if (round === ECONOMY.rounds.count) act({ type: 'streak_reward' });
         break;
       }
       case 'brain': {

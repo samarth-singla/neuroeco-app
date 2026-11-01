@@ -64,7 +64,7 @@ export function SwipeCard({
         className={`relative cursor-grab select-none ${
           fraud
             ? 'glow-card rounded-3xl p-4'
-            : 'rounded-2xl border border-slate-200 bg-white p-4 shadow-md'
+            : 'rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-md'
         }`}
       >
         <span
@@ -89,7 +89,7 @@ export function SwipeCard({
           className={
             fraud
               ? 'rounded-2xl border border-red-400/40 bg-red-500/10 py-3 text-base font-black text-red-300'
-              : 'rounded-xl border border-slate-300 bg-white py-3 text-base font-semibold text-slate-800'
+              : 'rounded-xl border border-slate-600 bg-slate-800 py-3 text-base font-semibold text-slate-100'
           }
         >
           ← {left.label}
@@ -101,7 +101,7 @@ export function SwipeCard({
           className={
             fraud
               ? 'rounded-2xl border border-neon-400/40 bg-neon-500/10 py-3 text-base font-black text-neon-300'
-              : 'rounded-xl border border-slate-300 bg-white py-3 text-base font-semibold text-slate-800'
+              : 'rounded-xl border border-slate-600 bg-slate-800 py-3 text-base font-semibold text-slate-100'
           }
         >
           {right.label} →
@@ -134,7 +134,7 @@ export function Slider7({
   return (
     <div>
       <div
-        className={`mb-2 text-center text-4xl font-black ${fraud ? 'text-gold-300' : 'text-blue-700'}`}
+        className={`mb-2 text-center text-4xl font-black ${fraud ? 'text-gold-300' : 'text-blue-300'}`}
       >
         {value ?? '–'}
         <span className={`text-base ${fraud ? 'text-white/40' : 'text-slate-400'}`}> / 7</span>
@@ -149,10 +149,10 @@ export function Slider7({
         aria-valuetext={value === null ? 'not answered' : String(value)}
         onChange={(e) => onChange(Number(e.target.value))}
         onClick={(e) => onChange(Number((e.target as HTMLInputElement).value))}
-        className={`w-full ${fraud ? 'accent-amber-400' : 'accent-blue-700'}`}
+        className={`w-full ${fraud ? 'accent-amber-400' : 'accent-blue-500'}`}
       />
       <div
-        className={`mt-1 flex justify-between text-xs ${fraud ? 'text-white/50' : 'text-slate-500'}`}
+        className={`mt-1 flex justify-between text-xs ${fraud ? 'text-white/50' : 'text-slate-400'}`}
       >
         <span>1 · {minLabel}</span>
         <span>{maxLabel} · 7</span>

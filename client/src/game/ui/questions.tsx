@@ -27,7 +27,7 @@ export function ChoiceList({
           className={
             fraud
               ? `w-full rounded-2xl border px-4 py-3.5 text-left text-base font-bold transition ${value === o.value ? 'border-neon-400 bg-neon-500/20 text-white' : 'border-white/10 bg-white/5 text-white hover:border-neon-400/50'}`
-              : `w-full rounded-xl border px-4 py-3 text-left text-base transition ${value === o.value ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-800 hover:border-slate-500'}`
+              : `w-full rounded-xl border px-4 py-3 text-left text-base transition ${value === o.value ? 'border-blue-500 bg-blue-700 text-white' : 'border-slate-600 bg-slate-800 text-slate-100 hover:border-slate-400'}`
           }
         >
           {o.label}
@@ -68,7 +68,7 @@ export function Scale7({
             className={
               fraud
                 ? `h-12 rounded-xl border text-lg font-black ${value === n ? 'border-gold-400 bg-gold-400 text-black' : 'border-white/10 bg-white/5 text-white'}`
-                : `h-12 rounded-lg border text-base font-semibold ${value === n ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-800'}`
+                : `h-12 rounded-lg border text-base font-semibold ${value === n ? 'border-blue-500 bg-blue-700 text-white' : 'border-slate-600 bg-slate-800 text-slate-100'}`
             }
           >
             {n}
@@ -76,7 +76,7 @@ export function Scale7({
         ))}
       </div>
       <div
-        className={`mt-1.5 flex justify-between text-xs ${fraud ? 'text-white/50' : 'text-slate-500'}`}
+        className={`mt-1.5 flex justify-between text-xs ${fraud ? 'text-white/50' : 'text-slate-400'}`}
       >
         <span>1 = {minLabel}</span>
         <span>7 = {maxLabel}</span>
@@ -111,7 +111,7 @@ export function NumberAnswer({
         className={
           fraud
             ? 'flex items-center rounded-2xl border border-neon-400/30 bg-black/40 px-3'
-            : 'flex items-center rounded-xl border border-slate-300 bg-white px-3'
+            : 'flex items-center rounded-xl border border-slate-600 bg-slate-800 px-3'
         }
       >
         <input
@@ -120,9 +120,9 @@ export function NumberAnswer({
           autoComplete="off"
           value={raw}
           onChange={(e) => setRaw(e.target.value.replace(/[^\d.]/g, '').slice(0, 8))}
-          className={`tabular w-full bg-transparent px-1 py-3 outline-none ${fraud ? 'text-3xl font-black text-white' : 'text-2xl font-semibold text-slate-900'}`}
+          className={`tabular w-full bg-transparent px-1 py-3 outline-none ${fraud ? 'text-3xl font-black text-white' : 'text-2xl font-semibold text-slate-50'}`}
         />
-        <span className={fraud ? 'text-white/60' : 'text-slate-500'}>{unit}</span>
+        <span className={fraud ? 'text-white/60' : 'text-slate-400'}>{unit}</span>
       </div>
       <button
         type="submit"

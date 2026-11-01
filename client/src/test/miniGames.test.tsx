@@ -7,6 +7,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import App from '../App';
 import {
   BRAIN,
+  ECONOMY,
   FEATURES,
   FOMO,
   GAME_ITEM_IDS,
@@ -81,7 +82,7 @@ for (const skin of ['fraud', 'plain'] as const) {
       await waitForStep('g:home');
 
       const spins = savedGame().game.spins;
-      expect(spins).toHaveLength(6);
+      expect(spins).toHaveLength(SPINS.gains.length);
       expect(
         spins.filter((s) => s.accepted).every((s) => s.outcome === 'win' || s.outcome === 'lose'),
       ).toBe(true);
@@ -89,8 +90,9 @@ for (const skin of ['fraud', 'plain'] as const) {
         ...PROFILE.map((q) => q.id),
         ...SPINS.gains.map((g) => `la_gain_${g}`),
       ]);
-      expect(api.responses.la_gain_50).toBe('accept');
-      expect(api.responses.la_gain_100).toBe('reject');
+      // gameSeed's spin order is SPINS.gains: accept the 1st and 3rd, skip the 2nd and 4th
+      expect(api.responses[`la_gain_${SPINS.gains[0]}`]).toBe('accept');
+      expect(api.responses[`la_gain_${SPINS.gains[1]}`]).toBe('reject');
       expect(api.responses.lit_self).toBe(6);
     });
 
@@ -119,7 +121,7 @@ for (const skin of ['fraud', 'plain'] as const) {
           await screen.findByRole('button', { name: /Next question|Back to trading/ }),
         );
       }
-      await waitForStep('g:round:4');
+      await waitForStep(`g:round:${ECONOMY.rounds.brainAfterRound + 1}`);
       // crt_1 and crt_3 correct (₹200) + lit_interest "more" correct (₹100); honest bonus ₹500 in Profit
       expect(savedGame().game.wallets.profit).toBe(300 + (skin === 'plain' ? 500 : 0));
       await responsesSaved(

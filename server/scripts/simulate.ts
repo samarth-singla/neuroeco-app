@@ -13,7 +13,7 @@
 import path from 'node:path';
 import type { AddressInfo } from 'node:net';
 import { fileURLToPath } from 'node:url';
-import { all, openDb } from '../src/db';
+import { all, openDb, run } from '../src/db';
 import { createApp } from '../src/app';
 import { wideColumns } from '../src/wide';
 import { finalBalance, spinNet } from '../../client/src/game/economy';
@@ -141,7 +141,9 @@ export async function runSimulation(n = 40, seed = 2026): Promise<SimulationResu
       await post(`/api/participants/${id}/step`, { step: 'g:report' });
       completed++;
       if (i % 15 === 7) {
-        await post(`/api/participants/${id}/withdraw`, {});
+        // The app no longer offers data withdrawal; this sets the legacy flag directly, as on rows
+        // withdrawn before it was removed, to check they stay out of the export.
+        await run(db, 'UPDATE participants SET withdrawn = 1 WHERE participant_id = ?', [id]);
         withdrawn++;
       } else {
         await post(`/api/participants/${id}/step`, { step: 'g:end' });

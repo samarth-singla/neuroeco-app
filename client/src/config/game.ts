@@ -36,18 +36,27 @@ export const ECONOMY = {
 
   /** Trading rounds (H2). Returns are scripted; round 1 depends on `round1_outcome`. */
   rounds: {
-    count: 6,
+    count: 4,
     round1: { small_win: 0.08, flat: 0 } as Record<'small_win' | 'flat', number>,
-    /** Rounds 2–6, net positive */
-    later: { 2: 0.06, 3: -0.04, 4: 0.1, 5: 0.05, 6: 0.07 } as Record<number, number>,
+    /**
+     * Rounds 2–4, net positive. Round 2 is unchanged (escalation ratio = round 2 ÷ round 1).
+     * DECISION: with 4 rounds instead of 6, rounds 3–4 pay +10% and +12%, so a player who stakes
+     * the same amount every round gets the same total gain into Profit over rounds 2–4 (+28% of the
+     * stake) as over rounds 2–6 before (6 + 10 + 5 + 7). The old −4% dip in round 3 is dropped;
+     * the market crash (S11) remains the scripted loss.
+     */
+    later: { 2: 0.06, 3: 0.1, 4: 0.12 } as Record<number, number>,
+    /** The brain bonus (S5) comes after this round, the mentor chat (S6) after the next one */
+    brainAfterRound: 2,
+    chatAfterRound: 3,
     /** Length of the chart animation after Invest/Skip */
     chartMs: 2600,
   },
   /**
-   * Paid to the Profit wallet after round 6 in both skins, so every player has at least ₹2,000 of
-   * profit when the H7 reinvest offer arrives (the profit framing needs it).
+   * Paid to the Profit wallet after the last round in both skins, so every player — even one who
+   * never invests — has at least ₹2,000 of profit when the H7 reinvest offer arrives.
    */
-  // DECISION: a fixed "6-round streak reward" guarantees the Profit wallet can fund the H7 offer.
+  // DECISION: a fixed "streak reward" after the last round guarantees the Profit wallet can fund the H7 offer.
   streakReward: 2000,
   /** Brain bonus: added to the Profit wallet per correct answer (S5) */
   brainReward: 100,
@@ -79,8 +88,11 @@ export const ECONOMY = {
   chatDepositWindowMs: 60000,
 };
 
-/** Bonus spins (H4): 50% lose ₹100, 50% win X. Results are revealed only on the report card. */
-export const SPINS = { loss: 100, gains: [50, 100, 150, 200, 250, 300] };
+/**
+ * Bonus spins (H4): 50% lose ₹100, 50% win X. Results are revealed only on the report card.
+ * λ = smallest accepted win ÷ 100 (1, 1.5, 2 or 3); rejecting all = 3.5 (server/src/scoring.ts).
+ */
+export const SPINS = { loss: 100, gains: [100, 150, 200, 300] };
 
 /** Optional prize draw. Switch on only with instructor approval (consent then states the rules). */
 export const PRIZE_DRAW = {
@@ -677,7 +689,7 @@ export const SHARE = {
   title: 'Think your friends would do better?',
   body: 'Challenge them to spot the traps. The link has no personal data in it.',
   shareText:
-    'Can you spot the scam? Try this 10-minute investment-app challenge from a university study.',
+    'Can you spot the scam? Try this 8-minute investment-app challenge from a university study.',
   button: 'Share the challenge',
   copied: 'Link copied!',
   finish: 'Finish',
@@ -686,7 +698,6 @@ export const SHARE = {
 export const END = {
   title: 'Thank you for playing!',
   body: 'Your participation is complete. You can close this page now.',
-  withdrawn: 'Your data has been withdrawn and will not be used. Thank you for your time.',
 };
 
 /** Report card: how each trap reads when the player avoided it */

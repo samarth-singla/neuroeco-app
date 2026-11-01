@@ -20,7 +20,7 @@ Open the link in private windows until you have had both skins (shown in `/admin
 - [ ] **Fraud:** ticker, winner toasts every few seconds, ★4.9 / 10 lakh+ / NDIA badge (tap → certificate),
       locked ₹500 bonus, countdown + "only 3 slots left", VIP ladder, testimonials, pulsing INVEST NOW (phone
       vibrates on Android), confetti on wins, "Rohit Sir" chat typing, flashing flash deals, crash flash, tax block.
-- [ ] **Honest:** light theme, equal Invest / Skip buttons, readable risk line above the buttons, About page,
+- [ ] **Honest:** dark slate theme with readable text and cards, normal-size numbers, equal Invest / Skip buttons, readable risk line above the buttons, About page,
       Help & FAQ card, no toasts / timers / badges / confetti, withdrawal goes through.
 - [ ] The honest skin does not feel noticeably shorter or duller.
 - [ ] Sound toggle (fraud) is off by default and works when switched on.
@@ -44,7 +44,7 @@ Open the link in private windows until you have had both skins (shown in `/admin
 
 ### Report card and data
 - [ ] Trap score and list make sense for what you did; spin results appear only here.
-- [ ] "Withdraw my data" → end screen says so; `/admin` Withdrawn +1; player missing from every CSV.
+- [ ] No "withdraw my data" option on the report card or the end screen.
 - [ ] Share opens the phone's share sheet (or copies the link) and the link has no personal data.
 - [ ] `/admin` counts and the four CSV downloads work; `wide.csv` columns match `docs/data-dictionary.md`.
 - [ ] A `?pilot=1` link gives `is_pilot = 1`.

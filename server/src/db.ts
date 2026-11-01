@@ -93,7 +93,8 @@ export async function openDb(target: string, authToken?: string): Promise<DB> {
   }
   const db = createClient({ url, authToken: authToken || undefined });
   await db.executeMultiple(SCHEMA);
-  // Phase 7: participants can withdraw their data on the debrief screen (excluded from every export)
+  // Phase 7: data withdrawal flag (excluded from every export). The app no longer offers withdrawal;
+  // the column stays (default 0) so rows withdrawn earlier remain excluded from exports.
   await ensureColumn(db, 'participants', 'withdrawn', 'INTEGER NOT NULL DEFAULT 0');
   // Phase 10: participants who came through a ?pilot=1 link (excluded from analysis)
   await ensureColumn(db, 'participants', 'is_pilot', 'INTEGER NOT NULL DEFAULT 0');

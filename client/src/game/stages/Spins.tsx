@@ -47,7 +47,7 @@ function Wheel({ spinning }: { spinning: boolean }) {
 }
 
 /**
- * S2 — Bonus spins (H4): six offers "50% lose ₹100 / 50% win ₹X", accept or skip.
+ * S2 — Bonus spins (H4): four offers "50% lose ₹100 / 50% win ₹X", accept or skip.
  * The result is drawn now but only revealed on the report card, so it cannot affect later play.
  */
 export function Spins() {
@@ -100,7 +100,7 @@ export function Spins() {
     <GameShell market={false} actions={actions}>
       <div className="text-center">
         <div
-          className={`text-xs font-bold tracking-widest uppercase ${fraud ? 'text-gold-300' : 'text-slate-500'}`}
+          className={`text-xs font-bold tracking-widest uppercase ${fraud ? 'text-gold-300' : 'text-slate-400'}`}
         >
           {fraud
             ? `Lucky spin ${i + 1} of ${SPINS.gains.length}`
@@ -108,9 +108,9 @@ export function Spins() {
         </div>
         {i === 0 && (
           <p
-            className={`mx-auto mt-2 max-w-xs text-sm ${fraud ? 'text-white/70' : 'text-slate-600'}`}
+            className={`mx-auto mt-2 max-w-xs text-sm ${fraud ? 'text-white/70' : 'text-slate-300'}`}
           >
-            Six bonus offers. Each is a coin flip. Results are revealed at the end of the game.
+            Four bonus offers. Each is a coin flip. Results are revealed at the end of the game.
           </p>
         )}
         {fraud ? (
@@ -118,7 +118,7 @@ export function Spins() {
             <Wheel spinning={busy === 'accept'} />
           </div>
         ) : (
-          <div className="mx-auto mt-6 flex h-28 w-28 items-center justify-center rounded-full border-4 border-slate-300 bg-white text-4xl">
+          <div className="mx-auto mt-6 flex h-28 w-28 items-center justify-center rounded-full border-4 border-slate-600 bg-slate-800 text-4xl">
             🪙
           </div>
         )}
@@ -127,15 +127,15 @@ export function Spins() {
             className={
               fraud
                 ? 'rounded-2xl bg-red-500/15 p-3'
-                : 'rounded-xl border border-slate-200 bg-white p-3'
+                : 'rounded-xl border border-slate-700 bg-slate-800 p-3'
             }
           >
-            <div className={`text-xs ${fraud ? 'text-white/60' : 'text-slate-500'}`}>
+            <div className={`text-xs ${fraud ? 'text-white/60' : 'text-slate-400'}`}>
               50% chance
             </div>
             <div
               className={
-                fraud ? 'text-2xl font-black text-red-300' : 'text-xl font-bold text-red-700'
+                fraud ? 'text-2xl font-black text-red-300' : 'text-xl font-bold text-red-400'
               }
             >
               lose {formatINR(SPINS.loss)}
@@ -145,15 +145,15 @@ export function Spins() {
             className={
               fraud
                 ? 'rounded-2xl bg-neon-500/15 p-3'
-                : 'rounded-xl border border-slate-200 bg-white p-3'
+                : 'rounded-xl border border-slate-700 bg-slate-800 p-3'
             }
           >
-            <div className={`text-xs ${fraud ? 'text-white/60' : 'text-slate-500'}`}>
+            <div className={`text-xs ${fraud ? 'text-white/60' : 'text-slate-400'}`}>
               50% chance
             </div>
             <div
               className={
-                fraud ? 'neon-text text-2xl font-black' : 'text-xl font-bold text-green-700'
+                fraud ? 'neon-text text-2xl font-black' : 'text-xl font-bold text-green-400'
               }
             >
               win {formatINR(gain)}
@@ -161,7 +161,7 @@ export function Spins() {
           </div>
         </div>
         {(busy || done) && (
-          <p className={`mt-4 text-sm font-semibold ${fraud ? 'text-gold-300' : 'text-slate-600'}`}>
+          <p className={`mt-4 text-sm font-semibold ${fraud ? 'text-gold-300' : 'text-slate-300'}`}>
             {(busy ?? (done?.accepted ? 'accept' : 'skip')) === 'accept'
               ? fraud
                 ? '🎁 Spin locked in! Result revealed on your report card'

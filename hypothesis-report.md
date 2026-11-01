@@ -88,7 +88,7 @@ Each sub-hypothesis is tested through the feature-level quick reaction "Did this
 
 **Variables**
 
-- **IV:** Loss aversion λ (from the in-game bonus spins: six 50-50 offers, lose ₹100 vs win ₹50–₹300)
+- **IV:** Loss aversion λ (from the in-game bonus spins: four 50-50 offers, lose ₹100 vs win ₹100 / ₹150 / ₹200 / ₹300; λ = smallest accepted win ÷ 100, rejecting all = 3.5)
 - **DVs:** Post-loss top-up (yes/no), top-up amount
 - **Controls:** App version, investing experience
 

@@ -8,7 +8,7 @@ as the report card. Download it from `/admin` → wide.csv. Yes/no columns use `
 a blank cell means "not applicable" or "not answered". Amounts are in virtual ₹. Stage numbers
 (S1–S15) are listed in `docs/screens.md`.
 
-Total columns: 106.
+Total columns: 102.
 
 **Other exports** (raw, for checking): `participants.csv` (one row per consented participant),
 `events.csv` (append-only behaviour log: `ts` = server time in ms, `client_ts` = ms since page load,
@@ -49,8 +49,6 @@ flagged with `is_pilot = 1`.
 | `r2_amount` | Round 2 stake, ₹ (0 if skipped) | H1, H2 |
 | `r3_amount` | Round 3 stake, ₹ (0 if skipped) | H1 |
 | `r4_amount` | Round 4 stake, ₹ (0 if skipped) | H1 |
-| `r5_amount` | Round 5 stake, ₹ (0 if skipped) | H1 |
-| `r6_amount` | Round 6 stake, ₹ (0 if skipped) | H1 |
 | `escalation_ratio` | r2_amount ÷ r1_amount; blank if r1_amount = 0 | H2 |
 | `chat_open` | 1 = opened the mentor chat (fraud) / Help & FAQ (honest) on S6 | H1f |
 | `chat_deposit` | 1 = invested within 60 s after S6 appeared | H1f |
@@ -109,11 +107,9 @@ flagged with `is_pilot = 1`.
 | `exp_trading_app` | S1 profile: Have you used a trading, investing or crypto app? (`yes` / `no`) | Controls, H9 |
 | `exp_fin_edu` | S1 profile: Have you taken any course or class on personal finance or investing? (`yes` / `no`) | H8 |
 | `lit_self` | S1 profile: How good are you with money? (1–7) | H8 (self-rated literacy) |
-| `la_gain_50` | S2 spin "50% lose ₹100 / 50% win ₹50": `accept` / `reject` | H4 |
 | `la_gain_100` | S2 spin "50% lose ₹100 / 50% win ₹100": `accept` / `reject` | H4 |
 | `la_gain_150` | S2 spin "50% lose ₹100 / 50% win ₹150": `accept` / `reject` | H4 |
 | `la_gain_200` | S2 spin "50% lose ₹100 / 50% win ₹200": `accept` / `reject` | H4 |
-| `la_gain_250` | S2 spin "50% lose ₹100 / 50% win ₹250": `accept` / `reject` | H4 |
 | `la_gain_300` | S2 spin "50% lose ₹100 / 50% win ₹300": `accept` / `reject` | H4 |
 | `crt_1` | S5 brain bonus: A bat and a ball cost ₹110 in total. The bat costs ₹100 more than the ball. How much do… (number) | H1 (moderator) |
 | `crt_2` | S5 brain bonus: If 5 machines take 5 minutes to make 5 widgets, how long would 100 machines take to mak… (number) | H1 (moderator) |
@@ -139,9 +135,9 @@ flagged with `is_pilot = 1`.
 | Column | Description | Hypotheses |
 | --- | --- | --- |
 | `crt_score` | Cognitive Reflection Test score 0–3 (correct: 5, 5, 47) | H1 (moderator) |
-| `lambda` | Loss aversion λ from the bonus spins = smallest accepted gain ÷ ₹100 (0.5–3.0); 3.5 if all rejected; blank if inconsistent | H4, H8, H9 |
+| `lambda` | Loss aversion λ from the bonus spins = smallest accepted win ÷ ₹100 (1, 1.5, 2, 3); 3.5 if all rejected; blank if inconsistent (accepts a win, then rejects a larger one) | H4, H8, H9 |
 | `la_consistent` | 1 = spin choices switch at most once (reject → accept), 0 = inconsistent | H4 |
-| `la_accepted` | Number of the six spins accepted (0–6) | H4 |
+| `la_accepted` | Number of the 4 spins accepted (0–4) | H4 |
 | `literacy_score` | Big Three financial literacy score 0–3 ("don't know" = wrong) | H8 |
 | `self_rated_literacy` | Self-rated "How good are you with money?" 1–7 (= `lit_self`) | H8 |
 | `overconfidence` | z(self_rated_literacy) − z(literacy_score), z over the rows in this export (sample SD); blank if either SD is 0 | H8 |

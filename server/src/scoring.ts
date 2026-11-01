@@ -4,8 +4,8 @@
  */
 import { ANSWER_KEY, SPINS } from '../../client/src/config/game';
 
-// Game bonus spins (S2): 50% lose ₹100 vs 50% win ₹50…₹300 — the v1 gamble task, same λ formula
-const GAMBLE_GAINS = SPINS.gains;
+// Game bonus spins (S2): 50% lose ₹100 vs 50% win ₹100, ₹150, ₹200 or ₹300, ordered by win
+const GAMBLE_GAINS = [...SPINS.gains].sort((x, y) => x - y);
 const GAMBLE_LOSS = SPINS.loss;
 
 export type Answers = Record<string, string | undefined>;
@@ -43,9 +43,10 @@ export interface LossAversion {
 export const LAMBDA_REJECT_ALL = 3.5;
 
 /**
- * Loss aversion from the six 50-50 gambles (lose ₹100 vs win ₹50…₹300), ordered by gain.
- * With linear utility a person accepts when gain ≥ λ × loss, so λ is estimated at the switching
- * point as (smallest accepted gain) ÷ loss. Accept-all gives 0.5.
+ * Loss aversion from the four 50-50 bonus spins (lose ₹100 vs win ₹100 / 150 / 200 / 300).
+ * With linear utility a person accepts when win ≥ λ × loss, so λ = smallest accepted win ÷ 100:
+ * 1, 1.5, 2 or 3 (accepting all gives 1). Rejecting all = 3.5. Accepting a win and then rejecting a
+ * larger one is inconsistent → λ blank.
  */
 export function lossAversion(a: Answers): LossAversion {
   const choices = GAMBLE_GAINS.map((g) => a[`la_gain_${g}`]);

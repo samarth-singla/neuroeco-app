@@ -12,8 +12,8 @@ import {
 } from '../src/scoring';
 
 const gambles = (choices: string): Answers => {
-  // choices: 6 letters, a = accept, r = reject, for gains 50…300
-  const gains = [50, 100, 150, 200, 250, 300];
+  // choices: 4 letters, a = accept, r = reject, for wins of ₹100, ₹150, ₹200, ₹300
+  const gains = [100, 150, 200, 300];
   return Object.fromEntries(
     gains.map((g, i) => [`la_gain_${g}`, choices[i] === 'a' ? 'accept' : 'reject']),
   );
@@ -31,26 +31,29 @@ describe('CRT', () => {
   });
 });
 
-describe('loss aversion λ', () => {
-  it('uses the smallest accepted gain ÷ 100', () => {
-    expect(lossAversion(gambles('rrrraa'))).toEqual({ lambda: 2.5, consistent: 1, accepted: 2 });
-    expect(lossAversion(gambles('raaaaa')).lambda).toBe(1);
-    expect(lossAversion(gambles('rrraaa')).lambda).toBe(2);
+describe('loss aversion λ (4 bonus spins)', () => {
+  it('uses the smallest accepted win ÷ 100: 1, 1.5, 2 or 3', () => {
+    expect(lossAversion(gambles('aaaa'))).toEqual({ lambda: 1, consistent: 1, accepted: 4 });
+    expect(lossAversion(gambles('raaa'))).toEqual({ lambda: 1.5, consistent: 1, accepted: 3 });
+    expect(lossAversion(gambles('rraa'))).toEqual({ lambda: 2, consistent: 1, accepted: 2 });
+    expect(lossAversion(gambles('rrra'))).toEqual({ lambda: 3, consistent: 1, accepted: 1 });
   });
-  it('accept-all gives 0.5, reject-all is top-coded', () => {
-    expect(lossAversion(gambles('aaaaaa')).lambda).toBe(0.5);
-    expect(lossAversion(gambles('rrrrrr'))).toEqual({
-      lambda: LAMBDA_REJECT_ALL,
-      consistent: 1,
-      accepted: 0,
-    });
+  it('rejecting all spins gives 3.5', () => {
+    expect(LAMBDA_REJECT_ALL).toBe(3.5);
+    expect(lossAversion(gambles('rrrr'))).toEqual({ lambda: 3.5, consistent: 1, accepted: 0 });
   });
-  it('flags inconsistent choices and leaves λ blank', () => {
-    expect(lossAversion(gambles('rarara'))).toEqual({ lambda: null, consistent: 0, accepted: 3 });
-    expect(lossAversion(gambles('aaaaar'))).toMatchObject({ lambda: null, consistent: 0 });
+  it('inconsistent choices (accept a win, reject a larger one) leave λ blank', () => {
+    expect(lossAversion(gambles('arar'))).toEqual({ lambda: null, consistent: 0, accepted: 2 });
+    expect(lossAversion(gambles('aaar'))).toMatchObject({ lambda: null, consistent: 0 });
+    expect(lossAversion(gambles('rarr'))).toMatchObject({ lambda: null, consistent: 0 });
   });
-  it('is blank if any gamble is unanswered', () => {
-    const a = gambles('rrraaa');
+  it('does not depend on the order the spins were shown in', () => {
+    const a = gambles('rraa');
+    const shuffled = Object.fromEntries(Object.entries(a).reverse());
+    expect(lossAversion(shuffled).lambda).toBe(2);
+  });
+  it('is blank if any spin is unanswered', () => {
+    const a = gambles('rraa');
     delete a.la_gain_150;
     expect(lossAversion(a)).toEqual({ lambda: null, consistent: null, accepted: null });
   });

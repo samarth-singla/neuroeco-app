@@ -9,7 +9,7 @@ import { Celebrate, CtaButton, TimerRing, Title } from '../ui/kit';
 import { ChoiceList, NumberAnswer } from '../ui/questions';
 
 /**
- * S5 — Brain bonus (between rounds 3 and 4): 3 CRT puzzles, then the Big Three literacy questions,
+ * S5 — Brain bonus (between rounds 2 and 3): 3 CRT puzzles, then the Big Three literacy questions,
  * one per screen. A correct answer really adds ₹100 to the Profit wallet (H1 moderator, H8).
  * The fraud skin's timer ring is visual only and never forces an answer.
  */
@@ -49,11 +49,11 @@ export function Brain() {
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
           <div
-            className={`text-xs font-bold tracking-widest uppercase ${fraud ? 'text-gold-300' : 'text-slate-500'}`}
+            className={`text-xs font-bold tracking-widest uppercase ${fraud ? 'text-gold-300' : 'text-slate-400'}`}
           >
             🧠 Brain bonus · {i + 1}/{BRAIN.length}
           </div>
-          <div className={fraud ? 'text-sm text-white/70' : 'text-sm text-slate-600'}>
+          <div className={fraud ? 'text-sm text-white/70' : 'text-sm text-slate-300'}>
             Earn ₹{ECONOMY.brainReward} for every correct answer
           </div>
         </div>
@@ -75,13 +75,13 @@ export function Brain() {
               className={
                 fraud
                   ? 'animate-pop neon-text text-5xl font-black'
-                  : 'text-2xl font-bold text-green-700'
+                  : 'text-2xl font-bold text-green-400'
               }
             >
               +₹{ECONOMY.brainReward}
             </div>
           ) : (
-            <div className={fraud ? 'text-lg text-white/50' : 'text-lg text-slate-600'}>
+            <div className={fraud ? 'text-lg text-white/50' : 'text-lg text-slate-300'}>
               No bonus this time
             </div>
           )}

@@ -51,8 +51,4 @@ export const api = {
   ): Promise<unknown> {
     return postJson('/api/responses', { participant_id: participantId, responses });
   },
-
-  withdrawData(id: string): Promise<unknown> {
-    return postJson(`/api/participants/${encodeURIComponent(id)}/withdraw`, {});
-  },
 };

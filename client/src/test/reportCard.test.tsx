@@ -5,7 +5,7 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import App from '../App';
-import { END, PRIZE_DRAW } from '../config/game';
+import { END, PRIZE_DRAW, SPINS } from '../config/game';
 import { finalBalance, formatINR } from '../game/economy';
 import { mulberry32, simulateGame } from '../game/sim';
 import { factsFromEvents, trapResult } from '../game/traps';
@@ -53,7 +53,7 @@ describe('report card', () => {
         );
         // every spin is revealed now, with its outcome
         const spins = screen.getByTestId('spin-results');
-        expect(spins.querySelectorAll('li')).toHaveLength(6);
+        expect(spins.querySelectorAll('li')).toHaveLength(SPINS.gains.length);
         for (const s of r.state.spins.filter((x) => x.accepted)) {
           expect(spins.textContent).toContain(
             s.outcome === 'win' ? `won +₹${s.gain}` : 'lost −₹100',
@@ -80,16 +80,20 @@ describe('report card', () => {
     });
   });
 
-  it('withdraw my data → server flag set, end screen says so', async () => {
-    const { a } = playToReport('plain', 2);
-    const api = installFakeApi(apiAssignment(a));
-    render(<App />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Withdraw my data' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Yes, withdraw my data' }));
-    expect(await screen.findByText(END.withdrawn)).toBeInTheDocument();
-    expect(api.withdrawn).toBe(true);
-    expect(savedGame().game.step).toBe('g:end');
-  });
+  for (const skin of ['plain', 'fraud'] as const) {
+    it(`${skin}: no withdraw-my-data option on the report card or the end screen`, async () => {
+      const { a } = playToReport(skin, 2);
+      installFakeApi(apiAssignment(a));
+      render(<App />);
+      await screen.findByTestId('trap-score');
+      expect(screen.queryByText(/withdraw (my|your) data/i)).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+      fireEvent.click(await screen.findByRole('button', { name: 'Finish' }));
+      expect(await screen.findByText(END.body)).toBeInTheDocument();
+      expect(screen.queryByText(/withdraw/i)).not.toBeInTheDocument();
+      expect(savedGame().game.step).toBe('g:end');
+    });
+  }
 
   it('share screen logs the tap and finishes', async () => {
     const a = gameAssignment();

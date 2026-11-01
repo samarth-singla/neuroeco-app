@@ -55,7 +55,7 @@ export function LiveChart({
     .join(' ');
   const up = rate >= 0;
   const fraud = skin === 'fraud';
-  const stroke = fraud ? (up ? '#22ff88' : '#f87171') : up ? '#15803d' : '#b91c1c';
+  const stroke = fraud ? (up ? '#22ff88' : '#f87171') : up ? '#4ade80' : '#f87171';
   const length = 900;
 
   return (
@@ -70,7 +70,7 @@ export function LiveChart({
         x2={w}
         y1={y(0)}
         y2={y(0)}
-        stroke={fraud ? 'rgba(255,255,255,0.12)' : '#e2e8f0'}
+        stroke={fraud ? 'rgba(255,255,255,0.12)' : '#334155'}
         strokeDasharray="4 4"
       />
       <path

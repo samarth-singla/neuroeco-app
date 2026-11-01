@@ -5,12 +5,11 @@ export interface FakeApi {
   events: { screen: string; event_type: string; payload?: Record<string, unknown> }[];
   responses: Record<string, unknown>;
   steps: string[];
-  withdrawn: boolean;
 }
 
 /** Replaces window.fetch with an in-memory version of the server API. */
 export function installFakeApi(assignment: Assignment): FakeApi {
-  const db: FakeApi = { events: [], responses: {}, steps: [], withdrawn: false };
+  const db: FakeApi = { events: [], responses: {}, steps: [] };
   const id = '11111111-2222-4333-8444-555555555555';
   const json = (body: unknown, status = 200) =>
     Promise.resolve(new Response(JSON.stringify(body), { status }));
@@ -30,10 +29,6 @@ export function installFakeApi(assignment: Assignment): FakeApi {
       }
       if (url.endsWith('/step')) {
         db.steps.push(body.step);
-        return json({ ok: true });
-      }
-      if (url.endsWith('/withdraw')) {
-        db.withdrawn = true;
         return json({ ok: true });
       }
       if (url === '/api/events') {

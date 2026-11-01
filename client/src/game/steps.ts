@@ -2,26 +2,32 @@
  * The game is a fixed sequence of steps. Each step is one screen; the step id is stored as the
  * participant's `current_step` (server) and in sessionStorage, so a refresh resumes on it.
  *
- * Order follows a scam lifecycle: profile → spins → hook (home) → rounds 1–3 → brain bonus →
- * round 4 → mentor chat → rounds 5–6 → flash deals → pool → test withdrawal → reinvest →
+ * Order follows a scam lifecycle: profile → spins → hook (home) → rounds 1–2 → brain bonus →
+ * round 3 → mentor chat → round 4 → flash deals → pool → test withdrawal → reinvest →
  * crash → cash out → quick reactions → report card → share.
  */
-import { BRAIN, FEATURES, FOMO, PROFILE, SLIDERS, SPINS } from '../config/game';
+import { BRAIN, ECONOMY, FEATURES, FOMO, PROFILE, SLIDERS, SPINS } from '../config/game';
 
 const range = (n: number) => Array.from({ length: n }, (_, i) => i);
+
+/** Trading rounds with the brain bonus and the mentor chat slotted in after their rounds. */
+function roundSteps(): string[] {
+  const out: string[] = [];
+  for (let r = 1; r <= ECONOMY.rounds.count; r++) {
+    out.push(`g:round:${r}`);
+    if (r === ECONOMY.rounds.brainAfterRound) {
+      out.push(...range(BRAIN.length).map((i) => `g:brain:${i}`));
+    }
+    if (r === ECONOMY.rounds.chatAfterRound) out.push('g:chat');
+  }
+  return out;
+}
 
 export const STEPS: string[] = [
   ...range(PROFILE.length).map((i) => `g:profile:${i}`),
   ...range(SPINS.gains.length).map((i) => `g:spin:${i}`),
   'g:home',
-  'g:round:1',
-  'g:round:2',
-  'g:round:3',
-  ...range(BRAIN.length).map((i) => `g:brain:${i}`),
-  'g:round:4',
-  'g:chat',
-  'g:round:5',
-  'g:round:6',
+  ...roundSteps(),
   'g:deal:0',
   'g:deal:1',
   'g:deal:2',

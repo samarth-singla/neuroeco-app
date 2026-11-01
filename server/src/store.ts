@@ -118,11 +118,6 @@ export function getParticipant(db: DB, id: string): Promise<ParticipantRow | und
   return get<ParticipantRow>(db, 'SELECT * FROM participants WHERE participant_id = ?', [id]);
 }
 
-/** Debrief "withdraw my data": the participant is kept but excluded from all exports. */
-export async function withdrawParticipant(db: DB, id: string): Promise<void> {
-  await run(db, 'UPDATE participants SET withdrawn = 1 WHERE participant_id = ?', [id]);
-}
-
 export async function setStep(db: DB, id: string, step: string): Promise<void> {
   await run(db, 'UPDATE participants SET current_step = ? WHERE participant_id = ?', [step, id]);
   if (COMPLETED_STEPS.has(step)) {

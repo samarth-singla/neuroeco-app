@@ -33,7 +33,7 @@ function combos(): GameAssignment[] {
               referral_source,
               money_source,
               deal_order: [8000, 500, 3000],
-              spin_order: [300, 50, 200, 100, 250, 150],
+              spin_order: [300, 100, 200, 150],
             });
   return out;
 }
@@ -70,7 +70,7 @@ describe('economy', () => {
   it('round rates: round 1 depends on the condition, later rounds are fixed and net positive', () => {
     expect(roundRate(1, 'small_win')).toBe(0.08);
     expect(roundRate(1, 'flat')).toBe(0);
-    const later = [2, 3, 4, 5, 6].map((r) => roundRate(r, 'flat'));
+    const later = [2, 3, 4].map((r) => roundRate(r, 'flat'));
     expect(later.reduce((s, x) => s + x, 0)).toBeGreaterThan(0);
   });
 
@@ -106,8 +106,35 @@ describe('steps', () => {
     expect(new Set(stages).size).toBe(15);
     expect(STEPS.at(-1)).toBe('g:end');
     expect(nextStep('g:end')).toBe('g:end');
-    expect(STEPS.indexOf('g:brain:0')).toBe(STEPS.indexOf('g:round:3') + 1);
-    expect(STEPS.indexOf('g:chat')).toBe(STEPS.indexOf('g:round:4') + 1);
+    expect(STEPS.indexOf('g:brain:0')).toBe(STEPS.indexOf('g:round:2') + 1);
+    expect(STEPS.indexOf('g:round:3')).toBe(STEPS.indexOf('g:brain:5') + 1);
+    expect(STEPS.indexOf('g:chat')).toBe(STEPS.indexOf('g:round:3') + 1);
+    expect(STEPS.indexOf('g:round:4')).toBe(STEPS.indexOf('g:chat') + 1);
+    expect(STEPS.indexOf('g:deal:0')).toBe(STEPS.indexOf('g:round:4') + 1);
+    expect(STEPS.filter((s) => s.startsWith('g:round:'))).toHaveLength(4);
+    expect(STEPS.filter((s) => s.startsWith('g:spin:'))).toHaveLength(4);
+    expect(STEPS).toHaveLength(47);
+  });
+  it('has 4 rounds: round 1 randomized, round 2 unchanged, all later rounds net positive', () => {
+    expect(ECONOMY.rounds.count).toBe(4);
+    expect(roundRate(1, 'small_win')).toBe(0.08);
+    expect(roundRate(1, 'flat')).toBe(0);
+    expect(roundRate(2, 'flat')).toBe(0.06);
+    expect([2, 3, 4].every((r) => roundRate(r, 'flat') > 0)).toBe(true);
+    // same total gain per rupee staked over the later rounds as the old 6-round script (+28%)
+    expect([2, 3, 4].reduce((sum, r) => sum + roundRate(r, 'flat'), 0)).toBeCloseTo(0.28, 10);
+  });
+  it('a player who never invests can still fund both Gold Plan framings', () => {
+    for (const a of combos()) {
+      const r = simulateGame(a, mulberry32(7), {
+        ...DEFAULT_POLICY,
+        invest: 0,
+        verify: 0,
+        correct: 0,
+      });
+      expect(r.snapshots['reinvest_before'].profit).toBeGreaterThanOrEqual(ECONOMY.reinvest.amount);
+      expect(r.snapshots['reinvest_before'].main).toBeGreaterThanOrEqual(ECONOMY.reinvest.amount);
+    }
   });
 });
 
@@ -136,7 +163,7 @@ describe('headless run through every stage for every factor combination', () => 
         expect(before.profit).toBeGreaterThanOrEqual(ECONOMY.reinvest.amount);
         expect(before.main).toBeGreaterThanOrEqual(ECONOMY.reinvest.amount);
 
-        // All six spins answered, in the assigned order
+        // All four spins answered, in the assigned order
         expect(s.spins.map((x) => x.gain)).toEqual(a.spin_order);
         // Every response item answered
         for (const id of GAME_ITEM_IDS) expect(r.answers, id).toHaveProperty(id);
