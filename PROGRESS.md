@@ -645,3 +645,69 @@ service sleeps or redeploys), so a local SQLite file would lose data.
   you to invest?" reactions (plus behaviour) instead of the three v1 rating scales, since that is what the game
   measures (REDESIGN_PLAN S13). Statements are unchanged.
 - `// DECISION:` The `?game=` switch was removed with the v1 flow; every link runs the game.
+
+## Redesign Phase 8 — Playtest pass
+
+**Status:** done
+
+**Built / fixed after playing both skins in Edge at 360 px**
+- Rounds: the amount field and quick chips now sit right under a shorter chart (they were pushed below the fold
+  by the fraud skin's bonus nudge and VIP panel, leaving a disabled INVEST NOW with no visible way forward); the
+  nudges follow below. The action bar shows a disabled "⏳ Trading…" button during the chart animation instead of
+  going blank. "VIP 0" now reads "Member".
+- Gold Plan: the slider starts at ₹0, so the H7 amount is an active choice rather than an accepted default.
+- New test: every derived variable listed in REDESIGN_PLAN §5 is a `wide.csv` column (and so in the dictionary).
+- Smoke test and playthroughs updated for the slider; both skins complete with no errors or covered buttons.
+
+**Length.** The game has 51 screens. Built-in waits (spins, chart animations, withdrawal processing, chat typing)
+add about 30 s and are identical in both skins; a scripted player finishes either skin in ~52 s. With realistic
+reading and decision time (about 4 s per profile / reaction tap, 10–15 s per money or brain screen, 1–2 min on the
+report card) a full play takes roughly 8–10 minutes.
+
+**Decisions**
+- `// DECISION:` Gold Plan slider default ₹0 (both framings).
+
+### Final checklist
+- [x] Both skins fun and complete; honest skin not noticeably shorter or duller — same 51 screens, same waits, same
+      payoffs (skin-parity test); honest skin has its own animated, polished presentation.
+- [x] Every DV in Section 5 exported and documented (test + generated `docs/data-dictionary.md`, 106 columns).
+- [x] No real money, payment, credential or identity fields anywhere (scanned; only fictional names).
+- [x] Database reset instructions in README (local file and Turso).
+- [x] Every phase committed and pushed; `git status` clean; no `.env` or `.db` files in history.
+- [x] Final summary written (below).
+
+---
+
+## Redesign summary for the team
+
+**What changed.** The study is now a ~10-minute game, **ZenTrade**, that follows a scam lifecycle: trader profile →
+bonus spins (λ) → dashboard hook → 6 trading rounds with a brain bonus (CRT + literacy) and a mentor chat → three
+flash deals (H3) → a pool invite from a friend or an ad (H5) → test withdrawal (H6) → Gold Plan from profit or main
+wallet (H7) → 40% crash and top-up (H4) → cash-out with the fraud skin's tax trap (H1g) → quick swipe reactions →
+personal Scam Report Card (debrief) → share. Half the players get the fraud skin "ZenTrade X" (neon, huge returns,
+ticker, winner pop-ups, fake NDIA badge, countdowns, VIP ladder, "Rohit Sir", flash banners, freeze warning); half
+get the honest skin with identical mechanics, timings and payoffs. H3, H4, H5 and H7 are now measured by behaviour,
+not hypothetical questions; H8's susceptibility is the trap score.
+
+**Running it** is unchanged: `npm install`, `.env`, `npm run dev` (http://localhost:5173). Every link now opens the
+game; `?pilot=1` still marks pilots. On Render, push to `main` and it redeploys; the Turso database gets the two new
+columns automatically on start.
+
+**Data.** `/admin` → `wide.csv`: one row per player who reached the report card (106 columns: assignments,
+behaviour recomputed from the event log, trap score + per-trap flags, all answers, CRT, λ, literacy,
+overconfidence, FOMO). Column-by-column documentation in `docs/data-dictionary.md`; stage list in
+`docs/screens.md`; `hypothesis-report.md` variables updated (statements unchanged).
+
+**Decisions worth a look before piloting** (all marked `// DECISION:` and listed per phase above):
+- Economy: round stakes and flash deals are trades (no affordability confound); a ₹2,000 streak reward after
+  round 6 makes the profit-framed Gold Plan always fundable; the crash hits Main + Portfolio.
+- Traps 8–10 ("3 more"): never verified anything, deposited after the withdrawal stage, took the Gold Plan; trap 1 =
+  deposited in round 1 (measurable in both skins). Honest players can score at most 9 (no tax screen).
+- Frozen money in the fraud skin still counts in the final balance, so the optional prize draw rewards choices only.
+- Prior financial education kept in the profile (H8); "ever scammed" dropped (would prime suspicion).
+- Gold Plan slider starts at ₹0; flash-deal and spin orders are random (not balanced) order controls.
+- `PRIZE_DRAW` is off; switch on only with instructor approval.
+
+**Before real data collection:** play both skins on a real phone (`docs/qa-checklist.md`), run a few `?pilot=1`
+players on the live site, then reset the Turso database (`npm run db:reset -- --yes` with the Turso lines in
+`.env`). Keep the Turso lines commented out in `.env` while developing, so local tests never reach live data.

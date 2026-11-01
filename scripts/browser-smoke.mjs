@@ -136,7 +136,9 @@ async function runOnce(browser, wanted) {
       await page.getByLabel(/Deposit/).fill('1000');
       await tap(btn(/DEPOSIT|^Deposit/));
     } else if (kind === 'reinvest') {
-      await tap(btn(/^Reinvest|^Add/));
+      await page.locator('#reinvest').focus();
+    await page.keyboard.press('End');
+    await tap(btn(/^Reinvest|^Add/));
     } else if (kind === 'crash') {
       await page.getByLabel(/Top-up amount/).fill('500');
       await tap(btn(/TOP UP|Top up/));

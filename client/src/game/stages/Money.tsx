@@ -155,9 +155,8 @@ export function Reinvest() {
   const fromProfit = assignment.money_source === 'profit';
   const sourceBalance = fromProfit ? game.wallets.profit : game.wallets.main;
   const max = Math.min(ECONOMY.reinvest.amount, sourceBalance);
-  const [amount, setAmount] = useState(
-    ECONOMY.reinvest.amount <= sourceBalance ? ECONOMY.reinvest.amount : 0,
-  );
+  // DECISION: the slider starts at ₹0, so the amount is an active choice (no default to accept)
+  const [amount, setAmount] = useState(0);
 
   function finish(value: number) {
     dispatch({ type: 'reinvest', amount: value, at: Date.now() });

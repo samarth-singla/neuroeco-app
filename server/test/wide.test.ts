@@ -255,6 +255,49 @@ describe('wide.csv (game)', () => {
     expect(rows.map((r) => r.participant_id)).toEqual([done]);
   });
 
+  it('exports every derived variable listed in REDESIGN_PLAN.md section 5', () => {
+    const names = wideColumns().map((c) => c.name);
+    const section5 = [
+      'decision_time_first_invest',
+      'verify_any',
+      'total_deposited',
+      'vip_upgrade',
+      'chat_deposit',
+      'escalation_ratio',
+      'deal_invest_500',
+      'deal_invest_3000',
+      'deal_invest_8000',
+      'deal_details_500',
+      'deal_details_3000',
+      'deal_details_8000',
+      'lambda',
+      'crash_topup',
+      'crash_topup_amount',
+      'pool_join',
+      'pool_details',
+      'post_withdrawal_deposit',
+      'reinvest_accept',
+      'reinvest_amount',
+      'tax_paid',
+      'crt_score',
+      'literacy_score',
+      'overconfidence',
+      'trap_score',
+      'feature_push_timer',
+      'feature_push_bonus',
+      'feature_push_vip',
+      'feature_push_regulator',
+      'feature_push_social',
+      'feature_push_chat',
+      'feature_push_tax',
+      'app_trust',
+      'app_urgency',
+      'fomo_score',
+      'final_balance',
+    ];
+    for (const v of section5) expect(names, v).toContain(v);
+  });
+
   it('has every game response item as a column, no duplicates', () => {
     const names = wideColumns().map((c) => c.name);
     for (const id of GAME_ITEM_IDS) expect(names).toContain(id);

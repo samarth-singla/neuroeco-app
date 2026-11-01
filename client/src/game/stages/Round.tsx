@@ -73,6 +73,12 @@ export function Round() {
         </SkipButton>
       </>
     );
+  } else if (animating) {
+    actions = (
+      <CtaButton skin={skin} disabled>
+        ⏳ Trading…
+      </CtaButton>
+    );
   } else if (showResult) {
     actions = (
       <CtaButton skin={skin} onClick={next}>
@@ -116,6 +122,7 @@ export function Round() {
           seed={round * 31}
           ms={ECONOMY.rounds.chartMs}
           running={!!settled}
+          height={settled ? 140 : 96}
         />
         {!settled && (
           <div
@@ -135,6 +142,13 @@ export function Round() {
 
       {!settled && (
         <div className="mt-3 space-y-3">
+          <AmountPicker
+            skin={skin}
+            max={game.wallets.main}
+            value={amount}
+            onChange={setAmount}
+            label="Invest this round"
+          />
           {fraud && round === 1 && game.wallets.bonusLocked > 0 && (
             <div className="rounded-2xl bg-gold-400/15 px-3 py-2 text-sm font-bold text-gold-300">
               🔓 Invest now to unlock your ₹{game.wallets.bonusLocked} bonus!
@@ -145,7 +159,7 @@ export function Round() {
               <div className="flex items-center justify-between gap-2">
                 <div className="text-sm">
                   <div className="font-black text-gold-300">
-                    👑 VIP {vip} → VIP {next2.level}
+                    👑 {vip > 0 ? `VIP ${vip}` : 'Member'} → VIP {next2.level}
                   </div>
                   <div className="text-xs text-white/70">
                     Deposit {formatINR(next2.needed)} more ·{' '}
@@ -167,13 +181,6 @@ export function Round() {
               </div>
             </Panel>
           )}
-          <AmountPicker
-            skin={skin}
-            max={game.wallets.main}
-            value={amount}
-            onChange={setAmount}
-            label="Invest this round"
-          />
           {!fraud && (
             <p className="text-xs text-slate-600">
               Each round can go up or down. Money you invest comes back after the round with the
