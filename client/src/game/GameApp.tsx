@@ -60,7 +60,7 @@ export function GameApp() {
 
   useEffect(() => {
     const s = loadSavedGame();
-    if (!s?.participantId || !isGameStep(s.game.step)) {
+    if (!s?.participantId || !isGameStep(s.game.step, s.assignment?.app_version)) {
       setStatus('ready');
       return;
     }

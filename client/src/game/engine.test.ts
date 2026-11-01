@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ECONOMY, GAME_ITEM_IDS, SPINS } from '../config/game';
+import { BRAIN, ECONOMY, GAME_ITEM_IDS, SPINS } from '../config/game';
 import {
   cap,
   crash,
@@ -14,7 +14,7 @@ import {
 } from './economy';
 import { initialGame, isCorrect, reduce, type GameAssignment } from './reducer';
 import { DEFAULT_POLICY, mulberry32, simulateGame } from './sim';
-import { STEPS, nextStep, stageOf } from './steps';
+import { ALL_STEPS, fraudOnlyStep, nextStep, stepsFor } from './steps';
 import { factsFromEvents, factsFromState, trapResult } from './traps';
 
 const DEALS = [500, 3000, 8000];
@@ -33,7 +33,7 @@ function combos(): GameAssignment[] {
               referral_source,
               money_source,
               deal_order: [8000, 500, 3000],
-              spin_order: [300, 100, 200, 150],
+              spin_order: [250, 150],
             });
   return out;
 }
@@ -90,30 +90,71 @@ describe('economy', () => {
   it('scores CRT and literacy answers', () => {
     expect(isCorrect('crt_1', '5')).toBe(true);
     expect(isCorrect('crt_1', 10)).toBe(false);
-    expect(isCorrect('crt_3', 47)).toBe(true);
+    expect(isCorrect('crt_3', 47)).toBe(false); // removed: only the bat-and-ball item is scored
     expect(isCorrect('lit_interest', 'more')).toBe(true);
     expect(isCorrect('lit_diversification', 'true')).toBe(false);
   });
 });
 
 describe('steps', () => {
-  it('cover all 15 stages in the planned order and end at g:end', () => {
-    const stages = STEPS.map(stageOf);
-    for (let i = 1; i < stages.length; i++) {
-      // stages never go backwards, except rounds that resume after the brain bonus / chat
-      if (stages[i] < stages[i - 1]) expect(STEPS[i]).toMatch(/^g:round:/);
+  it('fraud skin: mini-games interleaved with the 4 rounds, then the rest of the game', () => {
+    const fraud = stepsFor('fraud');
+    const core = fraud.filter((x) => !x.startsWith('g:profile') && !x.startsWith('g:react'));
+    expect(core).toEqual([
+      'g:home',
+      'g:spin:0',
+      'g:round:1',
+      'g:brain:0',
+      'g:round:2',
+      'g:spin:1',
+      'g:round:3',
+      'g:brain:1',
+      'g:brain:2',
+      'g:chat',
+      'g:round:4',
+      'g:brain:3',
+      'g:deal',
+      'g:pool',
+      'g:withdraw',
+      'g:reinvest',
+      'g:crash',
+      'g:cashout',
+      'g:report',
+      'g:share',
+      'g:end',
+    ]);
+    expect(fraud.filter((x) => x.startsWith('g:react'))).toHaveLength(12);
+    expect(fraud).toHaveLength(41);
+    expect(fraud).toBe(ALL_STEPS);
+  });
+  it('honest skin: same steps minus the mentor-chat screen and the 7 feature swipe cards', () => {
+    const plain = stepsFor('plain');
+    expect(plain).toEqual(ALL_STEPS.filter((x) => !fraudOnlyStep(x)));
+    expect(plain).not.toContain('g:chat');
+    expect(plain.filter((x) => x.startsWith('g:react'))).toEqual(
+      ['g:react:7', 'g:react:8', 'g:react:9', 'g:react:10', 'g:react:11'], // sliders + FOMO
+    );
+    expect(plain).toHaveLength(33);
+    for (const skin of ['plain', 'fraud'] as const) {
+      expect(stepsFor(skin).at(-1)).toBe('g:end');
+      expect(nextStep('g:end', skin)).toBe('g:end');
     }
-    expect(new Set(stages).size).toBe(15);
-    expect(STEPS.at(-1)).toBe('g:end');
-    expect(nextStep('g:end')).toBe('g:end');
-    expect(STEPS.indexOf('g:brain:0')).toBe(STEPS.indexOf('g:round:2') + 1);
-    expect(STEPS.indexOf('g:round:3')).toBe(STEPS.indexOf('g:brain:5') + 1);
-    expect(STEPS.indexOf('g:chat')).toBe(STEPS.indexOf('g:round:3') + 1);
-    expect(STEPS.indexOf('g:round:4')).toBe(STEPS.indexOf('g:chat') + 1);
-    expect(STEPS.indexOf('g:deal:0')).toBe(STEPS.indexOf('g:round:4') + 1);
-    expect(STEPS.filter((s) => s.startsWith('g:round:'))).toHaveLength(4);
-    expect(STEPS.filter((s) => s.startsWith('g:spin:'))).toHaveLength(4);
-    expect(STEPS).toHaveLength(47);
+    expect(nextStep('g:brain:2', 'plain')).toBe('g:round:4');
+    expect(nextStep('g:brain:2', 'fraud')).toBe('g:chat');
+    expect(nextStep('g:cashout', 'plain')).toBe('g:react:7');
+    expect(nextStep('g:cashout', 'fraud')).toBe('g:react:0');
+  });
+  it('2 spins (₹150 and ₹250) and 4 bonus questions (bat-and-ball + Big Three)', () => {
+    expect([...SPINS.gains].sort((x, y) => x - y)).toEqual([150, 250]);
+    expect(SPINS.loss).toBe(100);
+    expect(BRAIN.map((q) => q.id)).toEqual([
+      'crt_1',
+      'lit_interest',
+      'lit_inflation',
+      'lit_diversification',
+    ]);
+    expect(ECONOMY.rounds.chartMs).toBeGreaterThanOrEqual(6000);
+    expect(ECONOMY.rounds.chartMs).toBeLessThanOrEqual(8000);
   });
   it('has 4 rounds: round 1 randomized, round 2 unchanged, all later rounds net positive', () => {
     expect(ECONOMY.rounds.count).toBe(4);
@@ -155,18 +196,35 @@ describe('headless run through every stage for every factor combination', () => 
           for (const v of Object.values(w)) expect(v).toBeGreaterThanOrEqual(0);
         }
         // H3: every flash deal is affordable, whatever was done before
-        for (let i = 0; i < 3; i++) {
-          expect(r.snapshots[`g:deal:${i}`].main).toBeGreaterThanOrEqual(Math.max(...DEALS));
+        for (const size of DEALS) {
+          expect(r.snapshots[`deal_${size}`].main).toBeGreaterThanOrEqual(Math.max(...DEALS));
         }
         // H7: both framings can fund the full ₹2,000 offer
         const before = r.snapshots['reinvest_before'];
         expect(before.profit).toBeGreaterThanOrEqual(ECONOMY.reinvest.amount);
         expect(before.main).toBeGreaterThanOrEqual(ECONOMY.reinvest.amount);
 
-        // All four spins answered, in the assigned order
+        // Both spins answered, in the assigned order
         expect(s.spins.map((x) => x.gain)).toEqual(a.spin_order);
-        // Every response item answered
-        for (const id of GAME_ITEM_IDS) expect(r.answers, id).toHaveProperty(id);
+        // Every response item answered (honest skin: no feature swipe cards)
+        for (const id of GAME_ITEM_IDS) {
+          if (a.app_version === 'plain' && id.startsWith('feature_push_'))
+            expect(r.answers, id).not.toHaveProperty(id);
+          else expect(r.answers, id).toHaveProperty(id);
+        }
+        // VIP layer events only in the fraud skin; level-ups match the levels reached
+        const types = r.events.map((e) => e.type);
+        if (a.app_version === 'fraud') {
+          expect(types.filter((t) => t === 'vip_popup_shown')).toHaveLength(1);
+          // one level-up event per deposit that crosses a threshold (a jump of two levels logs one)
+          const ups = r.events.filter((e) => e.type === 'vip_level_up');
+          const top = Math.max(0, ...ups.map((e) => Number(e.payload?.level)));
+          expect(top).toBe(vipLevel(s.totalDeposited));
+          expect(types).toContain('chat_shown');
+        } else {
+          expect(types.some((t) => t.startsWith('vip_'))).toBe(false);
+          expect(types).not.toContain('chat_shown');
+        }
 
         // Report-card trap score = export trap score (from the event log)
         const fromState = factsFromState(s, a.app_version);
@@ -177,7 +235,7 @@ describe('headless run through every stage for every factor combination', () => 
         expect(fromEvents).toEqual(fromState);
         const t = trapResult(fromState);
         expect(t.score).toBeLessThanOrEqual(t.possible);
-        expect(t.possible).toBe(a.app_version === 'fraud' ? 10 : 9);
+        expect(t.possible).toBe(a.app_version === 'fraud' ? 10 : 8);
 
         // Final balance is consistent and the fraud skin's tax is the only skin-specific loss
         expect(Number.isFinite(finalBalance(s.wallets, s.spins))).toBe(true);

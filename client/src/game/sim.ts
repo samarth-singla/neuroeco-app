@@ -21,7 +21,7 @@ import {
   type GameEvent,
   type GameState,
 } from './reducer';
-import { nextStep, stepIndex, stepKind } from './steps';
+import { ALL_STEPS, fraudOnlyStep, nextStep, stepIndex, stepKind } from './steps';
 
 export type Rng = () => number;
 
@@ -93,11 +93,16 @@ export function simulateGame(
     for (const e of r.events) events.push({ ...e, at });
   };
 
-  while (s.step !== 'g:end') {
-    const step = s.step;
+  // Walk the full (fraud) step list in both skins. On steps the honest skin does not have, the
+  // same random numbers are drawn but nothing happens, so the same seed makes the same choices
+  // in both skins (skin-parity test).
+  for (const step of ALL_STEPS) {
+    if (step === 'g:end') break;
+    const skip = a.app_version === 'plain' && fraudOnlyStep(step);
+    if (!skip && s.step !== step) throw new Error(`sim: expected ${step}, at ${s.step}`);
     const kind = stepKind(step);
     const i = stepIndex(step);
-    snapshots[step] = s.wallets;
+    if (!skip) snapshots[step] = s.wallets;
 
     switch (kind) {
       case 'profile': {
@@ -114,6 +119,10 @@ export function simulateGame(
         });
         break;
       case 'home':
+        if (a.app_version === 'fraud') {
+          act({ type: 'vip_popup_shown' });
+          act({ type: 'vip_popup_close', ms: 3000 });
+        }
         if (chance(policy.verify))
           act({ type: 'verify', what: pick(['tnc', 'plan_details', 'badge', 'about'] as const) });
         act({
@@ -131,6 +140,10 @@ export function simulateGame(
           act({ type: 'round_invest', round, amount: amount(s.wallets.main), at: at + 1000 });
         } else act({ type: 'round_skip', round });
         if (round === ECONOMY.rounds.count) act({ type: 'streak_reward' });
+        const nudge = chance(0.2); // the VIP nudge after the round (fraud only)
+        if (a.app_version === 'fraud' && nudge) {
+          act({ type: 'vip_nudge_tap', round, amount: ECONOMY.minInvest });
+        }
         break;
       }
       case 'brain': {
@@ -143,16 +156,21 @@ export function simulateGame(
         });
         break;
       }
-      case 'chat':
+      case 'chat': {
+        const open = chance(policy.chatOpen);
+        if (skip) break;
         act({ type: 'chat_shown', at: at + 1 });
-        if (chance(policy.chatOpen)) act({ type: 'chat_open' });
-        break;
-      case 'deal': {
-        const size = a.deal_order[i];
-        if (chance(policy.verify)) act({ type: 'verify', what: 'deal_details', size });
-        act({ type: 'deal', size, invest: chance(policy.invest), at: at + 1, decisionMs: 3000 });
+        if (open) act({ type: 'chat_open' });
         break;
       }
+      case 'deal':
+        // one screen, three cards in the player's random order
+        for (const size of a.deal_order) {
+          snapshots[`deal_${size}`] = s.wallets;
+          if (chance(policy.verify)) act({ type: 'verify', what: 'deal_details', size });
+          act({ type: 'deal', size, invest: chance(policy.invest), at: at + 1, decisionMs: 3000 });
+        }
+        break;
       case 'pool':
         if (chance(policy.verify)) act({ type: 'verify', what: 'pool_details' });
         act({ type: 'pool', join: chance(policy.invest * 0.6), at: at + 1, decisionMs: 3000 });
@@ -199,13 +217,13 @@ export function simulateGame(
           ...FOMO.map((q) => ({ id: q.id, value: chance(0.5) ? 'agree' : 'disagree' })),
         ];
         const q = qs[i];
-        act({ type: 'answer', id: q.id, value: q.value });
+        if (!skip) act({ type: 'answer', id: q.id, value: q.value });
         break;
       }
       default:
         break;
     }
-    act({ type: 'go', step: nextStep(step) });
+    if (!skip) act({ type: 'go', step: nextStep(step, a.app_version) });
   }
   return { state: s, events, answers: s.answers, snapshots };
 }

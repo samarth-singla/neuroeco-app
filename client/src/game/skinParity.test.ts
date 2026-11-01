@@ -1,14 +1,17 @@
 /**
- * Redesign Phase 3 check: both skins have identical stage order, timings, amounts and payoffs.
+ * Skin parity: both skins have the same stage order, timings, amounts and payoffs.
  * The same player (same seed = same choices) is run through both skins and compared step by step.
- * Only two differences are allowed, both part of the manipulation: where the ₹500 bonus sits before
- * the first deposit (locked vs. in Profit, H1b) and the withdrawal tax at cash-out (H1g).
+ * Allowed differences, all part of the manipulation or the shorter honest flow:
+ * - where the ₹500 bonus sits before the first deposit (locked vs. in Profit, H1b);
+ * - the withdrawal tax at cash-out (H1g);
+ * - the fraud-only screens: the mentor chat and the 7 feature swipe cards (the honest skin skips
+ *   them; no money moves on them).
  */
 import { describe, expect, it } from 'vitest';
 import { ECONOMY, SPINS, TIMING } from '../config/game';
 import type { GameAssignment } from './reducer';
 import { mulberry32, simulateGame } from './sim';
-import { STEPS } from './steps';
+import { fraudOnlyStep, stepsFor } from './steps';
 
 function nonSkinCombos(): Omit<GameAssignment, 'app_version'>[] {
   const out: Omit<GameAssignment, 'app_version'>[] = [];
@@ -29,8 +32,8 @@ function nonSkinCombos(): Omit<GameAssignment, 'app_version'>[] {
 
 describe('skin parity', () => {
   it('stage order, timings and amounts come from one skin-independent config', () => {
-    // STEPS is a single list (no per-skin variant)
-    expect(STEPS.length).toBeGreaterThan(40);
+    // the honest steps are the fraud steps minus the fraud-only screens, in the same order
+    expect(stepsFor('plain')).toEqual(stepsFor('fraud').filter((x) => !fraudOnlyStep(x)));
     // every timing and amount is a plain number, not a per-skin value
     for (const v of Object.values(TIMING)) expect(typeof v).toBe('number');
     expect(typeof ECONOMY.rounds.chartMs).toBe('number');
@@ -45,8 +48,10 @@ describe('skin parity', () => {
         const plain = simulateGame({ ...base, app_version: 'plain' }, mulberry32(seed));
         const fraud = simulateGame({ ...base, app_version: 'fraud' }, mulberry32(seed));
 
-        // Same screens in the same order
-        expect(Object.keys(fraud.snapshots)).toEqual(Object.keys(plain.snapshots));
+        // Same screens in the same order (apart from the fraud-only ones)
+        expect(Object.keys(fraud.snapshots).filter((x) => !fraudOnlyStep(x))).toEqual(
+          Object.keys(plain.snapshots),
+        );
 
         // Same balances on every screen up to cash-out
         for (const step of Object.keys(plain.snapshots)) {

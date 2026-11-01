@@ -3,19 +3,9 @@
  * stay hidden until the report card.
  */
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import App from '../App';
-import {
-  BRAIN,
-  ECONOMY,
-  FEATURES,
-  FOMO,
-  GAME_ITEM_IDS,
-  PROFILE,
-  SLIDERS,
-  SPINS,
-  TIMING,
-} from '../config/game';
+import { BRAIN, FEATURES, FOMO, GAME_ITEM_IDS, PROFILE, SLIDERS, TIMING } from '../config/game';
 import { _resetLogger, flush } from '../lib/logger';
 import { installFakeApi, type FakeApi } from './fakeApi';
 import { apiAssignment, gameAssignment, savedGame, seedGame } from './gameSeed';
@@ -45,6 +35,14 @@ async function waitForStep(s: string) {
   await waitFor(() => expect(step()).toBe(s), { timeout: 4000 });
 }
 
+/** Re-open the game at another step with the current state, as after a refresh. */
+function resumeAt(stepId: string) {
+  const g = savedGame();
+  cleanup();
+  seedGame(stepId, g.assignment, g.game);
+  render(<App />);
+}
+
 async function responsesSaved(api: FakeApi, ids: string[]) {
   await waitFor(() => {
     for (const id of ids) expect(api.responses, id).toHaveProperty(id);
@@ -54,12 +52,11 @@ async function responsesSaved(api: FakeApi, ids: string[]) {
 
 for (const skin of ['fraud', 'plain'] as const) {
   describe(`${skin} skin`, () => {
-    it('S1 profile and S2 spins: answers stored, spin results not shown', async () => {
+    it('S1 profile: answers stored, then the home dashboard', async () => {
       const a = gameAssignment({ app_version: skin });
       const api = installFakeApi(apiAssignment(a));
       seedGame('g:profile:0', a);
       render(<App />);
-
       for (let i = 0; i < PROFILE.length; i++) {
         await waitForStep(`g:profile:${i}`);
         const q = PROFILE[i];
@@ -67,48 +64,54 @@ for (const skin of ['fraud', 'plain'] as const) {
         else fireEvent.click((await screen.findAllByRole('radio'))[0]);
       }
       fireEvent.click(await screen.findByRole('button', { name: /Start earning|Continue/ }));
-
-      for (let i = 0; i < SPINS.gains.length; i++) {
-        await waitForStep(`g:spin:${i}`);
-        const accept = i % 2 === 0;
-        fireEvent.click(
-          await screen.findByRole('button', {
-            name: accept ? /SPIN NOW|Accept this offer/ : /No thanks|Skip this offer/,
-          }),
-        );
-        // The outcome is drawn but never displayed before the report card
-        expect(document.body.textContent).not.toMatch(/you (won|lost)|result: (win|lose)/i);
-      }
       await waitForStep('g:home');
-
-      const spins = savedGame().game.spins;
-      expect(spins).toHaveLength(SPINS.gains.length);
-      expect(
-        spins.filter((s) => s.accepted).every((s) => s.outcome === 'win' || s.outcome === 'lose'),
-      ).toBe(true);
-      await responsesSaved(api, [
-        ...PROFILE.map((q) => q.id),
-        ...SPINS.gains.map((g) => `la_gain_${g}`),
-      ]);
-      // gameSeed's spin order is SPINS.gains: accept the 1st and 3rd, skip the 2nd and 4th
-      expect(api.responses[`la_gain_${SPINS.gains[0]}`]).toBe('accept');
-      expect(api.responses[`la_gain_${SPINS.gains[1]}`]).toBe('reject');
+      await responsesSaved(
+        api,
+        PROFILE.map((q) => q.id),
+      );
       expect(api.responses.lit_self).toBe(6);
     });
 
-    it('S5 brain bonus: answers stored and correct answers pay ₹100', async () => {
+    it('S2 spins: two pop-ups over the game (₹150 / ₹250), results not shown', async () => {
+      const a = gameAssignment({ app_version: skin, spin_order: [250, 150] });
+      const api = installFakeApi(apiAssignment(a));
+      seedGame('g:spin:0', a);
+      render(<App />);
+      // a pop-up over the (inert) trading screen, not a separate page
+      expect(await screen.findByRole('dialog')).toHaveTextContent('win ₹250');
+      expect(document.querySelector('[inert]')).not.toBeNull();
+      fireEvent.click(screen.getByRole('button', { name: /SPIN NOW|Accept this offer/ }));
+      expect(document.body.textContent).not.toMatch(/you (won|lost)|result: (win|lose)/i);
+      await waitForStep('g:round:1');
+
+      resumeAt('g:spin:1');
+      expect(await screen.findByRole('dialog')).toHaveTextContent('win ₹150');
+      fireEvent.click(screen.getByRole('button', { name: /No thanks|Skip this offer/ }));
+      expect(document.body.textContent).not.toMatch(/you (won|lost)|result: (win|lose)/i);
+      await waitForStep('g:round:3');
+
+      const spins = savedGame().game.spins;
+      expect(spins.map((x) => [x.gain, x.accepted])).toEqual([
+        [250, true],
+        [150, false],
+      ]);
+      expect(['win', 'lose']).toContain(spins[0].outcome);
+      await responsesSaved(api, ['la_gain_150', 'la_gain_250']);
+      expect(api.responses.la_gain_250).toBe('accept');
+      expect(api.responses.la_gain_150).toBe('reject');
+    });
+
+    it('S5 bonus questions: pop-ups between rounds, answers stored, ₹100 per correct', async () => {
       const a = gameAssignment({ app_version: skin });
       const api = installFakeApi(apiAssignment(a));
-      seedGame('g:brain:0', a);
-      render(<App />);
-      const answers: Record<string, string> = { crt_1: '5', crt_2: '100', crt_3: '47' };
-      for (let i = 0; i < BRAIN.length; i++) {
+      // bonus question k pops up before this round / screen
+      const after = ['g:round:2', skin === 'fraud' ? 'g:chat' : 'g:round:4', 'g:deal'];
+      async function answer(i: number) {
         await waitForStep(`g:brain:${i}`);
+        expect(await screen.findByRole('dialog', { name: 'Bonus question' })).toBeInTheDocument();
         const q = BRAIN[i];
         if (q.kind === 'number') {
-          fireEvent.change(await screen.findByRole('textbox'), {
-            target: { value: answers[q.id] },
-          });
+          fireEvent.change(await screen.findByRole('textbox'), { target: { value: '5' } });
           fireEvent.click(screen.getByRole('button', { name: 'Submit answer' }));
         } else {
           fireEvent.click(
@@ -117,13 +120,21 @@ for (const skin of ['fraud', 'plain'] as const) {
             }),
           );
         }
-        fireEvent.click(
-          await screen.findByRole('button', { name: /Next question|Back to trading/ }),
-        );
+        fireEvent.click(await screen.findByRole('button', { name: /Back to trading/ }));
       }
-      await waitForStep(`g:round:${ECONOMY.rounds.brainAfterRound + 1}`);
-      // crt_1 and crt_3 correct (₹200) + lit_interest "more" correct (₹100); honest bonus ₹500 in Profit
-      expect(savedGame().game.wallets.profit).toBe(300 + (skin === 'plain' ? 500 : 0));
+      seedGame('g:brain:0', a);
+      render(<App />);
+      await answer(0);
+      await waitForStep(after[0]);
+      resumeAt('g:brain:1');
+      await answer(1);
+      await answer(2);
+      await waitForStep(after[1]);
+      resumeAt('g:brain:3');
+      await answer(3);
+      await waitForStep(after[2]);
+      // crt_1 = ₹5 correct + lit_interest "more" correct = ₹200; honest bonus ₹500 in Profit
+      expect(savedGame().game.wallets.profit).toBe(200 + (skin === 'plain' ? 500 : 0));
       await responsesSaved(
         api,
         BRAIN.map((q) => q.id),
@@ -132,17 +143,18 @@ for (const skin of ['fraud', 'plain'] as const) {
         await flush();
       });
       const brainEvents = api.events.filter((e) => e.event_type === 'brain_answer');
-      expect(brainEvents).toHaveLength(6);
+      expect(brainEvents).toHaveLength(4);
       expect(typeof brainEvents[0].payload?.ms).toBe('number');
     });
 
-    it('S13 quick reactions: swipe cards, sliders and FOMO cards all stored', async () => {
+    it(`S13 quick reactions: ${skin === 'fraud' ? 'swipe cards, ' : ''}sliders and FOMO cards stored`, async () => {
       const a = gameAssignment({ app_version: skin });
       const api = installFakeApi(apiAssignment(a));
-      seedGame('g:react:0', a);
+      // the honest skin skips the 7 feature swipe cards
+      let i = skin === 'fraud' ? 0 : FEATURES.length;
+      seedGame(`g:react:${i}`, a);
       render(<App />);
-      let i = 0;
-      for (const f of FEATURES) {
+      for (const f of skin === 'fraud' ? FEATURES : []) {
         await waitForStep(`g:react:${i++}`);
         expect((await screen.findAllByText(f.label[skin])).length).toBeGreaterThan(0);
         fireEvent.click(await screen.findByRole('button', { name: i % 2 ? /Yes/ : /No/ }));
@@ -160,12 +172,13 @@ for (const skin of ['fraud', 'plain'] as const) {
       }
       await waitForStep('g:report');
       await responsesSaved(api, [
-        ...FEATURES.map((f) => `feature_push_${f.id}`),
+        ...(skin === 'fraud' ? FEATURES.map((f) => `feature_push_${f.id}`) : []),
         ...SLIDERS.map((q) => q.id),
         ...FOMO.map((q) => q.id),
       ]);
       expect(api.responses.app_trust).toBe(3);
-      expect(api.responses.feature_push_timer).toBe('yes');
+      if (skin === 'fraud') expect(api.responses.feature_push_timer).toBe('yes');
+      else expect(api.responses).not.toHaveProperty('feature_push_timer');
       expect(api.responses.fomo_1).toBe('agree');
     });
   });

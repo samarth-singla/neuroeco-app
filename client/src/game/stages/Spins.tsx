@@ -4,8 +4,8 @@ import { clientNow } from '../../lib/logger';
 import { useLog } from '../../lib/useLog';
 import { formatINR } from '../economy';
 import { useGame } from '../GameProvider';
-import { nextStep, stepIndex } from '../steps';
-import { GameShell } from '../ui/GameShell';
+import { stepIndex } from '../steps';
+import { PopupStage } from '../ui/PopupStage';
 import { CtaButton, SkipButton } from '../ui/kit';
 
 function Wheel({ spinning }: { spinning: boolean }) {
@@ -28,7 +28,7 @@ function Wheel({ spinning }: { spinning: boolean }) {
     );
   });
   return (
-    <div className="relative mx-auto h-44 w-44">
+    <div className="relative mx-auto h-36 w-36">
       <div className="absolute -top-1 left-1/2 z-10 -translate-x-1/2 text-2xl">▼</div>
       <svg
         viewBox="0 0 100 100"
@@ -47,11 +47,12 @@ function Wheel({ spinning }: { spinning: boolean }) {
 }
 
 /**
- * S2 — Bonus spins (H4): four offers "50% lose ₹100 / 50% win ₹X", accept or skip.
- * The result is drawn now but only revealed on the report card, so it cannot affect later play.
+ * S2 — Bonus spin pop-up (H4). Two per player, between the rounds: "50% lose ₹100 / 50% win ₹X",
+ * accept or skip; X = ₹150 or ₹250 in the player's random order (`spin_order`). The result is
+ * drawn now but only revealed on the report card, so it cannot affect later play.
  */
 export function Spins() {
-  const { game, assignment, skin, dispatch, respond, go } = useGame();
+  const { game, assignment, skin, dispatch, respond, next } = useGame();
   const step = game.step;
   useLog(step);
   const i = stepIndex(step);
@@ -63,9 +64,9 @@ export function Spins() {
 
   useEffect(() => {
     if (!busy) return;
-    const id = setTimeout(() => go(nextStep(step)), TIMING.spinMs + 300);
+    const id = setTimeout(next, TIMING.spinMs + 300);
     return () => clearTimeout(id);
-  }, [busy, go, step]);
+  }, [busy, next]);
 
   function choose(accept: boolean) {
     if (busy || done) return;
@@ -82,8 +83,8 @@ export function Spins() {
 
   const actions =
     done && !busy ? (
-      <CtaButton skin={skin} onClick={() => go(nextStep(step))}>
-        Next
+      <CtaButton skin={skin} onClick={next}>
+        Continue →
       </CtaButton>
     ) : (
       <>
@@ -97,37 +98,35 @@ export function Spins() {
     );
 
   return (
-    <GameShell market={false} actions={actions}>
+    <PopupStage label={fraud ? 'Lucky spin' : 'Bonus offer'} actions={actions}>
       <div className="text-center">
         <div
           className={`text-xs font-bold tracking-widest uppercase ${fraud ? 'text-gold-300' : 'text-slate-400'}`}
         >
           {fraud
-            ? `Lucky spin ${i + 1} of ${SPINS.gains.length}`
+            ? `🎰 Lucky spin ${i + 1} of ${SPINS.gains.length}`
             : `Bonus offer ${i + 1} of ${SPINS.gains.length}`}
         </div>
-        {i === 0 && (
-          <p
-            className={`mx-auto mt-2 max-w-xs text-sm ${fraud ? 'text-white/70' : 'text-slate-300'}`}
-          >
-            Four bonus offers. Each is a coin flip. Results are revealed at the end of the game.
-          </p>
-        )}
+        <p
+          className={`mx-auto mt-1 max-w-xs text-sm ${fraud ? 'text-white/70' : 'text-slate-300'}`}
+        >
+          A coin flip. The result is revealed at the end of the game.
+        </p>
         {fraud ? (
-          <div className="mt-4">
+          <div className="mt-3">
             <Wheel spinning={busy === 'accept'} />
           </div>
         ) : (
-          <div className="mx-auto mt-6 flex h-28 w-28 items-center justify-center rounded-full border-4 border-slate-600 bg-slate-800 text-4xl">
+          <div className="mx-auto mt-4 flex h-20 w-20 items-center justify-center rounded-full border-4 border-slate-600 bg-slate-900 text-3xl">
             🪙
           </div>
         )}
-        <div className="mt-5 grid grid-cols-2 gap-2">
+        <div className="mt-4 grid grid-cols-2 gap-2">
           <div
             className={
               fraud
                 ? 'rounded-2xl bg-red-500/15 p-3'
-                : 'rounded-xl border border-slate-700 bg-slate-800 p-3'
+                : 'rounded-xl border border-slate-700 bg-slate-900 p-3'
             }
           >
             <div className={`text-xs ${fraud ? 'text-white/60' : 'text-slate-400'}`}>
@@ -145,7 +144,7 @@ export function Spins() {
             className={
               fraud
                 ? 'rounded-2xl bg-neon-500/15 p-3'
-                : 'rounded-xl border border-slate-700 bg-slate-800 p-3'
+                : 'rounded-xl border border-slate-700 bg-slate-900 p-3'
             }
           >
             <div className={`text-xs ${fraud ? 'text-white/60' : 'text-slate-400'}`}>
@@ -161,7 +160,7 @@ export function Spins() {
           </div>
         </div>
         {(busy || done) && (
-          <p className={`mt-4 text-sm font-semibold ${fraud ? 'text-gold-300' : 'text-slate-300'}`}>
+          <p className={`mt-3 text-sm font-semibold ${fraud ? 'text-gold-300' : 'text-slate-300'}`}>
             {(busy ?? (done?.accepted ? 'accept' : 'skip')) === 'accept'
               ? fraud
                 ? '🎁 Spin locked in! Result revealed on your report card'
@@ -170,6 +169,6 @@ export function Spins() {
           </p>
         )}
       </div>
-    </GameShell>
+    </PopupStage>
   );
 }

@@ -20,15 +20,9 @@ import {
   TRAP_TEXT,
   type Skin,
 } from '../../client/src/config/game';
+import { vipLevel } from '../../client/src/game/economy';
 import { factsFromEvents, TRAPS, trapResult } from '../../client/src/game/traps';
-import {
-  crtScore,
-  LAMBDA_REJECT_ALL,
-  literacyScore,
-  lossAversion,
-  overconfidence,
-  type Answers,
-} from './scoring';
+import { crtCorrect, literacyScore, lossAversion, overconfidence, type Answers } from './scoring';
 
 export interface Column {
   name: string;
@@ -75,16 +69,20 @@ const ASSIGNMENT_COLUMNS = cols('Identifiers & assignments', [
   ],
   [
     'deal_order',
-    'Order the flash deals were shown, ₹ (e.g. `8000;500;3000`)',
+    'Order of the three flash-deal cards on the deals screen (top to bottom), ₹ (e.g. `8000;500;3000`)',
     'H3 (order control)',
   ],
-  ['spin_order', 'Order the bonus spins were shown (win amounts, ₹)', 'H4 (order control)'],
+  [
+    'spin_order',
+    'Order of the two bonus-spin pop-ups (win amounts, ₹): `150;250` = ₹150 bet before round 1, ₹250 bet before round 3',
+    'H4 (order control)',
+  ],
 ]);
 
 const BEHAVIOUR_COLUMNS = cols('App behaviour (event log)', [
   [
     'decision_time_first_invest',
-    'Seconds from first render of the home dashboard (S3) to the first Invest / Skip tap',
+    'Seconds from the home dashboard (S3) becoming usable to the first Invest / Skip tap (fraud skin: timed from closing the VIP pop-up; see vip_popup_time)',
     'H1, H1a, H1e',
   ],
   ['s3_choice', '`invest` or `skip` on the home dashboard (S3)', 'H1, H1b'],
@@ -105,23 +103,47 @@ const BEHAVIOUR_COLUMNS = cols('App behaviour (event log)', [
     `1 = total deposited reached VIP ${vip2.level} (${inr(vip2.minDeposited)}). VIP is shown only in the fraud skin; the threshold is computed for both`,
     'H1c',
   ],
-  ['vip_taps', 'Times the VIP "Upgrade" shortcut was tapped (fraud skin only)', 'H1c'],
+  [
+    'vip_level',
+    'Highest VIP level reached by total deposited (0–3; computed for both skins)',
+    'H1c',
+  ],
+  ['vip_taps', 'Times the in-round VIP "Upgrade" shortcut was tapped (fraud skin only)', 'H1c'],
+  [
+    'vip_popup_time',
+    'Seconds the VIP ladder pop-up was open on the home screen (fraud skin only; blank for honest)',
+    'H1c',
+  ],
+  [
+    'vip_nudge_taps',
+    'Times the after-round "Deposit ₹X more to unlock VIP n" nudge was tapped (fraud only; blank for honest)',
+    'H1c',
+  ],
+  ['vip_level_ups', 'VIP level-up celebrations shown (fraud only; blank for honest)', 'H1c'],
   ...ROUNDS.map((r): Def => [
     `r${r}_amount`,
     `Round ${r} stake, ₹ (0 if skipped)`,
     r <= 2 ? 'H1, H2' : 'H1',
   ]),
   ['escalation_ratio', 'r2_amount ÷ r1_amount; blank if r1_amount = 0', 'H2'],
-  ['chat_open', '1 = opened the mentor chat (fraud) / Help & FAQ (honest) on S6', 'H1f'],
+  [
+    'chat_open',
+    '1 = opened the mentor chat (S6, before round 4); fraud skin only, blank for honest (no chat screen)',
+    'H1f',
+  ],
   [
     'chat_deposit',
-    `1 = invested within ${ECONOMY.chatDepositWindowMs / 1000} s after S6 appeared`,
+    `1 = invested within ${ECONOMY.chatDepositWindowMs / 1000} s after the mentor chat appeared; fraud only, blank for honest (compare r4_amount across skins)`,
     'H1f',
   ],
   ...DEALS.flatMap((d): Def[] => [
     [`deal_invest_${d}`, `1 = invested in the ${inr(d)} flash deal`, 'H3'],
     [`deal_details_${d}`, `1 = opened the ${inr(d)} deal's details before deciding`, 'H3'],
-    [`deal_time_${d}`, `Seconds to decide on the ${inr(d)} deal`, 'H3'],
+    [
+      `deal_time_${d}`,
+      `Seconds from opening the deals screen to investing in the ${inr(d)} deal (if not taken: to Continue)`,
+      'H3',
+    ],
   ]),
   ['pool_join', '1 = joined the Diamond Pool (S8)', 'H5'],
   ['pool_details', '1 = opened the pool details before deciding', 'H5'],
@@ -144,7 +166,7 @@ const BEHAVIOUR_COLUMNS = cols('App behaviour (event log)', [
   ['crash_time', 'Seconds to decide after the crash', 'H4'],
   ['tax_shown', '1 = saw the withdrawal "tax" screen (fraud skin)', 'H1g'],
   ['tax_paid', '1 = paid the tax, 0 = refused; blank for the honest skin', 'H1g'],
-  ['brain_correct', 'Correct brain-bonus answers (0–6; CRT + literacy)', 'H1, H8'],
+  ['brain_correct', 'Correct bonus-question answers (0–4; 1 CRT + 3 literacy)', 'H1, H8'],
   [
     'spin_net',
     'Net result of the accepted bonus spins, ₹ (revealed on the report card)',
@@ -159,7 +181,11 @@ const BEHAVIOUR_COLUMNS = cols('App behaviour (event log)', [
 
 const TRAP_COLUMNS = cols('Traps', [
   ['trap_score', 'Number of traps fallen for (same function as the report card)', 'H8, H9'],
-  ['trap_possible', 'Traps possible: 10 (fraud) or 9 (honest — no tax screen)', 'H8, H9'],
+  [
+    'trap_possible',
+    'Traps possible: 10 (fraud) or 8 (honest — no mentor chat, no tax screen)',
+    'H8, H9',
+  ],
   ...TRAPS.map((t): Def => [
     `trap_${t.id}`,
     `1 = ${TRAP_TEXT[t.id].plain}${t.fraudOnly ? ' (fraud skin only; blank for honest)' : ''}`,
@@ -182,7 +208,7 @@ function itemDef(id: string): Def {
   if (id.startsWith('la_gain_')) {
     return [
       id,
-      `S2 spin "50% lose ₹${SPINS.loss} / 50% win ₹${id.slice(8)}": \`accept\` / \`reject\``,
+      `S2 bonus-spin pop-up "50% lose ₹${SPINS.loss} / 50% win ₹${id.slice(8)}": \`accept\` / \`reject\``,
       'H4',
     ];
   }
@@ -192,7 +218,7 @@ function itemDef(id: string): Def {
     const values = b.kind === 'choice' ? choices(b.options) : 'number';
     return [
       id,
-      `S5 brain bonus: ${text} (${values})`,
+      `S5 bonus question: ${text} (${values})`,
       id.startsWith('crt') ? 'H1 (moderator)' : 'H8',
     ];
   }
@@ -200,7 +226,7 @@ function itemDef(id: string): Def {
   if (f) {
     return [
       id,
-      `S13 "Did this push you to invest?" — ${f.label.fraud} (fraud) / ${f.label.plain} (honest): \`yes\` / \`no\``,
+      `S13 "Did this push you to invest?" — ${f.label.fraud}: \`yes\` / \`no\` (fraud skin only; blank for honest)`,
       'H1h',
     ];
   }
@@ -214,15 +240,19 @@ function itemDef(id: string): Def {
 const ITEM_COLUMNS = cols('Response items', GAME_ITEM_IDS.map(itemDef));
 
 const DERIVED_COLUMNS = cols('Derived scores', [
-  ['crt_score', 'Cognitive Reflection Test score 0–3 (correct: 5, 5, 47)', 'H1 (moderator)'],
   [
-    'lambda',
-    `Loss aversion λ from the bonus spins = smallest accepted win ÷ ₹${SPINS.loss} (${SPINS.gains.map((g) => g / SPINS.loss).join(', ')}); ${LAMBDA_REJECT_ALL} if all rejected; blank if inconsistent (accepts a win, then rejects a larger one)`,
+    'crt_correct',
+    'CRT, single bat-and-ball item: 1 = correct (₹5), 0 = incorrect',
+    'H1 (moderator)',
+  ],
+  [
+    'loss_aversion_group',
+    'From the 2 bonus spins (lose ₹100 vs win ₹150 / ₹250): 1 = accepted the ₹150 bet (low, λ ≤ 1.5); 2 = accepted only the ₹250 bet (typical, 1.5 < λ ≤ 2.5); 3 = rejected both (high, λ > 2.5); blank if inconsistent (accepted ₹150, rejected ₹250)',
     'H4, H8, H9',
   ],
   [
     'la_consistent',
-    '1 = spin choices switch at most once (reject → accept), 0 = inconsistent',
+    '1 = consistent spin choices, 0 = accepted the ₹150 bet but rejected the ₹250 bet',
     'H4',
   ],
   [
@@ -237,7 +267,11 @@ const DERIVED_COLUMNS = cols('Derived scores', [
     'z(self_rated_literacy) − z(literacy_score), z over the rows in this export (sample SD); blank if either SD is 0',
     'H8',
   ],
-  ['feature_push_count', 'Number of the 7 features answered "yes, it pushed me to invest"', 'H1h'],
+  [
+    'feature_push_count',
+    'Number of the 7 features answered "yes, it pushed me to invest" (fraud skin only; blank for honest)',
+    'H1h',
+  ],
   ['fomo_score', 'Number of the 3 FOMO statements agreed with (0–3)', 'H5 (moderator), H9'],
 ]);
 
@@ -297,6 +331,7 @@ export function behaviour(events: Ev[], skin: Skin, withdrawalOffer: string): Re
   const tax = first('tax_pay', 'tax_decline');
   const withdraw = first('test_withdraw', 'test_withdraw_skip');
   const report = last('report_shown');
+  const fraud = skin === 'fraud';
 
   const row: Record<string, Cell> = {
     decision_time_first_invest: secs(s3?.payload.decision_ms),
@@ -306,14 +341,18 @@ export function behaviour(events: Ev[], skin: Skin, withdrawalOffer: string): Re
     verify_count: of('verify_open').length,
     total_deposited: facts.totalDeposited,
     vip_upgrade: yes(traps.fallen.includes('vip')),
+    vip_level: vipLevel(facts.totalDeposited),
     vip_taps: of('vip_upgrade_tap').length,
+    vip_popup_time: fraud ? secs(last('vip_popup_close')?.ms) : null,
+    vip_nudge_taps: fraud ? of('vip_nudge_tap').length : null,
+    vip_level_ups: fraud ? of('vip_level_up').length : null,
     r1_amount: r1,
     r2_amount: r2,
     r3_amount: round(3),
     r4_amount: round(4),
     escalation_ratio: r1 > 0 ? Math.round((r2 / r1) * 10000) / 10000 : null,
-    chat_open: yes(of('chat_open').length > 0),
-    chat_deposit: yes(facts.chatDeposit),
+    chat_open: fraud ? yes(of('chat_open').length > 0) : null,
+    chat_deposit: fraud ? yes(facts.chatDeposit) : null,
     pool_join: pool ? yes(pool.event_type === 'pool_join') : null,
     pool_details: pool ? yes(pool.payload.details_before === true) : null,
     pool_time: secs(pool?.payload.decision_ms),
@@ -419,8 +458,8 @@ export async function wideRows(db: DB): Promise<Record<string, Cell>[]> {
     };
     for (const id of GAME_ITEM_IDS) row[id] = answers[id] ?? null;
     Object.assign(row, {
-      crt_score: crtScore(answers),
-      lambda: la.lambda,
+      crt_correct: crtCorrect(answers),
+      loss_aversion_group: la.group,
       la_consistent: la.consistent,
       la_accepted: la.accepted,
       literacy_score: literacyScore(answers),

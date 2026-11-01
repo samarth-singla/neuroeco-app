@@ -82,23 +82,28 @@ describe('wide.csv (game)', () => {
       .send({
         participant_id: id,
         events: [
+          ev('g:home', 'vip_popup_shown', {}),
+          ev('g:home', 'vip_popup_close', { ms: 4200 }),
           ev('g:home', 'verify_open', { what: 'tnc' }),
           ev('g:home', 's3_invest', { plan_id: 'growth', decision_ms: 12345 }),
           ev('g:round:1', 'round_invest', { round: 1, amount: 1000, since_chat_ms: null }),
+          ev('g:round:1', 'vip_level_up', { level: 1 }),
+          ev('g:round:1', 'vip_nudge_tap', { round: 1, amount: 4000 }),
+          ev('g:brain:0', 'brain_answer', { id: 'crt_1', correct: true }),
           ev('g:round:2', 'round_invest', { round: 2, amount: 2500, since_chat_ms: null }),
           ev('g:round:3', 'vip_upgrade_tap', {}),
           ev('g:round:3', 'round_invest', { round: 3, amount: 2000, since_chat_ms: null }),
           ev('g:chat', 'chat_shown', { kind: 'mentor' }),
           ev('g:chat', 'chat_open', { kind: 'mentor' }),
           ev('g:round:4', 'round_invest', { round: 4, amount: 500, since_chat_ms: 30000 }),
-          ev('g:deal:0', 'deal_skip', { size: 8000, details_before: true, decision_ms: 9000 }),
-          ev('g:deal:1', 'deal_invest', {
+          ev('g:deal', 'deal_skip', { size: 8000, details_before: true, decision_ms: 9000 }),
+          ev('g:deal', 'deal_invest', {
             size: 500,
             amount: 500,
             details_before: false,
             decision_ms: 2000,
           }),
-          ev('g:deal:2', 'deal_invest', {
+          ev('g:deal', 'deal_invest', {
             size: 3000,
             amount: 3000,
             details_before: true,
@@ -112,24 +117,19 @@ describe('wide.csv (game)', () => {
           ev('g:crash', 'crash_topup', { amount: 700, decision_ms: 5000 }),
           ev('g:cashout', 'tax_shown', { tax: 900 }),
           ev('g:cashout', 'tax_pay', { tax: 900 }),
-          ev('g:brain:0', 'brain_answer', { id: 'crt_1', correct: true }),
-          ev('g:brain:1', 'brain_answer', { id: 'crt_2', correct: false }),
+          ev('g:brain:1', 'brain_answer', { id: 'lit_interest', correct: false }),
           ev('g:report', 'report_shown', { trap_score: 10, spin_net: -50, final_balance: 9123 }),
         ],
       })
       .expect(200);
     const answers: Record<string, string | number> = {
       crt_1: 5,
-      crt_2: 100,
-      crt_3: 47,
       lit_interest: 'more',
       lit_inflation: 'less',
       lit_diversification: 'true',
       lit_self: 6,
-      la_gain_100: 'reject',
       la_gain_150: 'reject',
-      la_gain_200: 'accept',
-      la_gain_300: 'accept',
+      la_gain_250: 'accept',
       fomo_1: 'agree',
       fomo_2: 'disagree',
       fomo_3: 'agree',
@@ -172,7 +172,11 @@ describe('wide.csv (game)', () => {
       r4_amount: '500',
       escalation_ratio: '2.5',
       vip_upgrade: '1',
+      vip_level: '3',
       vip_taps: '1',
+      vip_popup_time: '4.2',
+      vip_nudge_taps: '1',
+      vip_level_ups: '1',
       chat_open: '1',
       chat_deposit: '1',
       deal_invest_8000: '0',
@@ -198,8 +202,10 @@ describe('wide.csv (game)', () => {
       trap_possible: '10',
       trap_hook: '1',
       trap_no_verify: '0',
-      crt_score: '2',
-      lambda: '2',
+      crt_correct: '1',
+      loss_aversion_group: '2',
+      la_consistent: '1',
+      la_accepted: '1',
       literacy_score: '2',
       self_rated_literacy: '6',
       feature_push_count: '3',
@@ -208,7 +214,7 @@ describe('wide.csv (game)', () => {
     });
   });
 
-  it('honest skin: tax columns blank; not-offered withdrawal blank; never-invested defaults', async () => {
+  it('honest skin: tax, chat, feature-card and VIP columns blank; not-offered withdrawal blank; never-invested defaults', async () => {
     const { app, db } = await makeApp();
     const id = await player(app, db, { app_version: 'plain', withdrawal_offer: 'not_offered' });
     await request(app)
@@ -233,8 +239,17 @@ describe('wide.csv (game)', () => {
       tax_shown: '0',
       tax_paid: '',
       trap_tax_paid: '',
-      trap_possible: '9',
+      trap_chat: '',
+      trap_possible: '8',
       trap_no_verify: '1',
+      chat_open: '',
+      chat_deposit: '',
+      feature_push_timer: '',
+      feature_push_count: '',
+      vip_level: '0',
+      vip_popup_time: '',
+      vip_nudge_taps: '',
+      vip_level_ups: '',
     });
   });
 
@@ -268,7 +283,7 @@ describe('wide.csv (game)', () => {
       'deal_details_500',
       'deal_details_3000',
       'deal_details_8000',
-      'lambda',
+      'loss_aversion_group', // replaces lambda (Playtest fixes 2)
       'crash_topup',
       'crash_topup_amount',
       'pool_join',
@@ -277,7 +292,7 @@ describe('wide.csv (game)', () => {
       'reinvest_accept',
       'reinvest_amount',
       'tax_paid',
-      'crt_score',
+      'crt_correct', // replaces crt_score (single CRT item)
       'literacy_score',
       'overconfidence',
       'trap_score',

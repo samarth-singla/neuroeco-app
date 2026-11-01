@@ -32,7 +32,7 @@ describe('participants', () => {
     expect(['friend', 'ad']).toContain(p.assignment.referral_source);
     expect(['profit', 'own']).toContain(p.assignment.money_source);
     expect(p.assignment.deal_order).toHaveLength(3);
-    expect(p.assignment.spin_order).toHaveLength(4);
+    expect(p.assignment.spin_order).toHaveLength(2);
   });
 
   it('resumes and updates the current step', async () => {

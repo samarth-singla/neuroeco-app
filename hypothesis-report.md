@@ -16,7 +16,7 @@ A neuroeconomic perspective · Samarth Singla, Aishani Sood · 2026-10-23
 
 - **IV:** App version (plain / fraud-style, randomly assigned)
 - **DVs:** Decision time (seconds), invested (yes/no), amount invested, verification click (yes/no), urgency and trust ratings (1–7)
-- **Moderator:** CRT score (Cognitive Reflection Test, 0–3)
+- **Moderator:** CRT (single bat-and-ball item, correct / incorrect)
 - **Controls:** Age, gender, investing experience, trading-app use
 - **Design note:** Both skins share identical mechanics and payoffs; only presentation differs.
 
@@ -88,7 +88,7 @@ Each sub-hypothesis is tested through the feature-level quick reaction "Did this
 
 **Variables**
 
-- **IV:** Loss aversion λ (from the in-game bonus spins: four 50-50 offers, lose ₹100 vs win ₹100 / ₹150 / ₹200 / ₹300; λ = smallest accepted win ÷ 100, rejecting all = 3.5)
+- **IV:** Loss aversion group (low / typical / high) from 2 in-game spins
 - **DVs:** Post-loss top-up (yes/no), top-up amount
 - **Controls:** App version, investing experience
 

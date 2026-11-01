@@ -1,9 +1,10 @@
 /**
  * Browser smoke test for the ZenTrade game: drives a real browser through the whole study
- * (consent → 15 stages → report card → share) at phone width (360 px), once per skin, with a page
- * refresh in the middle of the trading rounds. On every screen it checks for page errors, sideways
- * scrolling, and — with a hit-test on every visible button — that no overlay (toast, chat bubble,
- * confetti) covers a button.
+ * (consent → profile → home → rounds with spin / bonus-question pop-ups → deals → … → report card →
+ * share) at phone width (360 px), once per skin, with a page refresh in the middle of the trading
+ * rounds. On every screen it checks for page errors, sideways scrolling, and — with a hit-test on
+ * every visible button — that no overlay (toast, chat bubble, confetti) covers a button. Buttons on
+ * a screen that sits behind a pop-up are `inert` (not tappable by design) and are skipped.
  *
  * Needs the app running (npm run dev, or npm run build && npm start) and an installed Microsoft
  * Edge or Google Chrome (no browser download needed).
@@ -55,6 +56,7 @@ async function runOnce(browser, wanted) {
       for (const b of document.querySelectorAll('button')) {
         const r = b.getBoundingClientRect();
         if (r.width < 2 || r.height < 2 || r.bottom <= 0 || r.top >= innerHeight) continue;
+        if (b.closest('[inert]')) continue; // behind a pop-up: not tappable by design
         const y = Math.min(Math.max(r.top + r.height / 2, 0), innerHeight - 1);
         const el = document.elementFromPoint(r.left + r.width / 2, y);
         if (!el || b.contains(el) || el.contains(b)) continue;
@@ -71,6 +73,7 @@ async function runOnce(browser, wanted) {
 
   const started = Date.now();
   let refreshed = false;
+  const timeline = {};
   for (let guard = 0; guard < 120; guard++) {
     const step = (await state()).game.step;
     if (step === 'g:end') break;
@@ -85,8 +88,15 @@ async function runOnce(browser, wanted) {
         await tap(btn(/Start earning|Continue/));
       } else await tap(page.getByRole('radio').first());
     } else if (kind === 'spin') {
+      await page.getByRole('dialog').waitFor();
       await tap(btn(i % 2 ? /No thanks|Skip this offer/ : /SPIN NOW|Accept this offer/));
     } else if (kind === 'home') {
+      const vip = page.getByRole('dialog', { name: 'VIP ladder' });
+      if (wanted === 'fraud') {
+        await vip.waitFor();
+        await check(`${step} (VIP pop-up)`);
+        await tap(btn(/Start earning/));
+      } else if (await vip.count()) problems.push('honest skin shows the VIP pop-up');
       await page.waitForTimeout(5000); // let a toast appear, then check again
       await check(`${step} (toasts)`);
       await tap(btn('Details').first());
@@ -103,28 +113,38 @@ async function runOnce(browser, wanted) {
       await tap(btn(/INVEST NOW|^Invest/).first());
       await page.waitForTimeout(700);
       await check(`${step} (chart)`);
-      await btn(/Next|Continue/).waitFor({ timeout: 8000 });
+      await btn(/Continue/).waitFor({ timeout: 15000 });
       await check(`${step} (result)`);
-      await tap(btn(/Next|Continue/));
+      if (wanted === 'fraud') {
+        if (!(await page.getByTestId('vip-nudge').count())) problems.push(`${step}: no VIP nudge`);
+        if (i === 1) await tap(btn(/Upgrade next round/));
+      }
+      await tap(btn(/Continue/));
     } else if (kind === 'brain') {
+      await page.getByRole('dialog', { name: 'Bonus question' }).waitFor();
       const box = page.getByRole('textbox');
       if (await box.count()) {
-        await box.fill(i === 2 ? '47' : '5');
+        await box.fill('5');
         await tap(btn('Submit answer'));
       } else await tap(page.getByRole('radio').first());
-      await tap(btn(/Next question|Back to trading/));
+      await tap(btn(/Back to trading/));
     } else if (kind === 'chat') {
       await tap(btn(/Open chat|Open Help/));
       await page.waitForTimeout(4000);
       await check(`${step} (open)`);
       await tap(btn(/Continue to round/));
     } else if (kind === 'deal') {
-      if (i === 0) {
-        await tap(btn('View plan details'));
-        await tap(btn('Close'));
-      }
-      await tap(btn(/INVEST ₹|Invest ₹/));
-      await tap(btn(/Next/));
+      const cards = await page.evaluate(
+        () =>
+          document.querySelectorAll('[data-testid^="deal-"]:not([data-testid="deal-result"])')
+            .length,
+      );
+      if (cards !== 3) problems.push(`deals: ${cards} cards instead of 3`);
+      await tap(btn('View details').first());
+      await tap(btn('Close'));
+      for (let k = 0; k < 2; k++) await tap(btn(/INVEST ₹|Invest ₹/).first()); // take two, leave one
+      await check(`${step} (after investing)`);
+      await tap(btn(/Continue/));
     } else if (kind === 'pool') {
       await tap(btn(/JOIN POOL|Join for/));
     } else if (kind === 'withdraw') {
@@ -147,8 +167,10 @@ async function runOnce(browser, wanted) {
       await page.waitForTimeout(400);
       await check(`${step} (after withdraw)`);
       const pay = btn(/PAY TAX/);
-      if (await pay.count()) await tap(pay);
-      await tap(btn(/Continue/));
+      if (await pay.count()) {
+        await tap(pay);
+        await tap(btn(/Continue/));
+      } else if (wanted === 'fraud') problems.push('fraud cash-out not blocked by the tax');
     } else if (kind === 'react') {
       if (i === 7 || i === 8) {
         await page.locator('input[type=range]').focus();
@@ -161,6 +183,7 @@ async function runOnce(browser, wanted) {
     } else if (kind === 'share') {
       await tap(btn('Finish'));
     }
+    timeline[kind] = (timeline[kind] ?? 0) + 1;
     try {
       await page.waitForFunction(
         ([k, prev]) => JSON.parse(sessionStorage.getItem(k)).game.step !== prev,
@@ -179,6 +202,7 @@ async function runOnce(browser, wanted) {
     skin: wanted,
     participant: s.participantId,
     seconds: Math.round((Date.now() - started) / 1000),
+    screens: Object.values(timeline).reduce((a, b) => a + b, 0),
     problems,
   };
 }
@@ -194,7 +218,7 @@ try {
       console.error(`✗ ${name} skin:\n  ${r.problems.join('\n  ')}`);
     } else {
       console.log(
-        `✓ ${name} skin: full game in ${r.seconds}s (scripted), no errors, no covered buttons — ${r.participant}`,
+        `✓ ${name} skin: ${r.screens} screens in ${r.seconds}s (scripted), no errors, no covered buttons — ${r.participant}`,
       );
     }
   }

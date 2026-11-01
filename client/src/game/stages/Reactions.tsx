@@ -3,7 +3,7 @@ import { FEATURES, FOMO, REACTION_QUESTION, SLIDERS } from '../../config/game';
 import { clientNow } from '../../lib/logger';
 import { useLog } from '../../lib/useLog';
 import { useGame } from '../GameProvider';
-import { nextStep, stepIndex } from '../steps';
+import { stepIndex } from '../steps';
 import { FeatureMini } from '../ui/FeatureMini';
 import { GameShell } from '../ui/GameShell';
 import { CtaButton, Title } from '../ui/kit';
@@ -12,12 +12,13 @@ import { Slider7, SwipeCard } from '../ui/SwipeCard';
 export const REACTION_COUNT = FEATURES.length + SLIDERS.length + FOMO.length;
 
 /**
- * S13 — Quick reactions (about 60 s), one per screen:
- * 7 swipe cards "Did this push you to invest?" — one per feature, shown as the player saw it;
- * a trust slider and an urgency slider (1–7); 3 FOMO statements as agree/disagree swipe cards.
+ * S13 — Quick reactions, one per screen:
+ * fraud skin only: 7 swipe cards "Did this push you to invest?" — one per feature, as seen;
+ * both skins: a trust slider and an urgency slider (1–7), then 3 FOMO statements as
+ * agree/disagree swipe cards.
  */
 export function Reactions() {
-  const { game, skin, dispatch, respond, go } = useGame();
+  const { game, skin, dispatch, respond, next } = useGame();
   const step = game.step;
   const log = useLog(step);
   const i = stepIndex(step);
@@ -30,7 +31,7 @@ export function Reactions() {
     dispatch({ type: 'answer', id, value, ms: Math.round(clientNow() - shownAt.current) });
     respond(id, value);
     if (method) log('reaction_method', { id, method });
-    go(nextStep(step));
+    next();
   }
 
   let body;
@@ -82,7 +83,7 @@ export function Reactions() {
       <div
         className={`mb-3 text-xs font-bold tracking-widest uppercase ${fraud ? 'text-gold-300' : 'text-slate-400'}`}
       >
-        Quick reactions · {i + 1}/{REACTION_COUNT}
+        Quick reactions · {fraud ? i + 1 : i - nF + 1}/{fraud ? REACTION_COUNT : nS + FOMO.length}
       </div>
       {body}
     </GameShell>

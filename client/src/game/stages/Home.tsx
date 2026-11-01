@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ECONOMY,
   PLAN_DETAILS,
@@ -6,15 +6,26 @@ import {
   TERMS,
   TESTIMONIALS,
   TIMING,
+  VIP,
   type Skin,
 } from '../../config/game';
-import { useDecisionTimer, useLog } from '../../lib/useLog';
+import { clientNow } from '../../lib/logger';
+import { useLog } from '../../lib/useLog';
 import { formatINR } from '../economy';
 import { useGame } from '../GameProvider';
-import { nextStep } from '../steps';
 import { LiveChart } from '../ui/Chart';
 import { GameShell } from '../ui/GameShell';
-import { Countdown, CtaButton, InfoLink, Money, Panel, Sheet, SkipButton, Title } from '../ui/kit';
+import {
+  Countdown,
+  CtaButton,
+  InfoLink,
+  Modal,
+  Money,
+  Panel,
+  Sheet,
+  SkipButton,
+  Title,
+} from '../ui/kit';
 
 /** "Members earned today" ticking up every couple of seconds (fraud skin). */
 function LiveEarned() {
@@ -26,6 +37,28 @@ function LiveEarned() {
   return <Money value={v} className="gold-text text-4xl font-black" />;
 }
 
+function VipTiers({ total }: { total: number }) {
+  return (
+    <ul className="mt-2 space-y-1.5">
+      {ECONOMY.vipTiers.map((t) => {
+        const reached = total >= t.minDeposited;
+        return (
+          <li
+            key={t.level}
+            className={`flex items-center justify-between rounded-xl px-3 py-2 text-sm ${reached ? 'bg-gold-400/20' : 'bg-white/5'}`}
+          >
+            <span className="font-black">
+              {reached ? '✅' : '🔒'} VIP {t.level}
+            </span>
+            <span className="text-xs text-white/60">from {formatINR(t.minDeposited)}</span>
+            <span className="text-xs font-bold text-gold-300">{t.perk}</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export function VipLadder({ total }: { total: number }) {
   return (
     <Panel skin="fraud" className="border-gold-400/40" glow>
@@ -33,23 +66,8 @@ export function VipLadder({ total }: { total: number }) {
         <div className="gold-text text-lg font-black">👑 VIP ladder</div>
         <div className="text-[10px] text-white/50">Deposited {formatINR(total)}</div>
       </div>
-      <ul className="mt-2 space-y-1.5">
-        {ECONOMY.vipTiers.map((t) => {
-          const reached = total >= t.minDeposited;
-          return (
-            <li
-              key={t.level}
-              className={`flex items-center justify-between rounded-xl px-3 py-2 text-sm ${reached ? 'bg-gold-400/20' : 'bg-white/5'}`}
-            >
-              <span className="font-black">
-                {reached ? '✅' : '🔒'} VIP {t.level}
-              </span>
-              <span className="text-xs text-white/60">from {formatINR(t.minDeposited)}</span>
-              <span className="text-xs font-bold text-gold-300">{t.perk}</span>
-            </li>
-          );
-        })}
-      </ul>
+      <VipTiers total={total} />
+      <div className="mt-2 text-[10px] text-white/40">Higher rates {VIP.nextCycle}.</div>
     </Panel>
   );
 }
@@ -148,28 +166,46 @@ function PlanCard({
 }
 
 /**
- * S3 — Home dashboard (the hook). Choose a plan and invest, or skip. Decision time = first render
- * → first Invest/Skip tap (H1). Fraud adds: locked bonus (H1b), countdown + slots (H1a), VIP ladder
- * (H1c), badge/rating (header, H1d), ticker/toasts/testimonials (H1e).
+ * S3 — Home dashboard (the hook). Choose a plan and invest, or skip (H1). Fraud adds: VIP ladder
+ * pop-up on the first visit and a VIP ladder card (H1c), locked bonus (H1b), countdown + slots
+ * (H1a), badge/rating (header, H1d), ticker/toasts/testimonials (H1e).
+ * Decision time runs from the moment the dashboard can be used (fraud: after the VIP pop-up is
+ * closed) to the first Invest/Skip tap; the pop-up time is logged separately.
  */
 export function Home() {
-  const { game, skin, dispatch, go } = useGame();
+  const { game, skin, dispatch, next } = useGame();
   const step = game.step;
   const log = useLog(step);
-  const decide = useDecisionTimer();
   const fraud = skin === 'fraud';
   const [planId, setPlanId] = useState<string | null>(game.planId);
   const [sheet, setSheet] = useState<null | 'tnc' | 'plan'>(null);
+  // DECISION: the VIP pop-up shows on the first visit only (not again after a refresh).
+  const [popup, setPopup] = useState(fraud && !game.vipPopupSeen);
+  const openedAt = useRef(clientNow());
+  const usableAt = useRef(clientNow());
+
+  useEffect(() => {
+    if (popup) dispatch({ type: 'vip_popup_shown' });
+    // once, on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function closePopup() {
+    const now = clientNow();
+    dispatch({ type: 'vip_popup_close', ms: Math.round(now - openedAt.current) });
+    usableAt.current = now;
+    setPopup(false);
+  }
 
   function choose(choice: 'invest' | 'skip') {
-    const { decision_ms } = decide();
+    const decision_ms = Math.round(clientNow() - usableAt.current);
     dispatch({
       type: 's3_decide',
       choice,
       planId: choice === 'invest' ? planId : null,
       decisionMs: decision_ms,
     });
-    go(nextStep(step));
+    next();
   }
 
   const actions = (
@@ -184,128 +220,149 @@ export function Home() {
   );
 
   return (
-    <GameShell actions={actions}>
-      <div className="space-y-3">
-        {fraud ? (
-          <div className="text-center">
-            <div className="text-xs font-bold text-white/60 uppercase">Members earned today</div>
-            <LiveEarned />
-            <div className="mt-1 text-xs text-neon-300">▲ +312% average monthly return</div>
-          </div>
-        ) : (
-          <>
-            <Title skin={skin} sub="Pick a plan to trade with in the next rounds, or skip.">
-              Your practice account
-            </Title>
-            <Panel skin={skin}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs text-slate-400">Practice market today</div>
-                  <div className="text-lg font-semibold text-slate-50">ZenTrade index</div>
+    <>
+      <GameShell actions={actions} inert={popup}>
+        <div className="space-y-3">
+          {fraud ? (
+            <div className="text-center">
+              <div className="text-xs font-bold text-white/60 uppercase">Members earned today</div>
+              <LiveEarned />
+              <div className="mt-1 text-xs text-neon-300">▲ +312% average monthly return</div>
+            </div>
+          ) : (
+            <>
+              <Title skin={skin} sub="Pick a plan to trade with in the next rounds, or skip.">
+                Your practice account
+              </Title>
+              <Panel skin={skin}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-xs text-slate-400">Practice market today</div>
+                    <div className="text-lg font-semibold text-slate-50">ZenTrade index</div>
+                  </div>
+                  <div className="rounded-full bg-green-900/40 px-2.5 py-1 text-sm font-semibold text-green-400">
+                    ▲ 0.6%
+                  </div>
                 </div>
-                <div className="rounded-full bg-green-900/40 px-2.5 py-1 text-sm font-semibold text-green-400">
-                  ▲ 0.6%
+                <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs text-slate-300">
+                  <div className="rounded-lg bg-slate-900 py-1.5">
+                    <div className="font-semibold text-slate-50">{ECONOMY.rounds.count}</div>rounds
+                  </div>
+                  <div className="rounded-lg bg-slate-900 py-1.5">
+                    <div className="font-semibold text-slate-50">3</div>plans
+                  </div>
+                  <div className="rounded-lg bg-slate-900 py-1.5">
+                    <div className="font-semibold text-slate-50">₹0</div>fees
+                  </div>
                 </div>
-              </div>
-              <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs text-slate-300">
-                <div className="rounded-lg bg-slate-900 py-1.5">
-                  <div className="font-semibold text-slate-50">{ECONOMY.rounds.count}</div>rounds
-                </div>
-                <div className="rounded-lg bg-slate-900 py-1.5">
-                  <div className="font-semibold text-slate-50">3</div>plans
-                </div>
-                <div className="rounded-lg bg-slate-900 py-1.5">
-                  <div className="font-semibold text-slate-50">₹0</div>fees
+              </Panel>
+            </>
+          )}
+
+          {fraud ? (
+            <Panel skin={skin} className="border-gold-400/40 bg-gold-400/5">
+              <div className="flex items-center gap-3">
+                <div className="text-3xl">🎁</div>
+                <div className="flex-1">
+                  <div className="font-black text-gold-300">
+                    ₹{ECONOMY.signupBonus} sign-up bonus
+                  </div>
+                  <div className="text-xs text-white/70">
+                    🔒 Locked — unlocks after your first deposit
+                  </div>
                 </div>
               </div>
             </Panel>
-          </>
-        )}
-
-        {fraud ? (
-          <Panel skin={skin} className="border-gold-400/40 bg-gold-400/5">
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">🎁</div>
-              <div className="flex-1">
-                <div className="font-black text-gold-300">₹{ECONOMY.signupBonus} sign-up bonus</div>
-                <div className="text-xs text-white/70">
-                  🔒 Locked — unlocks after your first deposit
-                </div>
+          ) : (
+            <Panel skin={skin}>
+              <div className="text-sm">
+                <span className="font-semibold">₹{ECONOMY.signupBonus} welcome bonus</span> has been
+                added to your Profit wallet.
               </div>
-            </div>
-          </Panel>
-        ) : (
-          <Panel skin={skin}>
-            <div className="text-sm">
-              <span className="font-semibold">₹{ECONOMY.signupBonus} welcome bonus</span> has been
-              added to your Profit wallet.
-            </div>
-          </Panel>
-        )}
+            </Panel>
+          )}
 
-        {fraud && <Urgency onReset={() => log('timer_reset')} />}
+          {fraud && <Urgency onReset={() => log('timer_reset')} />}
 
-        <div
-          className={
-            fraud
-              ? 'rounded-2xl bg-black/30 p-2'
-              : 'rounded-xl border border-slate-700 bg-slate-800 p-2'
+          <div
+            className={
+              fraud
+                ? 'rounded-2xl bg-black/30 p-2'
+                : 'rounded-xl border border-slate-700 bg-slate-800 p-2'
+            }
+          >
+            <LiveChart skin={skin} rate={0.06} seed={7} ms={0} running={false} height={90} />
+          </div>
+
+          <div className="space-y-2">
+            {PLANS.map((p) => (
+              <PlanCard
+                key={p.id}
+                skin={skin}
+                plan={p}
+                selected={planId === p.id}
+                onSelect={() => {
+                  setPlanId(p.id);
+                  log('plan_select', { plan_id: p.id });
+                }}
+                onDetails={() => {
+                  setSheet('plan');
+                  dispatch({ type: 'verify', what: 'plan_details' });
+                }}
+              />
+            ))}
+          </div>
+
+          {fraud && <VipLadder total={game.totalDeposited} />}
+          {fraud && <Testimonials />}
+
+          <div className="text-center">
+            <InfoLink
+              skin={skin}
+              onClick={() => {
+                setSheet('tnc');
+                dispatch({ type: 'verify', what: 'tnc' });
+              }}
+            >
+              {fraud ? 'T&C apply' : 'Terms and risks'}
+            </InfoLink>
+          </div>
+        </div>
+
+        <Sheet
+          skin={skin}
+          open={sheet === 'tnc'}
+          onClose={() => setSheet(null)}
+          title="Terms & conditions"
+        >
+          <p className="text-sm">{TERMS.text}</p>
+        </Sheet>
+        <Sheet
+          skin={skin}
+          open={sheet === 'plan'}
+          onClose={() => setSheet(null)}
+          title="Plan details"
+        >
+          <p className="text-sm">{PLAN_DETAILS}</p>
+        </Sheet>
+      </GameShell>
+      {popup && (
+        <Modal
+          skin={skin}
+          label="VIP ladder"
+          actions={
+            <CtaButton skin={skin} onClick={closePopup}>
+              {VIP.popupCta} 🚀
+            </CtaButton>
           }
         >
-          <LiveChart skin={skin} rate={0.06} seed={7} ms={0} running={false} height={90} />
-        </div>
-
-        <div className="space-y-2">
-          {PLANS.map((p) => (
-            <PlanCard
-              key={p.id}
-              skin={skin}
-              plan={p}
-              selected={planId === p.id}
-              onSelect={() => {
-                setPlanId(p.id);
-                log('plan_select', { plan_id: p.id });
-              }}
-              onDetails={() => {
-                setSheet('plan');
-                dispatch({ type: 'verify', what: 'plan_details' });
-              }}
-            />
-          ))}
-        </div>
-
-        {fraud && <VipLadder total={game.totalDeposited} />}
-        {fraud && <Testimonials />}
-
-        <div className="text-center">
-          <InfoLink
-            skin={skin}
-            onClick={() => {
-              setSheet('tnc');
-              dispatch({ type: 'verify', what: 'tnc' });
-            }}
-          >
-            {fraud ? 'T&C apply' : 'Terms and risks'}
-          </InfoLink>
-        </div>
-      </div>
-
-      <Sheet
-        skin={skin}
-        open={sheet === 'tnc'}
-        onClose={() => setSheet(null)}
-        title="Terms & conditions"
-      >
-        <p className="text-sm">{TERMS.text}</p>
-      </Sheet>
-      <Sheet
-        skin={skin}
-        open={sheet === 'plan'}
-        onClose={() => setSheet(null)}
-        title="Plan details"
-      >
-        <p className="text-sm">{PLAN_DETAILS}</p>
-      </Sheet>
-    </GameShell>
+          <div className="text-center" data-testid="vip-popup">
+            <div className="gold-text text-2xl font-black">{VIP.popupTitle}</div>
+            <p className="mt-1 text-sm text-white/70">{VIP.popupBody}</p>
+          </div>
+          <VipTiers total={game.totalDeposited} />
+        </Modal>
+      )}
+    </>
   );
 }

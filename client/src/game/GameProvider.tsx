@@ -18,7 +18,7 @@ import {
   type GameAssignment,
   type GameState,
 } from './reducer';
-import { FIRST_STEP } from './steps';
+import { FIRST_STEP, nextStep } from './steps';
 
 /** Everything saved in sessionStorage so a refresh resumes the same player on the same screen. */
 export interface SavedGame {
@@ -99,6 +99,8 @@ interface GameApi {
   dispatch: (action: GameAction) => void;
   /** Move to another step (logs, tells the server, scrolls to top). */
   go: (step: string) => void;
+  /** Move to the next step of the player's own skin. */
+  next: () => void;
   /** Store a response item (sent to the server in the background, retried until saved). */
   respond: (itemId: string, value: string | number) => void;
 }
@@ -183,6 +185,11 @@ export function GameProvider({ initial, children }: { initial: SavedGame; childr
     [dispatch],
   );
 
+  const next = useCallback(() => {
+    const cur = ref.current;
+    go(nextStep(cur.game.step, cur.assignment.app_version));
+  }, [go]);
+
   // Tell the server where the player is (resume + completion). Failures retry on the next step.
   useEffect(() => {
     api.setStep(saved.participantId, saved.game.step).catch(() => undefined);
@@ -196,9 +203,10 @@ export function GameProvider({ initial, children }: { initial: SavedGame; childr
       participantId: saved.participantId,
       dispatch,
       go,
+      next,
       respond,
     }),
-    [saved, dispatch, go, respond],
+    [saved, dispatch, go, next, respond],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

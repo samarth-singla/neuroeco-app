@@ -2,28 +2,30 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   APP_NAME,
   APP_TAGLINE,
+  ECONOMY,
   RISK_WARNING,
   TICKER,
   TIMING,
   TOASTS,
   TRUST,
+  VIP,
   type Skin,
   RESEARCH_FOOTER,
 } from '../../config/game';
 import { logEvent } from '../../lib/logger';
-import { toNextVip, vipLevel } from '../economy';
+import { formatINR, toNextVip, vipLevel } from '../economy';
 import { useGame } from '../GameProvider';
 import { progressOf, stageOf } from '../steps';
-import { Money, Sheet } from './kit';
-import { setSound, soundOn } from './sound';
+import { Confetti, Money, Sheet } from './kit';
+import { haptic, play, setSound, soundOn } from './sound';
 
 const STAGE_NAMES = [
   '',
   'Trader profile',
-  'Bonus spins',
+  'Bonus spin',
   'Dashboard',
   'Trading rounds',
-  'Brain bonus',
+  'Bonus question',
   'Advisor',
   'Flash deals',
   'Invite',
@@ -157,8 +159,6 @@ function Wallets() {
   const { game, skin } = useGame();
   const w = game.wallets;
   const fraud = skin === 'fraud';
-  const vip = vipLevel(game.totalDeposited);
-  const next = toNextVip(game.totalDeposited);
   const cell = fraud ? 'rounded-xl bg-white/5 px-2 py-1.5' : 'rounded-lg bg-slate-800 px-2 py-1.5';
   const label = fraud
     ? 'text-[10px] tracking-wide text-white/50 uppercase'
@@ -194,20 +194,64 @@ function Wallets() {
           />
         </div>
       </div>
-      {fraud && (w.bonusLocked > 0 || vip > 0 || next) && (
+      {fraud && w.bonusLocked > 0 && (
         <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px]">
-          {w.bonusLocked > 0 && (
-            <span
-              className="rounded-full bg-gold-400/15 px-2 py-0.5 font-bold text-gold-300"
-              data-testid="locked-bonus"
-            >
-              🔒 ₹{w.bonusLocked} bonus · deposit to unlock
-            </span>
-          )}
-          <span className="rounded-full bg-gold-400/15 px-2 py-0.5 font-bold text-gold-300">
-            👑 {vip > 0 ? `VIP ${vip}` : 'Member'}
-            {next ? ` · ₹${next.needed.toLocaleString('en-IN')} to VIP ${next.level}` : ''}
+          <span
+            className="rounded-full bg-gold-400/15 px-2 py-0.5 font-bold text-gold-300"
+            data-testid="locked-bonus"
+          >
+            🔒 ₹{w.bonusLocked} bonus · deposit to unlock
           </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Fraud skin: persistent VIP bar on every money screen — current level, progress to the next
+ * level and its promised daily rate (H1c). A level-up shows a banner (and confetti in the content
+ * area) for a few seconds; the higher rate always starts "next cycle", so payoffs never change.
+ */
+function VipBar({ celebrating }: { celebrating: number | null }) {
+  const { game } = useGame();
+  const total = game.totalDeposited;
+  const vip = vipLevel(total);
+  const next = toNextVip(total);
+  const nextTier = next ? ECONOMY.vipTiers.find((t) => t.level === next.level) : undefined;
+  const from = ECONOMY.vipTiers.find((t) => t.level === vip)?.minDeposited ?? 0;
+  const pct = nextTier
+    ? Math.min(100, ((total - from) / (nextTier.minDeposited - from)) * 100)
+    : 100;
+  return (
+    <div className="px-3 pb-2" data-testid="vip-bar">
+      {celebrating !== null ? (
+        <div
+          className="animate-pop rounded-xl bg-linear-to-r from-gold-500 via-gold-300 to-gold-500 px-3 py-2 text-center text-xs font-black text-black"
+          data-testid="vip-level-up"
+        >
+          {VIP.levelUp(
+            celebrating,
+            ECONOMY.vipTiers.find((t) => t.level === celebrating)?.daily ?? '',
+          )}
+        </div>
+      ) : (
+        <div className="rounded-xl border border-gold-400/30 bg-gold-400/10 px-3 py-1.5">
+          <div className="flex items-center justify-between gap-2 text-[11px] font-bold text-gold-300">
+            <span>
+              👑 {vip > 0 ? `VIP ${vip}` : 'Member'}
+              {nextTier
+                ? ` · ${formatINR(total)} / ${formatINR(nextTier.minDeposited)} to VIP ${nextTier.level}`
+                : ' · top level'}
+            </span>
+            {nextTier && <span className="shrink-0 text-neon-300">{nextTier.daily} daily</span>}
+          </div>
+          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full rounded-full bg-linear-to-r from-gold-500 to-gold-300 transition-all duration-700"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
         </div>
       )}
     </div>
@@ -216,16 +260,14 @@ function Wallets() {
 
 function LevelBar({ step, skin }: { step: string; skin: Skin }) {
   const stage = stageOf(step);
-  const pct = Math.round(progressOf(step) * 100);
+  const pct = Math.round(progressOf(step, skin) * 100);
   const fraud = skin === 'fraud';
   return (
     <div className="px-3 pb-2">
       <div
         className={`flex justify-between text-[10px] font-bold tracking-wide uppercase ${fraud ? 'text-white/50' : 'text-slate-400'}`}
       >
-        <span>
-          Level {stage}/15 · {STAGE_NAMES[stage]}
-        </span>
+        <span>{STAGE_NAMES[stage]}</span>
         <span>{pct}%</span>
       </div>
       <div
@@ -245,22 +287,43 @@ function LevelBar({ step, skin }: { step: string; skin: Skin }) {
  * - `market`: show the money UI (wallets; fraud: ticker + toasts). Off for profile, brain bonus,
  *   reactions and the report card, which are not "in the app".
  * - `actions`: buttons pinned at the bottom, above the research footer. Nothing floats over them.
+ * - `inert`: the screen sits behind a pop-up (spins, bonus questions, VIP ladder) and cannot be
+ *   tapped; the pop-up has its own buttons.
  */
 export function GameShell({
   children,
   actions,
   market = true,
+  inert = false,
 }: {
   children: ReactNode;
   actions?: ReactNode;
   market?: boolean;
+  inert?: boolean;
 }) {
   const { game, skin, dispatch } = useGame();
   const fraud = skin === 'fraud';
   const [cert, setCert] = useState(false);
 
+  // Fraud: celebrate each VIP level once (state, so a level reached just before a screen change
+  // is celebrated on the next screen). The vip_level_up event itself is logged by the reducer.
+  const level = vipLevel(game.totalDeposited);
+  const celebrating = fraud && market && level > (game.vipCelebrated ?? 0) ? level : null;
+  useEffect(() => {
+    if (celebrating === null || inert) return;
+    play('cash');
+    haptic(80);
+    const id = setTimeout(
+      () => dispatch({ type: 'vip_celebrated', level: celebrating }),
+      TIMING.vipCelebrateMs,
+    );
+    return () => clearTimeout(id);
+  }, [celebrating, inert, dispatch]);
+
   return (
     <div
+      inert={inert}
+      aria-hidden={inert || undefined}
       className={`flex min-h-dvh justify-center ${fraud ? 'fraud-bg text-white' : 'bg-slate-950 text-slate-50'}`}
     >
       <div
@@ -315,10 +378,14 @@ export function GameShell({
           {fraud && market && <Ticker />}
           {fraud && market && <ToastLane screen={game.step} />}
           {market && <Wallets />}
+          {fraud && market && <VipBar celebrating={celebrating} />}
           <LevelBar step={game.step} skin={skin} />
         </header>
 
-        <main className="relative flex-1 overflow-hidden px-4 pt-2 pb-4">{children}</main>
+        <main className="relative flex-1 overflow-hidden px-4 pt-2 pb-4">
+          {celebrating !== null && !inert && <Confetti pieces={90} />}
+          {children}
+        </main>
 
         <div
           data-sticky="bottom"

@@ -3,7 +3,6 @@ import { CHAT, ECONOMY, TIMING } from '../../config/game';
 import { useDecisionTimer, useLog } from '../../lib/useLog';
 import { formatINR, taxFor, vipLevel, withdrawable } from '../economy';
 import { useGame } from '../GameProvider';
-import { nextStep } from '../steps';
 import { GameShell } from '../ui/GameShell';
 import {
   AmountPicker,
@@ -23,7 +22,7 @@ import { play } from '../ui/sound';
  * withdrawals are closed. Then a deposit offer (the H6 DV), capped at ₹5,000.
  */
 export function Withdraw() {
-  const { game, assignment, skin, dispatch, go } = useGame();
+  const { game, assignment, skin, dispatch, next } = useGame();
   const step = game.step;
   useLog(step);
   const fraud = skin === 'fraud';
@@ -49,7 +48,7 @@ export function Withdraw() {
 
   function deposit(value: number) {
     dispatch({ type: 's9_deposit', amount: value, at: Date.now() });
-    go(nextStep(step));
+    next();
   }
 
   let actions;
@@ -148,7 +147,7 @@ export function Withdraw() {
 
 /** S10 — Gold Plan reinvest offer (H7): ₹2,000 from Profit wallet vs from Main wallet. */
 export function Reinvest() {
-  const { game, assignment, skin, dispatch, go } = useGame();
+  const { game, assignment, skin, dispatch, next } = useGame();
   const step = game.step;
   useLog(step);
   const fraud = skin === 'fraud';
@@ -160,7 +159,7 @@ export function Reinvest() {
 
   function finish(value: number) {
     dispatch({ type: 'reinvest', amount: value, at: Date.now() });
-    go(nextStep(step));
+    next();
   }
 
   const headline = fromProfit
@@ -237,7 +236,7 @@ export function Reinvest() {
  * or leave it. Fraud adds a "recover in 10 minutes" countdown (resets, never blocks).
  */
 export function Crash() {
-  const { game, skin, dispatch, go } = useGame();
+  const { game, skin, dispatch, next } = useGame();
   const step = game.step;
   const log = useLog(step);
   const decide = useDecisionTimer();
@@ -252,7 +251,7 @@ export function Crash() {
   function finish(value: number) {
     const { decision_ms } = decide();
     dispatch({ type: 'topup', amount: value, at: Date.now(), decisionMs: decision_ms });
-    go(nextStep(step));
+    next();
   }
 
   return (
@@ -333,11 +332,12 @@ export function Crash() {
 }
 
 /**
- * S12 — Withdraw everything. Honest: processes. Fraud: blocked by a 10% "processing tax" (H1g),
- * with an account-freeze warning and a support message pushing payment.
+ * S12 — Withdraw everything. Honest: processes instantly and the game moves straight on (no extra
+ * screen). Fraud: blocked by a 10% "processing tax" (H1g), with an account-freeze warning and a
+ * support message pushing payment.
  */
 export function Cashout() {
-  const { game, skin, dispatch, go } = useGame();
+  const { game, skin, dispatch, next } = useGame();
   const step = game.step;
   const log = useLog(step);
   const fraud = skin === 'fraud';
@@ -348,7 +348,7 @@ export function Cashout() {
   let actions;
   if (game.cashout) {
     actions = (
-      <CtaButton skin={skin} onClick={() => go(nextStep(step))}>
+      <CtaButton skin={skin} onClick={() => next()}>
         Continue →
       </CtaButton>
     );
@@ -365,7 +365,13 @@ export function Cashout() {
     );
   } else {
     actions = (
-      <CtaButton skin={skin} onClick={() => dispatch({ type: 'cashout_click' })}>
+      <CtaButton
+        skin={skin}
+        onClick={() => {
+          dispatch({ type: 'cashout_click' });
+          if (!fraud) next();
+        }}
+      >
         Withdraw everything {formatINR(total)}
       </CtaButton>
     );

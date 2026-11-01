@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { PROFILE } from '../../config/game';
 import { useLog } from '../../lib/useLog';
 import { useGame } from '../GameProvider';
-import { nextStep, stepIndex } from '../steps';
+import { stepIndex } from '../steps';
 import { GameShell } from '../ui/GameShell';
 import { CtaButton, Title } from '../ui/kit';
 import { ChoiceList, Scale7 } from '../ui/questions';
@@ -11,7 +11,7 @@ const AVATARS = ['🦁', '🐯', '🦊', '🐼', '🦅', '🐺'];
 
 /** S1 — Trader profile: one question per screen (controls, H8 self-rating, H9 groups). */
 export function Profile() {
-  const { game, skin, dispatch, respond, go } = useGame();
+  const { game, skin, dispatch, respond, next } = useGame();
   const step = game.step;
   const log = useLog(step);
   const i = stepIndex(step);
@@ -24,7 +24,7 @@ export function Profile() {
   function answer(value: string | number) {
     dispatch({ type: 'answer', id: q.id, value });
     respond(q.id, value);
-    if (!last) go(nextStep(step));
+    if (!last) next();
   }
 
   if (last && answered !== undefined) {
@@ -33,7 +33,7 @@ export function Profile() {
       <GameShell
         market={false}
         actions={
-          <CtaButton skin={skin} onClick={() => go(nextStep(step))}>
+          <CtaButton skin={skin} onClick={() => next()}>
             {fraud ? 'Start earning 🚀' : 'Continue'}
           </CtaButton>
         }

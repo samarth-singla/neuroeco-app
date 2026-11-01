@@ -1,7 +1,7 @@
 /**
  * Trap score (0–10): the scam tricks a player fell for. Computed from "facts" so the report card
  * (facts from the game state) and the export (facts from the event log) use the same rule.
- * The tax trap exists only in the fraud skin, so honest players can score at most 9.
+ * The mentor-chat and tax traps exist only in the fraud skin, so honest players can score at most 8.
  */
 import { ECONOMY, type Skin } from '../config/game';
 import { vipLevel } from './economy';
@@ -23,7 +23,7 @@ export interface TrapFacts {
 export const TRAPS: { id: string; fraudOnly?: boolean; test: (f: TrapFacts) => boolean }[] = [
   { id: 'hook', test: (f) => f.r1Amount > 0 },
   { id: 'vip', test: (f) => vipLevel(f.totalDeposited) >= ECONOMY.vipUpgradeLevel },
-  { id: 'chat', test: (f) => f.chatDeposit },
+  { id: 'chat', fraudOnly: true, test: (f) => f.chatDeposit },
   { id: 'deal_no_details', test: (f) => f.dealNoDetails },
   { id: 'pool_no_details', test: (f) => f.poolNoDetails },
   { id: 'crash_topup', test: (f) => f.crashTopup },

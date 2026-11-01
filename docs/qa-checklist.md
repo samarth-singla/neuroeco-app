@@ -17,10 +17,12 @@ Turso database — comment out the Turso lines in `.env`), and reset it afterwar
 ### Both skins
 Open the link in private windows until you have had both skins (shown in `/admin`, or the app name: "ZenTrade X"
 = fraud, "ZenTrade" = honest).
-- [ ] **Fraud:** ticker, winner toasts every few seconds, ★4.9 / 10 lakh+ / NDIA badge (tap → certificate),
+- [ ] **Fraud:** VIP ladder pop-up on the first home visit (2% / 3% / 5% daily), VIP bar on every money screen,
+      after-round "Deposit ₹X more to unlock VIP n" nudge, level-up banner when a threshold is crossed; ticker, winner toasts every few seconds, ★4.9 / 10 lakh+ / NDIA badge (tap → certificate),
       locked ₹500 bonus, countdown + "only 3 slots left", VIP ladder, testimonials, pulsing INVEST NOW (phone
       vibrates on Android), confetti on wins, "Rohit Sir" chat typing, flashing flash deals, crash flash, tax block.
-- [ ] **Honest:** dark slate theme with readable text and cards, normal-size numbers, equal Invest / Skip buttons, readable risk line above the buttons, About page,
+- [ ] **Honest:** no mentor-chat screen, no feature swipe cards (only the 2 sliders + 3 FOMO cards), cash-out
+      goes straight on; dark slate theme with readable text and cards, normal-size numbers, equal Invest / Skip buttons, readable risk line above the buttons, About page,
       Help & FAQ card, no toasts / timers / badges / confetti, withdrawal goes through.
 - [ ] The honest skin does not feel noticeably shorter or duller.
 - [ ] Sound toggle (fraud) is off by default and works when switched on.
@@ -35,7 +37,11 @@ Open the link in private windows until you have had both skins (shown in `/admin
 - [ ] Pool invite is a friend message or a sponsored ad.
 - [ ] Test withdrawal: ₹500 succeeds (`allowed`) or "Withdrawals open at VIP n" (`not_offered`).
 - [ ] Gold Plan says "from your profits" or "from your main wallet".
-- [ ] Flash deals appear in a different order for different players.
+- [ ] Flash deals: one screen, three cards; the card order differs between players; each card has its own
+      "View details" and "Invest".
+- [ ] Spins and bonus questions pop up over the game (spin 1 before round 1, bonus question 1 after round 1,
+      spin 2 after round 2, bonus questions 2–3 after round 3, bonus question 4 after round 4); spin results only
+      on the report card.
 
 ### No dead ends
 - [ ] Every money screen can be skipped; never investing still reaches the report card.

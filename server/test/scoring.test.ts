@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  crtScore,
+  crtCorrect,
   escalationRatio,
-  LAMBDA_REJECT_ALL,
   literacyScore,
   lossAversion,
   meanOf,
@@ -11,51 +10,47 @@ import {
   type Answers,
 } from '../src/scoring';
 
-const gambles = (choices: string): Answers => {
-  // choices: 4 letters, a = accept, r = reject, for wins of ₹100, ₹150, ₹200, ₹300
-  const gains = [100, 150, 200, 300];
-  return Object.fromEntries(
-    gains.map((g, i) => [`la_gain_${g}`, choices[i] === 'a' ? 'accept' : 'reject']),
-  );
-};
+const spins = (s150: string, s250: string): Answers => ({
+  la_gain_150: s150 === 'a' ? 'accept' : 'reject',
+  la_gain_250: s250 === 'a' ? 'accept' : 'reject',
+});
 
-describe('CRT', () => {
-  it('scores 0–3 against 5, 5, 47', () => {
-    expect(crtScore({ crt_1: '5', crt_2: '5', crt_3: '47' })).toBe(3);
-    expect(crtScore({ crt_1: '10', crt_2: '100', crt_3: '24' })).toBe(0); // intuitive answers
-    expect(crtScore({ crt_1: '5.0', crt_2: '100', crt_3: '47' })).toBe(2);
+describe('CRT (single bat-and-ball item)', () => {
+  it('1 = ₹5 (correct), 0 = anything else', () => {
+    expect(crtCorrect({ crt_1: '5' })).toBe(1);
+    expect(crtCorrect({ crt_1: '5.0' })).toBe(1);
+    expect(crtCorrect({ crt_1: '10' })).toBe(0); // the intuitive answer
+    expect(crtCorrect({ crt_1: '105' })).toBe(0);
   });
-  it('is blank if an answer is missing', () => {
-    expect(crtScore({ crt_1: '5', crt_2: '5' })).toBeNull();
-    expect(crtScore({ crt_1: '5', crt_2: '5', crt_3: '' })).toBeNull();
+  it('is blank if unanswered', () => {
+    expect(crtCorrect({})).toBeNull();
+    expect(crtCorrect({ crt_1: '' })).toBeNull();
   });
 });
 
-describe('loss aversion λ (4 bonus spins)', () => {
-  it('uses the smallest accepted win ÷ 100: 1, 1.5, 2 or 3', () => {
-    expect(lossAversion(gambles('aaaa'))).toEqual({ lambda: 1, consistent: 1, accepted: 4 });
-    expect(lossAversion(gambles('raaa'))).toEqual({ lambda: 1.5, consistent: 1, accepted: 3 });
-    expect(lossAversion(gambles('rraa'))).toEqual({ lambda: 2, consistent: 1, accepted: 2 });
-    expect(lossAversion(gambles('rrra'))).toEqual({ lambda: 3, consistent: 1, accepted: 1 });
+describe('loss-aversion group (2 bonus spins: lose ₹100 vs win ₹150 / ₹250)', () => {
+  it('1 = accepted the ₹150 bet (low, λ ≤ 1.5)', () => {
+    expect(lossAversion(spins('a', 'a'))).toEqual({ group: 1, consistent: 1, accepted: 2 });
   });
-  it('rejecting all spins gives 3.5', () => {
-    expect(LAMBDA_REJECT_ALL).toBe(3.5);
-    expect(lossAversion(gambles('rrrr'))).toEqual({ lambda: 3.5, consistent: 1, accepted: 0 });
+  it('2 = accepted only the ₹250 bet (typical, 1.5–2.5)', () => {
+    expect(lossAversion(spins('r', 'a'))).toEqual({ group: 2, consistent: 1, accepted: 1 });
   });
-  it('inconsistent choices (accept a win, reject a larger one) leave λ blank', () => {
-    expect(lossAversion(gambles('arar'))).toEqual({ lambda: null, consistent: 0, accepted: 2 });
-    expect(lossAversion(gambles('aaar'))).toMatchObject({ lambda: null, consistent: 0 });
-    expect(lossAversion(gambles('rarr'))).toMatchObject({ lambda: null, consistent: 0 });
+  it('3 = rejected both (high, λ > 2.5)', () => {
+    expect(lossAversion(spins('r', 'r'))).toEqual({ group: 3, consistent: 1, accepted: 0 });
+  });
+  it('accepted ₹150 but rejected ₹250 = inconsistent, blank', () => {
+    expect(lossAversion(spins('a', 'r'))).toEqual({ group: null, consistent: 0, accepted: 1 });
   });
   it('does not depend on the order the spins were shown in', () => {
-    const a = gambles('rraa');
-    const shuffled = Object.fromEntries(Object.entries(a).reverse());
-    expect(lossAversion(shuffled).lambda).toBe(2);
+    const a = spins('r', 'a');
+    expect(lossAversion(Object.fromEntries(Object.entries(a).reverse())).group).toBe(2);
   });
-  it('is blank if any spin is unanswered', () => {
-    const a = gambles('rraa');
-    delete a.la_gain_150;
-    expect(lossAversion(a)).toEqual({ lambda: null, consistent: null, accepted: null });
+  it('is blank if a spin is unanswered', () => {
+    expect(lossAversion({ la_gain_150: 'accept' })).toEqual({
+      group: null,
+      consistent: null,
+      accepted: null,
+    });
   });
 });
 

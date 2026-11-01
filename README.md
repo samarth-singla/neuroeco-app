@@ -1,7 +1,7 @@
 # Neuroeco research app
 
 Research prototype for the course project *Analyzing the Behavioral Mechanics of App-Based Investment
-Frauds*. Participants play a ~8-minute trading game, **ZenTrade**, that follows a real scam lifecycle (hook →
+Frauds*. Participants play a ~7–8-minute trading game, **ZenTrade**, that follows a real scam lifecycle (hook →
 deposit → escalate → trap). Half get the **fraud skin** ("ZenTrade X": countdowns, fake badges, winner
 pop-ups, a "mentor", a withdrawal tax…), half the **honest skin**, with identical mechanics and payoffs. Almost
 every hypothesis is measured through behaviour inside the game; the game ends with a personal **Scam Report
@@ -127,10 +127,10 @@ per-level counts for every randomized factor and four downloads:
 
 | File | Contents |
 | --- | --- |
-| `wide.csv` | **Use this for analysis.** One row per player who reached the report card (earlier withdrawn rows excluded): assignments, behaviour measures recomputed from the event log, trap score and per-trap flags, every in-game answer and derived scores (CRT, λ from the bonus spins, literacy, overconfidence, FOMO). Columns are documented in [`docs/data-dictionary.md`](docs/data-dictionary.md). |
+| `wide.csv` | **Use this for analysis.** One row per player who reached the report card (earlier withdrawn rows excluded): assignments, behaviour measures recomputed from the event log, trap score and per-trap flags, every in-game answer and derived scores (CRT correct / incorrect, loss-aversion group from the two bonus spins, literacy, overconfidence, FOMO). Columns are documented in [`docs/data-dictionary.md`](docs/data-dictionary.md). |
 | `participants.csv` | One row per consented participant (including unfinished) |
 | `events.csv` | Raw behaviour log (one row per event) |
-| `responses.csv` | Raw answers (profile, spins, brain bonus, quick reactions; one row per participant × item) |
+| `responses.csv` | Raw answers (profile, spins, bonus questions, quick reactions; one row per participant × item) |
 
 The game no longer offers data withdrawal; rows withdrawn earlier (`withdrawn = 1`) stay excluded from all four files. Scores are computed by the
 server at download time (overconfidence uses z-scores over the downloaded sample). Data from the original
@@ -167,7 +167,8 @@ The manual checklist is in [`docs/qa-checklist.md`](docs/qa-checklist.md).
 | Everything in the game: economy (₹ amounts, round returns, crash, tax), timings, plans, VIP tiers, deals, pool, chat, toasts, ticker, questions, answer key, trap and report texts, safety tips, `PRIZE_DRAW` flag | `client/src/config/game.ts` |
 | Consent text | `client/src/config/study.ts` |
 | Trap rules (which behaviour counts as each trap) | `client/src/game/traps.ts` |
-| λ and overconfidence formulas | `server/src/scoring.ts` |
+| Step order per skin (where the pop-ups, chat and reactions go) | `client/src/game/steps.ts` |
+| Loss-aversion group, CRT and overconfidence formulas | `server/src/scoring.ts` |
 | `wide.csv` columns and their descriptions | `server/src/wide.ts` → then run `npm run docs:dictionary` |
 
 Keep item ids stable once data collection starts — they are the column names in the exports.

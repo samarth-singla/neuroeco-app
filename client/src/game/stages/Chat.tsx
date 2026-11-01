@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { CHAT, ECONOMY, TIMING } from '../../config/game';
+import { CHAT, TIMING } from '../../config/game';
 import { useLog } from '../../lib/useLog';
 import { useGame } from '../GameProvider';
-import { nextStep } from '../steps';
 import { GameShell } from '../ui/GameShell';
 import { CtaButton, Panel, SecondaryButton } from '../ui/kit';
 import { play } from '../ui/sound';
@@ -45,11 +44,12 @@ function ChatThread() {
 }
 
 /**
- * S6 — After round 3. Fraud: "Rohit Sir, Senior Advisor" messages you (H1f). Honest: a static
- * Help & FAQ card. A deposit within 60 s of this screen counts as a chat deposit.
+ * S6 — Fraud skin only, right before round 4: "Rohit Sir, Senior Advisor" messages you (H1f).
+ * A deposit within 60 s of this screen counts as a chat deposit. The honest skin has no screen
+ * here; the Help & FAQ branch below is no longer reached (kept in case the screen returns).
  */
 export function Chat() {
-  const { game, skin, dispatch, go } = useGame();
+  const { game, skin, dispatch, next } = useGame();
   const step = game.step;
   useLog(step);
   const fraud = skin === 'fraud';
@@ -71,12 +71,8 @@ export function Chat() {
           {fraud ? 'Open chat 💬' : 'Open Help & FAQ'}
         </CtaButton>
       )}
-      <SecondaryButton skin={skin} onClick={() => go(nextStep(step))}>
-        {open
-          ? `Continue to round ${ECONOMY.rounds.chatAfterRound + 1} →`
-          : fraud
-            ? 'Later'
-            : 'Continue'}
+      <SecondaryButton skin={skin} onClick={() => next()}>
+        {open ? 'Continue to round 4 →' : fraud ? 'Later' : 'Continue'}
       </SecondaryButton>
     </>
   );

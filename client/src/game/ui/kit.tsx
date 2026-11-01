@@ -210,6 +210,45 @@ export function Sheet({
   );
 }
 
+/**
+ * Pop-up over the game screen (spins, bonus questions, VIP ladder). The screen behind it is made
+ * `inert` by the caller, so nothing behind can be tapped; the pop-up has its own buttons, so it
+ * never blocks progress.
+ */
+export function Modal({
+  skin,
+  label,
+  children,
+  actions,
+}: {
+  skin: Skin;
+  label: string;
+  children: ReactNode;
+  actions?: ReactNode;
+}) {
+  const fraud = skin === 'fraud';
+  return (
+    <div
+      data-modal
+      className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 px-4 py-6"
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={label}
+        className={
+          fraud
+            ? 'animate-pop relative flex max-h-full w-full max-w-[380px] flex-col overflow-hidden rounded-3xl border border-gold-400/40 bg-void-900 text-white shadow-[0_0_40px_rgba(251,191,36,0.25)]'
+            : 'animate-pop relative flex max-h-full w-full max-w-[380px] flex-col overflow-hidden rounded-2xl border border-slate-700 bg-slate-800 text-slate-50 shadow-xl'
+        }
+      >
+        <div className="relative overflow-x-hidden overflow-y-auto p-5">{children}</div>
+        {actions && <div className="space-y-1 px-5 pt-1 pb-5">{actions}</div>}
+      </div>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------------------------
 // Numbers, timers, celebrations
 // ---------------------------------------------------------------------------------------------

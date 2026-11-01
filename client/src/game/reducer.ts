@@ -68,6 +68,12 @@ export interface GameState {
   cashout?: 'done' | 'tax_paid' | 'tax_declined';
   brain: Record<string, { correct: boolean }>;
   answers: Record<string, string | number>;
+  /** Fraud skin: the VIP ladder pop-up was shown on the home screen (shown once) */
+  vipPopupSeen?: boolean;
+  /** Fraud skin: amount pre-filled in a round after tapping the VIP nudge (UI only) */
+  vipPrefill?: { round: number; amount: number };
+  /** Fraud skin: highest VIP level already celebrated on screen (UI only) */
+  vipCelebrated?: number;
 }
 
 export interface GameEvent {
@@ -89,6 +95,10 @@ export type GameAction =
   | { type: 'round_invest'; round: number; amount: number; at: number; decisionMs?: number }
   | { type: 'round_skip'; round: number; decisionMs?: number }
   | { type: 'vip_tap' }
+  | { type: 'vip_popup_shown' }
+  | { type: 'vip_popup_close'; ms: number }
+  | { type: 'vip_nudge_tap'; round: number; amount: number }
+  | { type: 'vip_celebrated'; level: number }
   | { type: 'streak_reward' }
   | { type: 'chat_shown'; at: number }
   | { type: 'chat_open' }
@@ -151,7 +161,25 @@ function deposit(s: GameState, amount: number, at: number) {
 
 type Result = { state: GameState; events: GameEvent[] };
 
+/**
+ * Applies an action. In the fraud skin, a deposit that crosses a VIP threshold also logs
+ * `vip_level_up` (the celebration is display only; payoffs are identical in both skins).
+ */
 export function reduce(s: GameState, action: GameAction, a: GameAssignment): Result {
+  const r = reduceAction(s, action, a);
+  const before = vipLevel(s.totalDeposited);
+  const after = vipLevel(r.state.totalDeposited);
+  if (a.app_version === 'fraud' && after > before) {
+    r.events.push({
+      screen: s.step,
+      type: 'vip_level_up',
+      payload: { level: after, total_deposited: r.state.totalDeposited },
+    });
+  }
+  return r;
+}
+
+function reduceAction(s: GameState, action: GameAction, a: GameAssignment): Result {
   const ev = (type: string, payload?: Record<string, unknown>): GameEvent => ({
     screen: s.step,
     type,
@@ -259,6 +287,29 @@ export function reduce(s: GameState, action: GameAction, a: GameAssignment): Res
 
     case 'vip_tap':
       return { state: s, events: [ev('vip_upgrade_tap', { total_deposited: s.totalDeposited })] };
+
+    case 'vip_popup_shown':
+      if (s.vipPopupSeen) return same;
+      return { state: { ...s, vipPopupSeen: true }, events: [ev('vip_popup_shown')] };
+
+    case 'vip_popup_close':
+      return { state: s, events: [ev('vip_popup_close', { ms: action.ms })] };
+
+    case 'vip_celebrated':
+      if ((s.vipCelebrated ?? 0) >= action.level) return same;
+      return { state: { ...s, vipCelebrated: action.level }, events: [] };
+
+    case 'vip_nudge_tap':
+      return {
+        state: { ...s, vipPrefill: { round: action.round + 1, amount: action.amount } },
+        events: [
+          ev('vip_nudge_tap', {
+            round: action.round,
+            amount: action.amount,
+            total_deposited: s.totalDeposited,
+          }),
+        ],
+      };
 
     case 'streak_reward':
       if (s.streakPaid) return same;

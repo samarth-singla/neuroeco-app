@@ -1,133 +1,167 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { DEAL_DETAILS, DEALS, ECONOMY, POOL, TIMING } from '../../config/game';
+import { clientNow } from '../../lib/logger';
 import { useDecisionTimer, useLog } from '../../lib/useLog';
 import { formatINR } from '../economy';
 import { useGame } from '../GameProvider';
-import { nextStep, stepIndex } from '../steps';
 import { GameShell } from '../ui/GameShell';
-import { Celebrate, Countdown, CtaButton, InfoLink, Panel, Sheet, SkipButton } from '../ui/kit';
+import {
+  Celebrate,
+  Countdown,
+  CtaButton,
+  InfoLink,
+  Panel,
+  SecondaryButton,
+  Sheet,
+  SkipButton,
+  Title,
+} from '../ui/kit';
 
 /**
- * S7 — Flash deal (H3): three sizes (₹500 / ₹3,000 / ₹8,000), one per screen, in the player's
- * random order. Measures: invest or not, opened details before investing, decision time.
+ * S7 — Flash deals (H3): the three sizes (₹500 / ₹3,000 / ₹8,000) on one screen as three cards,
+ * in the player's random order (`deal_order`), each with its own "View details" and "Invest".
+ * Per deal: invested or not, details opened before deciding, and decision time (screen open →
+ * Invest tap; for a deal not taken, screen open → Continue). Deals settle at once (+5%), so every
+ * card stays affordable whatever the player did on the others.
  */
 export function Deal() {
-  const { game, assignment, skin, dispatch, go } = useGame();
+  const { game, assignment, skin, dispatch, next } = useGame();
   const step = game.step;
   const log = useLog(step);
-  const decide = useDecisionTimer();
-  const i = stepIndex(step);
-  const size = assignment.deal_order[i];
-  const deal = DEALS[size];
   const fraud = skin === 'fraud';
-  const done = game.deals[size];
-  const [details, setDetails] = useState(false);
-  const affordable = game.wallets.main >= size;
+  const shownAt = useRef(clientNow());
+  const [details, setDetails] = useState<number | null>(null);
+  const elapsed = () => Math.round(clientNow() - shownAt.current);
 
-  function choose(invest: boolean) {
-    const { decision_ms } = decide();
-    dispatch({ type: 'deal', size, invest, at: Date.now(), decisionMs: decision_ms });
-    if (!invest) go(nextStep(step));
+  function invest(size: number) {
+    dispatch({ type: 'deal', size, invest: true, at: Date.now(), decisionMs: elapsed() });
   }
 
-  const actions = done ? (
-    <CtaButton skin={skin} onClick={() => go(nextStep(step))}>
-      Next →
-    </CtaButton>
-  ) : (
-    <>
-      <CtaButton skin={skin} disabled={!affordable} onClick={() => choose(true)}>
-        {fraud ? `INVEST ${formatINR(size)} ⚡` : `Invest ${formatINR(size)}`}
-      </CtaButton>
-      <SkipButton skin={skin} onClick={() => choose(false)}>
-        {fraud ? 'Skip deal' : 'Skip this deal'}
-      </SkipButton>
-    </>
-  );
+  function finish() {
+    const ms = elapsed();
+    for (const size of assignment.deal_order) {
+      if (!game.deals[size]) {
+        dispatch({ type: 'deal', size, invest: false, at: Date.now(), decisionMs: ms });
+      }
+    }
+    next();
+  }
+
+  const open = details === null ? null : DEALS[details];
+  const anyGain = assignment.deal_order.some((d) => game.deals[d]?.invested);
 
   return (
-    <GameShell actions={actions}>
-      {done?.invested && done.gain > 0 && <Celebrate skin={skin} />}
+    <GameShell
+      actions={
+        <SecondaryButton skin={skin} onClick={finish}>
+          Continue →
+        </SecondaryButton>
+      }
+    >
+      {anyGain && <Celebrate skin={skin} />}
       {fraud ? (
-        <div className="animate-blink mb-3 rounded-2xl bg-linear-to-r from-red-600 via-gold-500 to-red-600 py-2 text-center text-lg font-black tracking-widest text-black">
-          ⚡ FLASH DEAL ⚡
+        <div className="mb-3">
+          <div className="animate-blink rounded-2xl bg-linear-to-r from-red-600 via-gold-500 to-red-600 py-2 text-center text-lg font-black tracking-widest text-black">
+            ⚡ FLASH DEALS ⚡
+          </div>
+          <div className="mt-2 text-center text-sm font-bold text-red-300">
+            All deals end in{' '}
+            <Countdown seconds={TIMING.offerCountdownSec} onReset={() => log('timer_reset')} />
+          </div>
         </div>
       ) : (
-        <div className="mb-3 text-xs font-semibold tracking-wide text-slate-400 uppercase">
-          Deal {i + 1} of {ECONOMY.deals.sizes.length}
-        </div>
+        <Title skin={skin} sub="Three optional deals. Take any, all or none.">
+          Deals
+        </Title>
       )}
 
-      <Panel skin={skin} glow={fraud}>
-        <div className="flex items-center justify-between">
-          <div className={fraud ? 'text-xl font-black' : 'text-lg font-semibold'}>{deal.name}</div>
-          <div className={fraud ? 'gold-text text-2xl font-black' : 'text-lg font-semibold'}>
-            {formatINR(size)}
-          </div>
-        </div>
-        <div
-          className={fraud ? 'neon-text mt-2 text-4xl font-black' : 'mt-2 text-base text-slate-200'}
-        >
-          {deal.claim[skin]}
-        </div>
-        {fraud && (
-          <div className="mt-3 flex items-center justify-between rounded-xl bg-red-500/15 px-3 py-2 text-sm font-bold text-red-300">
-            <span>
-              Ends in{' '}
-              <Countdown seconds={TIMING.offerCountdownSec} onReset={() => log('timer_reset')} />
-            </span>
-            <span className="text-xs">🔥 {7 + i * 4} people viewing</span>
-          </div>
-        )}
-        {!fraud && <p className="mt-3 text-xs text-slate-300">{DEAL_DETAILS}</p>}
-        <div className="mt-3">
-          <InfoLink
-            skin={skin}
-            onClick={() => {
-              setDetails(true);
-              dispatch({ type: 'verify', what: 'deal_details', size });
-            }}
-          >
-            View plan details
-          </InfoLink>
-        </div>
-      </Panel>
+      <div className="space-y-3">
+        {assignment.deal_order.map((size, i) => {
+          const deal = DEALS[size];
+          const done = game.deals[size];
+          return (
+            <Panel key={size} skin={skin} glow={fraud && !done}>
+              <div data-testid={`deal-${size}`}>
+                <div className="flex items-center justify-between">
+                  <div className={fraud ? 'text-lg font-black' : 'text-base font-semibold'}>
+                    {deal.name}
+                  </div>
+                  <div
+                    className={fraud ? 'gold-text text-2xl font-black' : 'text-lg font-semibold'}
+                  >
+                    {formatINR(size)}
+                  </div>
+                </div>
+                <div
+                  className={
+                    fraud ? 'neon-text mt-1 text-2xl font-black' : 'mt-1 text-sm text-slate-200'
+                  }
+                >
+                  {deal.claim[skin]}
+                </div>
+                {fraud && !done && (
+                  <div className="mt-1 text-xs font-bold text-red-300">
+                    🔥 {7 + i * 4} people viewing
+                  </div>
+                )}
+                {done ? (
+                  <div
+                    className={
+                      fraud
+                        ? 'animate-pop neon-text mt-3 text-center text-2xl font-black'
+                        : 'mt-3 text-center text-base font-bold text-green-400'
+                    }
+                    data-testid="deal-result"
+                  >
+                    {done.invested ? `Deal settled +${formatINR(done.gain)}` : 'Not taken'}
+                  </div>
+                ) : (
+                  <div className="mt-3 flex items-center gap-3">
+                    <InfoLink
+                      skin={skin}
+                      className="shrink-0"
+                      onClick={() => {
+                        setDetails(size);
+                        dispatch({ type: 'verify', what: 'deal_details', size });
+                      }}
+                    >
+                      View details
+                    </InfoLink>
+                    <button
+                      type="button"
+                      disabled={game.wallets.main < size}
+                      onClick={() => invest(size)}
+                      className={
+                        fraud
+                          ? 'flex-1 rounded-xl bg-linear-to-r from-gold-500 via-gold-300 to-gold-500 px-3 py-2.5 text-sm font-black text-black uppercase disabled:opacity-40'
+                          : 'flex-1 rounded-xl bg-blue-700 px-3 py-2.5 text-sm font-semibold text-white hover:bg-blue-600 disabled:opacity-40'
+                      }
+                    >
+                      {fraud ? `INVEST ${formatINR(size)} ⚡` : `Invest ${formatINR(size)}`}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </Panel>
+          );
+        })}
+      </div>
 
-      {!affordable && !done && (
-        <p className={`mt-3 text-sm ${fraud ? 'text-white/60' : 'text-slate-300'}`}>
-          Not enough in your Main wallet for this deal.
-        </p>
-      )}
-
-      {done && (
-        <div className="mt-4 text-center" data-testid="deal-result">
-          {done.invested ? (
-            <div
-              className={
-                fraud
-                  ? 'animate-pop neon-text text-4xl font-black'
-                  : 'text-xl font-bold text-green-400'
-              }
-            >
-              Deal settled +{formatINR(done.gain)}
-            </div>
-          ) : (
-            <div className={fraud ? 'text-white/60' : 'text-slate-300'}>Deal skipped.</div>
-          )}
-        </div>
-      )}
+      {!fraud && <p className="mt-3 text-xs text-slate-300">{DEAL_DETAILS}</p>}
 
       <Sheet
         skin={skin}
-        open={details}
-        onClose={() => setDetails(false)}
-        title={`${deal.name} — details`}
+        open={open !== null}
+        onClose={() => setDetails(null)}
+        title={open ? `${open.name} — details` : ''}
       >
         <p className="text-sm">{DEAL_DETAILS}</p>
-        <p className="mt-2 text-sm">
-          Amount: {formatINR(size)}. Expected settlement: +{Math.round(ECONOMY.deals.rate * 100)}%
-          (not guaranteed).
-        </p>
+        {details !== null && (
+          <p className="mt-2 text-sm">
+            Amount: {formatINR(details)}. Expected settlement: +
+            {Math.round(ECONOMY.deals.rate * 100)}% (not guaranteed).
+          </p>
+        )}
       </Sheet>
     </GameShell>
   );
@@ -138,7 +172,7 @@ export function Deal() {
  * separate from the skin. Measures: join, opened details first, decision time.
  */
 export function Pool() {
-  const { game, assignment, skin, dispatch, go } = useGame();
+  const { game, assignment, skin, dispatch, next } = useGame();
   const step = game.step;
   useLog(step);
   const decide = useDecisionTimer();
@@ -150,7 +184,7 @@ export function Pool() {
   function choose(join: boolean) {
     const { decision_ms } = decide();
     dispatch({ type: 'pool', join, at: Date.now(), decisionMs: decision_ms });
-    go(nextStep(step));
+    next();
   }
 
   const actions = (

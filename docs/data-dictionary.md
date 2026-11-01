@@ -30,37 +30,41 @@ flagged with `is_pilot = 1`.
 | `pool_source` | IV. Diamond Pool invite: `friend` message or sponsored `ad` | H5 |
 | `withdrawal_offer` | IV. Test withdrawal (S9): `allowed` or `not_offered` | H6 |
 | `reinvest_framing` | IV. Gold Plan offer (S10): `profit` (from Profit wallet) or `main` (from Main wallet) | H7 |
-| `deal_order` | Order the flash deals were shown, ₹ (e.g. `8000;500;3000`) | H3 (order control) |
-| `spin_order` | Order the bonus spins were shown (win amounts, ₹) | H4 (order control) |
+| `deal_order` | Order of the three flash-deal cards on the deals screen (top to bottom), ₹ (e.g. `8000;500;3000`) | H3 (order control) |
+| `spin_order` | Order of the two bonus-spin pop-ups (win amounts, ₹): `150;250` = ₹150 bet before round 1, ₹250 bet before round 3 | H4 (order control) |
 
 ## App behaviour (event log)
 
 | Column | Description | Hypotheses |
 | --- | --- | --- |
-| `decision_time_first_invest` | Seconds from first render of the home dashboard (S3) to the first Invest / Skip tap | H1, H1a, H1e |
+| `decision_time_first_invest` | Seconds from the home dashboard (S3) becoming usable to the first Invest / Skip tap (fraud skin: timed from closing the VIP pop-up; see vip_popup_time) | H1, H1a, H1e |
 | `s3_choice` | `invest` or `skip` on the home dashboard (S3) | H1, H1b |
 | `plan` | Plan chosen on S3 (`starter`, `growth`, `turbo`); blank if skipped | H1 |
 | `verify_any` | 1 = opened the T&C, plan details, deal or pool details, or the badge / About page at least once | H1, H1d |
 | `verify_count` | Number of times any of those was opened | H1, H1d |
 | `total_deposited` | Sum of every amount invested (round stakes, deals, pool, deposits, Gold Plan, top-up), ₹ | H1 |
 | `vip_upgrade` | 1 = total deposited reached VIP 2 (₹5,000). VIP is shown only in the fraud skin; the threshold is computed for both | H1c |
-| `vip_taps` | Times the VIP "Upgrade" shortcut was tapped (fraud skin only) | H1c |
+| `vip_level` | Highest VIP level reached by total deposited (0–3; computed for both skins) | H1c |
+| `vip_taps` | Times the in-round VIP "Upgrade" shortcut was tapped (fraud skin only) | H1c |
+| `vip_popup_time` | Seconds the VIP ladder pop-up was open on the home screen (fraud skin only; blank for honest) | H1c |
+| `vip_nudge_taps` | Times the after-round "Deposit ₹X more to unlock VIP n" nudge was tapped (fraud only; blank for honest) | H1c |
+| `vip_level_ups` | VIP level-up celebrations shown (fraud only; blank for honest) | H1c |
 | `r1_amount` | Round 1 stake, ₹ (0 if skipped) | H1, H2 |
 | `r2_amount` | Round 2 stake, ₹ (0 if skipped) | H1, H2 |
 | `r3_amount` | Round 3 stake, ₹ (0 if skipped) | H1 |
 | `r4_amount` | Round 4 stake, ₹ (0 if skipped) | H1 |
 | `escalation_ratio` | r2_amount ÷ r1_amount; blank if r1_amount = 0 | H2 |
-| `chat_open` | 1 = opened the mentor chat (fraud) / Help & FAQ (honest) on S6 | H1f |
-| `chat_deposit` | 1 = invested within 60 s after S6 appeared | H1f |
+| `chat_open` | 1 = opened the mentor chat (S6, before round 4); fraud skin only, blank for honest (no chat screen) | H1f |
+| `chat_deposit` | 1 = invested within 60 s after the mentor chat appeared; fraud only, blank for honest (compare r4_amount across skins) | H1f |
 | `deal_invest_500` | 1 = invested in the ₹500 flash deal | H3 |
 | `deal_details_500` | 1 = opened the ₹500 deal's details before deciding | H3 |
-| `deal_time_500` | Seconds to decide on the ₹500 deal | H3 |
+| `deal_time_500` | Seconds from opening the deals screen to investing in the ₹500 deal (if not taken: to Continue) | H3 |
 | `deal_invest_3000` | 1 = invested in the ₹3,000 flash deal | H3 |
 | `deal_details_3000` | 1 = opened the ₹3,000 deal's details before deciding | H3 |
-| `deal_time_3000` | Seconds to decide on the ₹3,000 deal | H3 |
+| `deal_time_3000` | Seconds from opening the deals screen to investing in the ₹3,000 deal (if not taken: to Continue) | H3 |
 | `deal_invest_8000` | 1 = invested in the ₹8,000 flash deal | H3 |
 | `deal_details_8000` | 1 = opened the ₹8,000 deal's details before deciding | H3 |
-| `deal_time_8000` | Seconds to decide on the ₹8,000 deal | H3 |
+| `deal_time_8000` | Seconds from opening the deals screen to investing in the ₹8,000 deal (if not taken: to Continue) | H3 |
 | `pool_join` | 1 = joined the Diamond Pool (S8) | H5 |
 | `pool_details` | 1 = opened the pool details before deciding | H5 |
 | `pool_time` | Seconds to decide on the pool invite | H5 |
@@ -74,7 +78,7 @@ flagged with `is_pilot = 1`.
 | `crash_time` | Seconds to decide after the crash | H4 |
 | `tax_shown` | 1 = saw the withdrawal "tax" screen (fraud skin) | H1g |
 | `tax_paid` | 1 = paid the tax, 0 = refused; blank for the honest skin | H1g |
-| `brain_correct` | Correct brain-bonus answers (0–6; CRT + literacy) | H1, H8 |
+| `brain_correct` | Correct bonus-question answers (0–4; 1 CRT + 3 literacy) | H1, H8 |
 | `spin_net` | Net result of the accepted bonus spins, ₹ (revealed on the report card) | Descriptive |
 | `final_balance` | Final balance on the report card (Main + Profit + Portfolio + Cashed out − tax + spins), ₹ | Prize draw, descriptive |
 
@@ -83,10 +87,10 @@ flagged with `is_pilot = 1`.
 | Column | Description | Hypotheses |
 | --- | --- | --- |
 | `trap_score` | Number of traps fallen for (same function as the report card) | H8, H9 |
-| `trap_possible` | Traps possible: 10 (fraud) or 9 (honest — no tax screen) | H8, H9 |
+| `trap_possible` | Traps possible: 10 (fraud) or 8 (honest — no mentor chat, no tax screen) | H8, H9 |
 | `trap_hook` | 1 = You invested straight away in round 1 | H8, H9 |
 | `trap_vip` | 1 = You deposited ₹5,000+ in total | H8, H9 |
-| `trap_chat` | 1 = You invested within a minute of the help card | H8, H9 |
+| `trap_chat` | 1 = You invested within a minute of the help card (fraud skin only; blank for honest) | H8, H9 |
 | `trap_deal_no_details` | 1 = You invested in a deal without opening its details | H8, H9 |
 | `trap_pool_no_details` | 1 = You joined the Diamond Pool without checking it | H8, H9 |
 | `trap_crash_topup` | 1 = You topped up after the crash | H8, H9 |
@@ -107,23 +111,19 @@ flagged with `is_pilot = 1`.
 | `exp_trading_app` | S1 profile: Have you used a trading, investing or crypto app? (`yes` / `no`) | Controls, H9 |
 | `exp_fin_edu` | S1 profile: Have you taken any course or class on personal finance or investing? (`yes` / `no`) | H8 |
 | `lit_self` | S1 profile: How good are you with money? (1–7) | H8 (self-rated literacy) |
-| `la_gain_100` | S2 spin "50% lose ₹100 / 50% win ₹100": `accept` / `reject` | H4 |
-| `la_gain_150` | S2 spin "50% lose ₹100 / 50% win ₹150": `accept` / `reject` | H4 |
-| `la_gain_200` | S2 spin "50% lose ₹100 / 50% win ₹200": `accept` / `reject` | H4 |
-| `la_gain_300` | S2 spin "50% lose ₹100 / 50% win ₹300": `accept` / `reject` | H4 |
-| `crt_1` | S5 brain bonus: A bat and a ball cost ₹110 in total. The bat costs ₹100 more than the ball. How much do… (number) | H1 (moderator) |
-| `crt_2` | S5 brain bonus: If 5 machines take 5 minutes to make 5 widgets, how long would 100 machines take to mak… (number) | H1 (moderator) |
-| `crt_3` | S5 brain bonus: A patch of lily pads doubles in size every day. If it takes 48 days to cover the whole … (number) | H1 (moderator) |
-| `lit_interest` | S5 brain bonus: You have ₹100 in a savings account at 2% interest per year. After 5 years, how much is … (`more` / `exactly` / `less` / `dont_know`) | H8 |
-| `lit_inflation` | S5 brain bonus: Your savings earn 1% interest per year and inflation is 2% per year. After 1 year, you … (`more` / `same` / `less` / `dont_know`) | H8 |
-| `lit_diversification` | S5 brain bonus: True or false: buying one company's stock is usually safer than buying a stock mutual f… (`true` / `false` / `dont_know`) | H8 |
-| `feature_push_timer` | S13 "Did this push you to invest?" — Countdown & “only 3 slots left” (fraud) / Plan cards (honest): `yes` / `no` | H1h |
-| `feature_push_bonus` | S13 "Did this push you to invest?" — Locked ₹500 bonus (fraud) / ₹500 welcome bonus (honest): `yes` / `no` | H1h |
-| `feature_push_vip` | S13 "Did this push you to invest?" — VIP ladder (fraud) / Deposit summary (honest): `yes` / `no` | H1h |
-| `feature_push_regulator` | S13 "Did this push you to invest?" — “NDIA Certified” badge (fraud) / About ZenTrade (honest): `yes` / `no` | H1h |
-| `feature_push_social` | S13 "Did this push you to invest?" — Winner pop-ups, ticker & testimonials (fraud) / Market chart (honest): `yes` / `no` | H1h |
-| `feature_push_chat` | S13 "Did this push you to invest?" — Rohit Sir, Senior Advisor (fraud) / Help & FAQ card (honest): `yes` / `no` | H1h |
-| `feature_push_tax` | S13 "Did this push you to invest?" — 10% withdrawal “processing tax” (fraud) / Withdrawal screen (honest): `yes` / `no` | H1h |
+| `la_gain_150` | S2 bonus-spin pop-up "50% lose ₹100 / 50% win ₹150": `accept` / `reject` | H4 |
+| `la_gain_250` | S2 bonus-spin pop-up "50% lose ₹100 / 50% win ₹250": `accept` / `reject` | H4 |
+| `crt_1` | S5 bonus question: A bat and a ball cost ₹110 in total. The bat costs ₹100 more than the ball. How much do… (number) | H1 (moderator) |
+| `lit_interest` | S5 bonus question: You have ₹100 in a savings account at 2% interest per year. After 5 years, how much is … (`more` / `exactly` / `less` / `dont_know`) | H8 |
+| `lit_inflation` | S5 bonus question: Your savings earn 1% interest per year and inflation is 2% per year. After 1 year, you … (`more` / `same` / `less` / `dont_know`) | H8 |
+| `lit_diversification` | S5 bonus question: True or false: buying one company's stock is usually safer than buying a stock mutual f… (`true` / `false` / `dont_know`) | H8 |
+| `feature_push_timer` | S13 "Did this push you to invest?" — Countdown & “only 3 slots left”: `yes` / `no` (fraud skin only; blank for honest) | H1h |
+| `feature_push_bonus` | S13 "Did this push you to invest?" — Locked ₹500 bonus: `yes` / `no` (fraud skin only; blank for honest) | H1h |
+| `feature_push_vip` | S13 "Did this push you to invest?" — VIP ladder: `yes` / `no` (fraud skin only; blank for honest) | H1h |
+| `feature_push_regulator` | S13 "Did this push you to invest?" — “NDIA Certified” badge: `yes` / `no` (fraud skin only; blank for honest) | H1h |
+| `feature_push_social` | S13 "Did this push you to invest?" — Winner pop-ups, ticker & testimonials: `yes` / `no` (fraud skin only; blank for honest) | H1h |
+| `feature_push_chat` | S13 "Did this push you to invest?" — Rohit Sir, Senior Advisor: `yes` / `no` (fraud skin only; blank for honest) | H1h |
+| `feature_push_tax` | S13 "Did this push you to invest?" — 10% withdrawal “processing tax”: `yes` / `no` (fraud skin only; blank for honest) | H1h |
 | `app_trust` | S13: Overall, how much did you trust the app? (1–7) | H1, H6 |
 | `app_urgency` | S13: Overall, how much did the app make you feel you had to act fast? (1–7) | H1 |
 | `fomo_1` | S13: "When many people are making money from something, I want in too." (`agree` / `disagree`) | H5 (moderator), H9 |
@@ -134,12 +134,12 @@ flagged with `is_pilot = 1`.
 
 | Column | Description | Hypotheses |
 | --- | --- | --- |
-| `crt_score` | Cognitive Reflection Test score 0–3 (correct: 5, 5, 47) | H1 (moderator) |
-| `lambda` | Loss aversion λ from the bonus spins = smallest accepted win ÷ ₹100 (1, 1.5, 2, 3); 3.5 if all rejected; blank if inconsistent (accepts a win, then rejects a larger one) | H4, H8, H9 |
-| `la_consistent` | 1 = spin choices switch at most once (reject → accept), 0 = inconsistent | H4 |
-| `la_accepted` | Number of the 4 spins accepted (0–4) | H4 |
+| `crt_correct` | CRT, single bat-and-ball item: 1 = correct (₹5), 0 = incorrect | H1 (moderator) |
+| `loss_aversion_group` | From the 2 bonus spins (lose ₹100 vs win ₹150 / ₹250): 1 = accepted the ₹150 bet (low, λ ≤ 1.5); 2 = accepted only the ₹250 bet (typical, 1.5 < λ ≤ 2.5); 3 = rejected both (high, λ > 2.5); blank if inconsistent (accepted ₹150, rejected ₹250) | H4, H8, H9 |
+| `la_consistent` | 1 = consistent spin choices, 0 = accepted the ₹150 bet but rejected the ₹250 bet | H4 |
+| `la_accepted` | Number of the 2 spins accepted (0–2) | H4 |
 | `literacy_score` | Big Three financial literacy score 0–3 ("don't know" = wrong) | H8 |
 | `self_rated_literacy` | Self-rated "How good are you with money?" 1–7 (= `lit_self`) | H8 |
 | `overconfidence` | z(self_rated_literacy) − z(literacy_score), z over the rows in this export (sample SD); blank if either SD is 0 | H8 |
-| `feature_push_count` | Number of the 7 features answered "yes, it pushed me to invest" | H1h |
+| `feature_push_count` | Number of the 7 features answered "yes, it pushed me to invest" (fraud skin only; blank for honest) | H1h |
 | `fomo_score` | Number of the 3 FOMO statements agreed with (0–3) | H5 (moderator), H9 |

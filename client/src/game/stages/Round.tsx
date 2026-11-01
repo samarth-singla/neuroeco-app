@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ECONOMY, PLANS } from '../../config/game';
+import { ECONOMY, PLANS, VIP } from '../../config/game';
 import { useDecisionTimer, useLog } from '../../lib/useLog';
 import { formatINR, roundRate, toNextVip, vipLevel } from '../economy';
 import { useGame } from '../GameProvider';
-import { nextStep, stepIndex } from '../steps';
+import { stepIndex } from '../steps';
 import { LiveChart } from '../ui/Chart';
 import { GameShell } from '../ui/GameShell';
 import { AmountPicker, Celebrate, CtaButton, Panel, SkipButton, validAmount } from '../ui/kit';
@@ -15,14 +15,20 @@ import { play } from '../ui/sound';
  * Skipping shows the same chart and timing, so both choices take equally long.
  */
 export function Round() {
-  const { game, assignment, skin, dispatch, go } = useGame();
+  const { game, assignment, skin, dispatch, next } = useGame();
   const step = game.step;
   useLog(step);
   const decide = useDecisionTimer();
   const round = stepIndex(step);
   const fraud = skin === 'fraud';
   const settled = game.rounds[round];
-  const [amount, setAmount] = useState(0);
+  // Fraud: a tapped VIP nudge pre-fills this round with the amount needed for the next level
+  const [amount, setAmount] = useState(() =>
+    game.vipPrefill?.round === round && !settled
+      ? Math.min(game.vipPrefill.amount, game.wallets.main)
+      : 0,
+  );
+  const [nudged, setNudged] = useState(false);
   const [animating, setAnimating] = useState(false);
   const rate = roundRate(round, assignment.round1_outcome);
   const plan = PLANS.find((p) => p.id === game.planId);
@@ -49,9 +55,9 @@ export function Round() {
     setAnimating(true);
   }
 
-  function next() {
+  function finish() {
     if (round === ECONOMY.rounds.count) dispatch({ type: 'streak_reward' });
-    go(nextStep(step));
+    next();
   }
 
   const next2 = toNextVip(game.totalDeposited);
@@ -81,10 +87,8 @@ export function Round() {
     );
   } else if (showResult) {
     actions = (
-      <CtaButton skin={skin} onClick={next}>
-        {round === ECONOMY.rounds.count
-          ? 'Continue'
-          : `Next ${round === ECONOMY.rounds.brainAfterRound ? '— Brain bonus' : 'round'} →`}
+      <CtaButton skin={skin} onClick={finish}>
+        Continue →
       </CtaButton>
     );
   }
@@ -236,6 +240,39 @@ export function Round() {
           ) : (
             <div className={fraud ? 'text-lg text-white/70' : 'text-lg text-slate-200'}>
               You sat this round out. The market moved {pct}.
+            </div>
+          )}
+          {fraud && next2 && (
+            <div
+              className="animate-pop mt-4 rounded-2xl border border-gold-400/50 bg-gold-400/10 p-3 text-left"
+              data-testid="vip-nudge"
+            >
+              <div className="text-sm font-black text-gold-300">
+                👑{' '}
+                {VIP.nudge(
+                  formatINR(next2.needed),
+                  next2.level,
+                  ECONOMY.vipTiers.find((t) => t.level === next2.level)?.daily ?? '',
+                )}
+              </div>
+              <div className="mt-0.5 text-[10px] text-white/50">Higher rate {VIP.nextCycle}.</div>
+              {round < ECONOMY.rounds.count && (
+                <button
+                  type="button"
+                  disabled={nudged}
+                  onClick={() => {
+                    setNudged(true);
+                    dispatch({
+                      type: 'vip_nudge_tap',
+                      round,
+                      amount: Math.max(ECONOMY.minInvest, next2.needed),
+                    });
+                  }}
+                  className="mt-2 w-full rounded-xl bg-gold-400 px-3 py-2 text-sm font-black text-black disabled:opacity-60"
+                >
+                  {nudged ? '✅ Amount ready for next round' : `⚡ ${VIP.nudgeCta}`}
+                </button>
+              )}
             </div>
           )}
           {round === ECONOMY.rounds.count && (

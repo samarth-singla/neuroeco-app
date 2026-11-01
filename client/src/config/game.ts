@@ -46,11 +46,8 @@ export const ECONOMY = {
      * the market crash (S11) remains the scripted loss.
      */
     later: { 2: 0.06, 3: 0.1, 4: 0.12 } as Record<number, number>,
-    /** The brain bonus (S5) comes after this round, the mentor chat (S6) after the next one */
-    brainAfterRound: 2,
-    chatAfterRound: 3,
-    /** Length of the chart animation after Invest/Skip */
-    chartMs: 2600,
+    /** Length of the chart animation after Invest/Skip (same for invest and skip, both skins) */
+    chartMs: 7000,
   },
   /**
    * Paid to the Profit wallet after the last round in both skins, so every player — even one who
@@ -58,14 +55,17 @@ export const ECONOMY = {
    */
   // DECISION: a fixed "streak reward" after the last round guarantees the Profit wallet can fund the H7 offer.
   streakReward: 2000,
-  /** Brain bonus: added to the Profit wallet per correct answer (S5) */
+  /** Bonus questions: added to the Profit wallet per correct answer (S5) */
   brainReward: 100,
 
-  /** VIP ladder (fraud display only). Perks are promises; real returns are identical (H1c). */
+  /**
+   * VIP ladder (fraud display only). The daily rates are promises "starting next cycle", which
+   * never arrives inside the game, so real payoffs stay identical to the honest skin (H1c).
+   */
   vipTiers: [
-    { level: 1, minDeposited: 1000, perk: 'up to 1.5× returns' },
-    { level: 2, minDeposited: 5000, perk: 'up to 3× returns' },
-    { level: 3, minDeposited: 10000, perk: 'up to 5× returns + instant withdrawals' },
+    { level: 1, minDeposited: 1000, daily: '2%', perk: '2% daily' },
+    { level: 2, minDeposited: 5000, daily: '3%', perk: '3% daily' },
+    { level: 3, minDeposited: 10000, daily: '5%', perk: '5% daily + instant withdrawals' },
   ],
   /** Reaching this VIP level counts as the "VIP upgrade" trap (computed in both skins) */
   vipUpgradeLevel: 2,
@@ -89,10 +89,12 @@ export const ECONOMY = {
 };
 
 /**
- * Bonus spins (H4): 50% lose ₹100, 50% win X. Results are revealed only on the report card.
- * λ = smallest accepted win ÷ 100 (1, 1.5, 2 or 3); rejecting all = 3.5 (server/src/scoring.ts).
+ * Bonus spins (H4): two pop-ups, 50% lose ₹100 / 50% win X, order randomized per player.
+ * Results are revealed only on the report card. Loss-aversion group (server/src/scoring.ts):
+ * 1 = accepted ₹150 (low, λ ≤ 1.5), 2 = accepted only ₹250 (typical, 1.5–2.5),
+ * 3 = rejected both (high, λ > 2.5); accepted ₹150 but rejected ₹250 = inconsistent (blank).
  */
-export const SPINS = { loss: 100, gains: [100, 150, 200, 300] };
+export const SPINS = { loss: 100, gains: [150, 250] };
 
 /** Optional prize draw. Switch on only with instructor approval (consent then states the rules). */
 export const PRIZE_DRAW = {
@@ -121,7 +123,9 @@ export const TIMING = {
   chatTypingMs: 1100,
   /** Bonus-spin wheel animation before moving on */
   spinMs: 1100,
-  /** Brain-bonus timer ring (visual only, restarts) */
+  /** Fraud skin: how long the VIP level-up banner shows */
+  vipCelebrateMs: 4000,
+  /** Bonus-question timer ring (visual only, restarts) */
   brainRingSec: 20,
 };
 
@@ -222,6 +226,20 @@ export const TRUST = {
     'Your funds are 100% protected under NDIA guidelines.',
     'Trusted by 10 lakh+ members across India.',
   ],
+};
+
+/** Fraud skin VIP system (H1c): pop-up, bar, nudges and level-up texts */
+export const VIP = {
+  popupTitle: '👑 Become a VIP member',
+  popupBody: 'Deposit more to earn more every day. Higher rates start next cycle.',
+  popupCta: 'Start earning',
+  nextCycle: 'starting next cycle',
+  /** Shown after every round while a higher level is still open */
+  nudge: (needed: string, level: number, daily: string) =>
+    `Deposit ${needed} more to unlock VIP ${level} and earn ${daily} daily.`,
+  nudgeCta: 'Upgrade next round',
+  levelUp: (level: number, daily: string) =>
+    `🎉 VIP ${level} unlocked! ${daily} daily returns starting next cycle`,
 };
 
 /** Honest skin: readable risk line right above the buttons on every money screen */
@@ -411,25 +429,16 @@ export const PROFILE: GameQuestion[] = [
   },
 ];
 
-/** S5 brain bonus: 3 CRT items, then the Big Three literacy items. Correct answers pay ₹100. */
+/**
+ * S5 bonus questions, shown as pop-ups between the rounds: 1 CRT item (bat-and-ball, after round 1),
+ * then the Big Three literacy items (after rounds 3 and 4). Correct answers pay ₹100.
+ */
 export const BRAIN: GameQuestion[] = [
   {
     id: 'crt_1',
     kind: 'number',
     text: 'A bat and a ball cost ₹110 in total. The bat costs ₹100 more than the ball. How much does the ball cost?',
     unit: '₹',
-  },
-  {
-    id: 'crt_2',
-    kind: 'number',
-    text: 'If 5 machines take 5 minutes to make 5 widgets, how long would 100 machines take to make 100 widgets?',
-    unit: 'minutes',
-  },
-  {
-    id: 'crt_3',
-    kind: 'number',
-    text: 'A patch of lily pads doubles in size every day. If it takes 48 days to cover the whole lake, how long does it take to cover half the lake?',
-    unit: 'days',
   },
   {
     id: 'lit_interest',
@@ -467,7 +476,7 @@ export const BRAIN: GameQuestion[] = [
 
 /** Correct answers (CRT: ₹ version of bat-and-ball). Used by the game and by export scoring. */
 export const ANSWER_KEY = {
-  crt: { crt_1: 5, crt_2: 5, crt_3: 47 } as Record<string, number>,
+  crt: { crt_1: 5 } as Record<string, number>,
   literacy: { lit_interest: 'more', lit_inflation: 'less', lit_diversification: 'false' } as Record<
     string,
     string
@@ -493,7 +502,7 @@ export const FEATURES: {
   {
     id: 'vip',
     label: { fraud: 'VIP ladder', plain: 'Deposit summary' },
-    hint: { fraud: '👑 VIP 2 — up to 3× returns', plain: 'Total invested so far' },
+    hint: { fraud: '👑 VIP 2 — 3% daily', plain: 'Total invested so far' },
   },
   {
     id: 'regulator',
@@ -661,7 +670,7 @@ export const FEATURE_EXPLAINERS: { name: string; what: string }[] = [
   },
   {
     name: 'VIP ladder',
-    what: 'Promised bigger returns for bigger deposits. Real returns were identical for everyone.',
+    what: 'Promised 2–5% daily returns “starting next cycle” for bigger deposits. That cycle never came: real returns were identical for everyone.',
   },
   {
     name: '“NDIA Certified” badge, 4.9★, 10 lakh+ users',

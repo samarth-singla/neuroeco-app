@@ -3,18 +3,19 @@ import { BRAIN, ECONOMY, TIMING } from '../../config/game';
 import { clientNow } from '../../lib/logger';
 import { useLog } from '../../lib/useLog';
 import { useGame } from '../GameProvider';
-import { nextStep, stepIndex } from '../steps';
-import { GameShell } from '../ui/GameShell';
-import { Celebrate, CtaButton, TimerRing, Title } from '../ui/kit';
+import { stepIndex } from '../steps';
+import { Celebrate, CtaButton, TimerRing } from '../ui/kit';
+import { PopupStage } from '../ui/PopupStage';
 import { ChoiceList, NumberAnswer } from '../ui/questions';
 
 /**
- * S5 — Brain bonus (between rounds 2 and 3): 3 CRT puzzles, then the Big Three literacy questions,
- * one per screen. A correct answer really adds ₹100 to the Profit wallet (H1 moderator, H8).
- * The fraud skin's timer ring is visual only and never forces an answer.
+ * S5 — Bonus question pop-up between the rounds: question 1 is the bat-and-ball CRT item (after
+ * round 1), questions 2–4 the Big Three literacy items (after rounds 3 and 4). A correct answer
+ * really adds ₹100 to the Profit wallet (H1 moderator, H8). The fraud skin's timer ring is visual
+ * only and never forces an answer.
  */
 export function Brain() {
-  const { game, skin, dispatch, respond, go } = useGame();
+  const { game, skin, dispatch, respond, next } = useGame();
   const step = game.step;
   useLog(step);
   const i = stepIndex(step);
@@ -35,12 +36,12 @@ export function Brain() {
   }
 
   return (
-    <GameShell
-      market={false}
+    <PopupStage
+      label="Bonus question"
       actions={
         result ? (
-          <CtaButton skin={skin} onClick={() => go(nextStep(step))}>
-            {i === BRAIN.length - 1 ? 'Back to trading →' : 'Next question →'}
+          <CtaButton skin={skin} onClick={next}>
+            Back to trading →
           </CtaButton>
         ) : undefined
       }
@@ -51,15 +52,17 @@ export function Brain() {
           <div
             className={`text-xs font-bold tracking-widest uppercase ${fraud ? 'text-gold-300' : 'text-slate-400'}`}
           >
-            🧠 Brain bonus · {i + 1}/{BRAIN.length}
+            🧠 Bonus question {i + 1}/{BRAIN.length}
           </div>
           <div className={fraud ? 'text-sm text-white/70' : 'text-sm text-slate-300'}>
-            Earn ₹{ECONOMY.brainReward} for every correct answer
+            Earn ₹{ECONOMY.brainReward} for a correct answer
           </div>
         </div>
-        {fraud && !result && <TimerRing seconds={TIMING.brainRingSec} />}
+        {fraud && !result && <TimerRing seconds={TIMING.brainRingSec} size={52} />}
       </div>
-      <Title skin={skin}>{q.text}</Title>
+      <h2 className={fraud ? 'mb-3 text-lg leading-snug font-black' : 'mb-3 text-lg font-bold'}>
+        {q.text}
+      </h2>
 
       {!result && q.kind === 'number' && (
         <NumberAnswer skin={skin} unit={q.unit} label={q.text} onSubmit={(v) => answer(v)} />
@@ -69,7 +72,7 @@ export function Brain() {
       )}
 
       {result && (
-        <div className="mt-6 text-center" data-testid="brain-result">
+        <div className="mt-4 text-center" data-testid="brain-result">
           {result.correct ? (
             <div
               className={
@@ -87,6 +90,6 @@ export function Brain() {
           )}
         </div>
       )}
-    </GameShell>
+    </PopupStage>
   );
 }

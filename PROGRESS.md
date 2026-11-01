@@ -768,3 +768,90 @@ the report card), a full play takes about 7½–8½ minutes, roughly 40 s shorte
 - A player who is mid-game on round 5 or 6 when this deploys has a saved step that no longer exists. A refresh then
   shows the consent screen and starts them as a new participant (no dead end); their partial data stays in the raw
   exports. Deploy between sessions, and reset the database before real collection as planned.
+
+---
+
+## Playtest fixes 2
+
+**Status:** done
+
+**Changed**
+- **Mini-games interleaved with the rounds** (same structure in both skins): profile → home → spin 1 → round 1 →
+  bonus question 1 → round 2 → spin 2 → round 3 → bonus questions 2–3 → [mentor chat, fraud only] → round 4 →
+  bonus question 4 → flash deals → pool → test withdrawal → Gold Plan → crash → cash out → reactions → report card.
+  Spins and bonus questions are pop-ups (`ui/PopupStage.tsx`, `Modal` in `ui/kit.tsx`) over the trading screen,
+  which is dimmed and `inert` behind them. Each pop-up is still its own step, so refresh-resume works.
+- **2 bonus spins:** lose ₹100 vs win ₹150 and lose ₹100 vs win ₹250, order random per player (`spin_order`,
+  exported). Results hidden until the report card. `loss_aversion_group` replaces `lambda`: 1 = accepted ₹150 (low,
+  λ ≤ 1.5), 2 = accepted only ₹250 (typical, 1.5–2.5), 3 = rejected both (high, λ > 2.5); accepted ₹150 but rejected
+  ₹250 = blank (`la_consistent = 0`).
+- **4 bonus questions:** bat-and-ball CRT (₹5), then the Big Three literacy items; ₹100 per correct answer. `crt_2`
+  and `crt_3` removed; `crt_correct` (0/1) replaces `crt_score`; `literacy_score` (0–3) and `overconfidence` (the
+  self-rating stays in the profile) unchanged. `brain_correct` is now 0–4.
+- **VIP system (fraud only):** VIP ladder pop-up on the first home visit (VIP 1 = 2%, VIP 2 = 3%, VIP 3 = 5% daily,
+  with thresholds); a persistent VIP bar on every money screen ("VIP 1 · ₹3,200 / ₹5,000 to VIP 2"); a nudge after
+  every round ("Deposit ₹X more to unlock VIP 2 and earn 3% daily"; tapping pre-fills the next round); a level-up
+  banner with confetti when a threshold is crossed. Every higher rate starts "next cycle", so payoffs stay identical.
+  Logged: `vip_popup_shown`, `vip_popup_close` (ms), `vip_nudge_tap`, `vip_level_up`. New columns: `vip_level`,
+  `vip_popup_time`, `vip_nudge_taps`, `vip_level_ups`.
+- **Shorter honest skin:** no mentor-chat screen; quick reactions skip the 7 feature swipe cards; the final
+  withdrawal processes instantly and moves straight on.
+- **Both skins:** the round chart animation is 7 s (was 2.6 s). Flash deals are one screen with three cards in
+  random order, each with its own "View details" and "Invest"; per-deal invest, details-before and decision time are
+  still logged.
+- `hypothesis-report.md`: the H1 moderator is "CRT (single bat-and-ball item, correct / incorrect)"; the H4 IV is "loss
+  aversion group (low / typical / high) from 2 in-game spins". Docs: `docs/screens.md`, `docs/qa-checklist.md`,
+  `README.md`; `docs/data-dictionary.md` regenerated (102 columns: 4 removed, 4 added).
+- Tests: step lists per skin (fraud 41 steps, honest 33); skin parity (honest steps = fraud steps minus the
+  fraud-only ones; same balances and payoffs); the headless player for all 32 conditions (VIP events fraud only,
+  honest has no feature answers or chat events, trap maximum 10 / 8); spin and bonus pop-ups (inert background,
+  answers stored); one-screen deals; VIP pop-up / bar / nudge / pre-fill / level-up; honest instant cash-out;
+  loss-aversion group and CRT scoring; export columns and honest blanks; the 40-player simulation. The browser
+  smoke test follows the new flow and checks the pop-ups, the 3 deal cards, the VIP nudges and the tax block.
+
+**Decisions**
+- `// DECISION:` The mentor chat (fraud) sits right before round 4, after bonus questions 2–3, so the 60-second
+  chat-deposit window covers the round-4 stake.
+- `// DECISION:` Decision time on the home screen runs from when the dashboard is usable. For the fraud skin that is
+  when the VIP pop-up closes; the pop-up time is exported separately (`vip_popup_time`), so the pop-up does not add
+  reading time to the H1 comparison.
+- `// DECISION:` The VIP pop-up shows on the first visit to the home screen only, not again after a refresh.
+- `// DECISION:` A deposit that jumps two VIP levels logs one `vip_level_up` (with the new level) and shows one banner.
+- `// DECISION:` The honest skin still answers the 3 FOMO statements, not only the two sliders: FOMO is the H5
+  moderator and an H9 bias score, and dropping it would remove those for half the sample. The task said honest
+  players "only answer the overall trust and urgency sliders"; removing the FOMO cards too is a one-line change in
+  `fraudOnlyStep()` in `steps.ts`.
+- `// DECISION:` The chat trap is now fraud-only (honest players never see a chat), so honest players can score at
+  most 8 traps (was 9). `chat_open`, `chat_deposit`, `trap_chat`, `feature_push_*` and `feature_push_count` are blank
+  for honest players.
+- `// DECISION:` Deal decision time = seconds from opening the deals screen to tapping that deal's Invest; for a deal
+  not taken, to Continue.
+- `// DECISION:` The task asked for a 6–8 s chart animation under "speed up"; 6–8 s is longer than before (2.6 s),
+  so it was set to 7 s as written (`ECONOMY.rounds.chartMs`). It adds about 18 s per player in both skins.
+
+**Effects on the analysis to note**
+- H1a–H1g: the feature swipe cards ("Did this push you to invest?") now exist only in the fraud skin, so the
+  plain-vs-fraud chi-square per feature described under H1 in `hypothesis-report.md` can no longer be run;
+  only within-fraud answers plus the behaviour per feature remain. That line in the report was not changed
+  (only the two requested edits were made).
+- H1f: the honest skin has no chat counterpart, so the 60-second chat deposit exists for fraud players only;
+  `r4_amount` (the stake right after the chat slot) can be compared across skins instead.
+- The honest skin is now about a minute shorter than the fraud skin (REDESIGN_PLAN rule 7 asked for equal length).
+
+**Checks**
+- Lint, typecheck, 49 server + 99 client tests, the 40-player simulation and `npm run smoke` all pass. In the
+  smoke test, fraud ran 40 screens in 59 s and honest 32 screens in 48 s (scripted), with a refresh mid-game, no
+  covered buttons and no sideways scroll.
+- Played both skins at 360 px with screenshots of every screen (VIP pop-up, spin and bonus pop-ups, one-screen
+  deals, VIP bar / nudge / level-up, honest dark theme).
+
+**Length.** Scripted runs: fraud 59–65 s and honest 48–52 s, which includes the built-in waits (four 7 s charts,
+spin animations, chat typing). With realistic reading and decision time (≈4 s per profile or reaction tap, 6 s
+per spin, 10 s to decide each round, 10–15 s per bonus question, 30 s on the deals screen, 12–15 s per other money
+screen, 1½ min on the report card), a full play takes about **7½–8 minutes in the fraud skin** and about
+**6½–7 minutes in the honest skin**.
+
+**Open**
+- A player mid-game when this deploys whose saved step no longer exists (an old `g:spin:2`, `g:brain:4`,
+  `g:deal:1`, or an honest player on `g:chat` / a feature card) restarts at consent as a new participant. Reset the
+  database before real collection as planned.

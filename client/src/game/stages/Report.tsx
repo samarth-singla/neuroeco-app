@@ -15,7 +15,6 @@ import { logEvent } from '../../lib/logger';
 import { useLog } from '../../lib/useLog';
 import { finalBalance, formatINR, spinNet } from '../economy';
 import { useGame } from '../GameProvider';
-import { nextStep } from '../steps';
 import { factsFromState, TRAPS, trapResult } from '../traps';
 
 /** After the reveal the app fiction is over: report, share and end use one neutral design. */
@@ -62,7 +61,7 @@ export function prizeCode(participantId: string): string {
  * score uses the same function as the export.
  */
 export function Report() {
-  const { game, skin, participantId, go } = useGame();
+  const { game, skin, participantId, next } = useGame();
   const step = game.step;
   useLog(step);
   const facts = factsFromState(game, skin);
@@ -95,7 +94,7 @@ export function Report() {
   return (
     <ReportLayout
       actions={
-        <button type="button" className={btnPrimary} onClick={() => go(nextStep(step))}>
+        <button type="button" className={btnPrimary} onClick={() => next()}>
           Continue
         </button>
       }
@@ -253,7 +252,7 @@ export function Report() {
 
 /** S15 — Share the challenge (link without personal data). */
 export function Share() {
-  const { game, go } = useGame();
+  const { game, next } = useGame();
   const step = game.step;
   const log = useLog(step);
   const [copied, setCopied] = useState(false);
@@ -277,7 +276,7 @@ export function Share() {
   return (
     <ReportLayout
       actions={
-        <button type="button" className={btnSecondary} onClick={() => go(nextStep(step))}>
+        <button type="button" className={btnSecondary} onClick={() => next()}>
           {SHARE.finish}
         </button>
       }

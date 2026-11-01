@@ -18,7 +18,8 @@ import { createApp } from '../src/app';
 import { wideColumns } from '../src/wide';
 import { finalBalance, spinNet } from '../../client/src/game/economy';
 import { mulberry32, simulateGame } from '../../client/src/game/sim';
-import { STEPS } from '../../client/src/game/steps';
+import { FEATURES } from '../../client/src/config/game';
+import { stepsFor } from '../../client/src/game/steps';
 import { factsFromState, trapResult } from '../../client/src/game/traps';
 import type { GameAssignment } from '../../client/src/game/reducer';
 
@@ -60,7 +61,21 @@ const CONDITIONAL: Record<string, (r: Record<string, string>) => boolean> = {
   withdrew: (r) => r.withdrawal_offer === 'not_offered',
   tax_paid: (r) => r.skin === 'honest',
   trap_tax_paid: (r) => r.skin === 'honest',
-  lambda: (r) => r.la_consistent === '0',
+  loss_aversion_group: (r) => r.la_consistent === '0',
+  // The honest skin has no mentor chat, no feature swipe cards and no VIP layer
+  chat_open: (r) => r.skin === 'honest',
+  chat_deposit: (r) => r.skin === 'honest',
+  trap_chat: (r) => r.skin === 'honest',
+  feature_push_count: (r) => r.skin === 'honest',
+  vip_popup_time: (r) => r.skin === 'honest',
+  vip_nudge_taps: (r) => r.skin === 'honest',
+  vip_level_ups: (r) => r.skin === 'honest',
+  ...Object.fromEntries(
+    FEATURES.map((x) => [
+      `feature_push_${x.id}`,
+      (r: Record<string, string>) => r.skin === 'honest',
+    ]),
+  ),
 };
 
 export interface SimulationResult {
@@ -101,9 +116,10 @@ export async function runSimulation(n = 40, seed = 2026): Promise<SimulationResu
       const a: GameAssignment = { ...p.assignment };
       const sim = simulateGame(a, mulberry32(seed * 1000 + i));
       const dropOut = i % 10 === 9; // every 10th player stops at the crash screen
-      const stopAt = dropOut ? STEPS.indexOf('g:crash') : Infinity;
+      const steps = stepsFor(a.app_version);
+      const stopAt = dropOut ? steps.indexOf('g:crash') : Infinity;
       const events = sim.events
-        .filter((e) => STEPS.indexOf(e.screen) < stopAt)
+        .filter((e) => steps.indexOf(e.screen) < stopAt)
         .map((e, k) => ({
           client_ts: k * 1000,
           screen: e.screen,
