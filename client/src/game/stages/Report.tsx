@@ -9,8 +9,8 @@ import {
   SPINS,
   TRAP_AVOIDED,
   TRAP_TEXT,
+  RESEARCH_FOOTER,
 } from '../../config/game';
-import { RESEARCH_FOOTER } from '../../config/session';
 import { api } from '../../lib/api';
 import { logEvent } from '../../lib/logger';
 import { useLog } from '../../lib/useLog';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CONSENT } from '../config/study';
-import { StudyLayout } from '../components/AppShell';
+import { StudyLayout } from '../components/StudyLayout';
 import { Button, Card } from '../components/ui';
 
 /**

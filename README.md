@@ -1,12 +1,15 @@
 # Neuroeco research app
 
 Research prototype for the course project *Analyzing the Behavioral Mechanics of App-Based Investment
-Frauds*. Participants use a simulated investment app — a **plain** or a **fraud-style** version, assigned at
-random — and then answer a UI/UX survey and a general survey. Every screen, randomized factor and logged
-variable maps to a hypothesis in [`hypothesis-report.md`](hypothesis-report.md) (H1–H9).
+Frauds*. Participants play a 10-minute trading game, **ZenTrade**, that follows a real scam lifecycle (hook →
+deposit → escalate → trap). Half get the **fraud skin** ("ZenTrade X": countdowns, fake badges, winner
+pop-ups, a "mentor", a withdrawal tax…), half the **honest skin**, with identical mechanics and payoffs. Almost
+every hypothesis is measured through behaviour inside the game; the game ends with a personal **Scam Report
+Card** (debrief). Every stage maps to a hypothesis in [`hypothesis-report.md`](hypothesis-report.md) (H1–H9);
+see [`docs/screens.md`](docs/screens.md).
 
 > **Simulation only.** No real money, no payment fields, no names, emails, phone numbers or ID numbers.
-> The app ("Dhanoura") and the regulator ("NDIA") are fictional.
+> The app ("ZenTrade"), the regulator ("NDIA") and all people in the game are fictional.
 
 ## Contents
 
@@ -124,13 +127,14 @@ per-level counts for every randomized factor and four downloads:
 
 | File | Contents |
 | --- | --- |
-| `wide.csv` | **Use this for analysis.** One row per completed, non-withdrawn participant: assignments, behaviour measures, every survey answer and derived scores (CRT, λ, literacy, overconfidence, herd, susceptibility). Columns are documented in [`docs/data-dictionary.md`](docs/data-dictionary.md). |
+| `wide.csv` | **Use this for analysis.** One row per player who reached the report card and did not withdraw: assignments, behaviour measures recomputed from the event log, trap score and per-trap flags, every in-game answer and derived scores (CRT, λ from the bonus spins, literacy, overconfidence, FOMO). Columns are documented in [`docs/data-dictionary.md`](docs/data-dictionary.md). |
 | `participants.csv` | One row per consented participant (including unfinished) |
 | `events.csv` | Raw behaviour log (one row per event) |
-| `responses.csv` | Raw survey answers (one row per participant × item) |
+| `responses.csv` | Raw answers (profile, spins, brain bonus, quick reactions; one row per participant × item) |
 
-Participants who withdrew their data on the debrief screen are excluded from all four files. Scores are
-computed by the server at download time (overconfidence uses z-scores over the downloaded sample).
+Players who withdrew their data on the report card are excluded from all four files. Scores are computed by the
+server at download time (overconfidence uses z-scores over the downloaded sample). Data from the original
+survey flow (before the game) remains only in the three raw files.
 
 ## Reset the database before real data collection
 
@@ -148,9 +152,9 @@ Test runs (including `npm run smoke`) create real rows. Before collecting real d
 
 | Command | What it does |
 | --- | --- |
-| `npm test` | All unit and flow tests (server + client), including a 40-participant API simulation |
-| `npm run simulate` | The API simulation on its own (`npm run simulate -- 100` for more participants) |
-| `npm run smoke` | Real browser run through the whole study at 360 px in both versions (app must be running; `npm run smoke -- http://localhost:3001` for a built app, `BROWSER=chrome` for Chrome) |
+| `npm test` | All unit and flow tests (server + client): game economy for every condition, skin parity, mini-games, report card, export, and a 40-player API simulation |
+| `npm run simulate` | The API simulation on its own (`npm run simulate -- 100` for more players) |
+| `npm run smoke` | Real browser plays the whole game at 360 px in both skins and checks no overlay covers a button (app must be running **locally**; `npm run smoke -- http://localhost:3001` for a built app, `BROWSER=chrome` for Chrome). It writes rows to whatever database the server uses — never run it against the live site |
 | `npm run lint` | ESLint + Prettier check (`npm run format` fixes formatting) |
 | `npm run typecheck` | TypeScript checks |
 
@@ -160,24 +164,29 @@ The manual checklist is in [`docs/qa-checklist.md`](docs/qa-checklist.md).
 
 | What | File |
 | --- | --- |
-| App name, amounts, returns, fees, bonus, VIP tiers, timer, ticker, testimonials, chat, screen texts | `client/src/config/session.ts` |
-| UI/UX and general survey questions | `client/src/config/survey.ts` |
-| Consent, debrief and thank-you texts | `client/src/config/study.ts` |
-| Scoring keys (CRT answers, literacy answers, λ rule) | `server/src/scoring.ts` |
+| Everything in the game: economy (₹ amounts, round returns, crash, tax), timings, plans, VIP tiers, deals, pool, chat, toasts, ticker, questions, answer key, trap and report texts, safety tips, `PRIZE_DRAW` flag | `client/src/config/game.ts` |
+| Consent text | `client/src/config/study.ts` |
+| Trap rules (which behaviour counts as each trap) | `client/src/game/traps.ts` |
+| λ and overconfidence formulas | `server/src/scoring.ts` |
 | `wide.csv` columns and their descriptions | `server/src/wide.ts` → then run `npm run docs:dictionary` |
 
-Keep survey item ids stable once data collection starts — they are the column names in the exports.
+Keep item ids stable once data collection starts — they are the column names in the exports.
+
+**Optional prize draw.** `PRIZE_DRAW.enabled` in `game.ts` (off by default). Switch it on only with the
+instructor's approval: the consent screen then states the rules, and the report card gives tickets (1 per ₹1,000
+of final balance) and a code (`ZT-XXXX-XXXX`) the team can match to `participant_id`.
 
 ## Project layout
 
 ```
 client/                React + TypeScript + Vite + Tailwind (participant-facing app)
-  src/config/          all texts, amounts and survey questions (pure data, also used by the server)
-  src/screens/app/     app session screens A1–A10
-  src/features/        dark-design features and their plain counterparts
-  src/screens/         consent, survey pages, debrief
-  src/lib/             wallet maths, event logger, API client
-  src/test/            flow tests
+  src/config/          game.ts (all game texts, numbers, timings) and study.ts (consent)
+  src/game/            economy, step machine, reducer, traps, headless player, provider
+  src/game/stages/     the 15 stages (both skins)
+  src/game/ui/         shell, ticker/toasts, buttons, chart, swipe cards, sounds
+  src/screens/         consent
+  src/lib/             event logger, API client
+  src/test/            flow tests (jsdom)
 server/                Express + TypeScript + SQLite
   src/                 API, randomization, scoring, exports, admin page
   scripts/             simulate.ts, data-dictionary.ts, reset-db.ts

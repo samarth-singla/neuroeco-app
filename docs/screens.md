@@ -1,45 +1,37 @@
-# Screens
+# Screens — the ZenTrade game
 
-Participant journey, in order. Both app versions have the same screens, returns and flow; the fraud-style
-version adds the H1 dark-design features. Code: `client/src/screens/`. Texts and amounts:
-`client/src/config/session.ts`, `survey.ts`, `study.ts`. Event names are in `events.csv`
-(`event_type` column); derived columns are described in `docs/data-dictionary.md`.
+Participant journey, in order (about 8–10 minutes). Both skins have the same stages, timings, amounts and
+payoffs; the fraud skin ("ZenTrade X") adds the dark-design layer, the honest skin ("ZenTrade") presents the
+same thing the way a regulated app would. Code: `client/src/game/stages/`. Texts, numbers and timings:
+`client/src/config/game.ts`. Step ids (`g:<stage>:<n>`) are stored as the participant's `current_step`; event
+names appear in `events.csv`; derived columns are in `docs/data-dictionary.md`.
 
-## Before the app
-
-| Step | Screen | Shows | Logs | Hypothesis |
+| Stage | What the player does | Fraud skin adds | Logged | Hypothesis |
 | --- | --- | --- | --- | --- |
-| — | Consent | Study info (no fraud framing), 18+ and agree checkboxes. Declining ends without a record. | participant created on agree | — |
-| — | Random assignment | Server-side, balanced: `app_version`, `round1_outcome`, `withdrawal_offer`, `referral_source`, `money_source`; shuffled `stake_order` | `participants` row | H1, H2, H3, H5, H6, H7 |
+| S0 Consent | Study info (no fraud framing), 18+ and agree boxes; declining creates no record | — | participant created, balanced randomization | — |
+| S1 Trader profile (8 screens) | Age band, gender, field, family income, investing experience, trading-app use, prior financial education, "How good are you with money?" 1–7 | Avatar picker, "Profile 100% complete!" | `responses` | Controls, H8, H9 |
+| S2 Bonus spins (6) | "50% lose ₹100 / 50% win ₹X" (X = 50…300, random order): accept or skip; results hidden until S14 | Spinning wheel, "Lucky spin" | `spin_accept` / `spin_skip`, `la_gain_X` | H4 (λ) |
+| S3 Home dashboard | Wallets, ₹500 bonus, 3 plans with details, chart; invest or skip | Bonus locked until first deposit; ticker, winner toasts, testimonials, "NDIA Certified" badge, ★4.9, 10 lakh+ users; countdown + "only 3 slots left"; VIP ladder; tiny T&C | `s3_invest`/`s3_skip` (decision time), `plan_select`, `verify_open`, `toast_shown` | H1, H1a–H1e |
+| S4 Trading rounds 1–3 | Pick an amount, Invest or Skip, animated chart, result (round 1: +8% or 0% by condition) | Pulsing INVEST NOW, VIP "Upgrade" shortcut, confetti on wins | `round_invest`/`round_skip`, `vip_upgrade_tap` | H1c, H2 |
+| S5 Brain bonus (6) | 3 CRT puzzles + 3 Big Three literacy questions; +₹100 per correct answer | Timer ring (visual only) | `brain_answer`, `responses` | H1 moderator, H8 |
+| S4 Round 4 | as above | as above | as above | — |
+| S6 Mentor chat | Open the message or continue | "Rohit Sir, Senior Advisor" typing: "Most members upgrade to VIP 2 today…"; honest: Help & FAQ card | `chat_shown`, `chat_open`, deposit within 60 s | H1f |
+| S4 Rounds 5–6 | as above; ₹2,000 streak reward after round 6 | as above | as above | H1f (chat deposit) |
+| S7 Flash deals (3) | ₹500 / ₹3,000 / ₹8,000 deals in random order: view details, invest or skip | Flashing FLASH DEAL banner, countdown, viewers | `deal_invest`/`deal_skip` (details before, decision time) | H3 |
+| S8 Diamond Pool | Friend message or sponsored ad (random, separate from skin): join ₹2,000 or not | — | `pool_join`/`pool_skip` (details before, decision time) | H5 |
+| S9 Test withdrawal | Allowed: withdraw ₹500 ("Money sent!") — or not offered; then a deposit offer (≤ ₹5,000) | Celebration; "Withdrawals open at VIP n" | `test_withdraw`, `post_withdrawal_deposit` | H6 |
+| S10 Gold Plan | ₹2,000 offer from the Profit wallet or the Main wallet (random); slider ₹0–2,000 | — | `reinvest` | H7 |
+| S11 Market crash | Main + Portfolio −40%; top up ("Loss Shield") or leave it | Red flash, shake, "recover in 10 minutes" countdown | `crash`, `crash_topup`/`crash_leave` | H4 |
+| S12 Cash out | Withdraw everything. Honest: processed | Blocked: 10% "processing tax", freeze warning, support message; Pay tax / Don't pay | `cashout` / `tax_shown`, `tax_pay`/`tax_decline` | H1g |
+| S13 Quick reactions (12) | 7 swipe cards "Did this push you to invest?" (feature re-rendered in own skin), trust and urgency sliders, 3 FOMO agree/disagree cards | — | `responses`, `reaction_method` | H1h, H5, H9 |
+| S14 Scam Report Card | Reveal; traps fallen for (score /10, honest /9) and avoided; spin results; final balance; how the scam worked; safety tips; withdraw my data | — | `report_shown`, `data_withdraw` | Debrief |
+| S15 Share | Share the challenge (link without personal data) | — | `share_tap` | Recruitment |
 
-## App session (A1–A10)
+## Rules every stage follows
 
-| # | Screen | Plain version | Fraud-style version | Logs | Hypothesis |
-| --- | --- | --- | --- | --- | --- |
-| A1 | Welcome | Intro: ₹10,000 practice balance, use it or not | Same + **₹500 sign-up bonus**, locked until the first deposit | `screen_view`, `bonus_shown` | H1b |
-| A2 | Investment plans | 3 plans (Starter / Growth / Premium, "up to 8/10/12% per cycle") + risk note; About / Verify link (neutral company info) | Same plans + **countdown & "Only 3 slots left"** (H1a), **VIP tiers** (H1c), **"NDIA Certified" badge and certificate** behind the same About / Verify link (H1d), **live withdrawal ticker and screenshot testimonials** (H1e) | `plan_select`, `invest_click` / `exit_click` (with `decision_ms`), `verify_click`, `verify_close`, `timer_reset` | H1, H1a, H1c, H1d, H1e |
-| A3 | Deposit 1 | Amount input + quick amounts; "Don't invest" | Same | `deposit_submit {round: 1}` | H1, H1b, H2 |
-| A4 | Round-1 outcome | +8% (`small_win`) or 0% (`flat`) on the deposit | Same | `outcome_shown` | H2 |
-| A5 | Deposit 2 | "Invest again?" + Help & FAQ link | Same + **mentor chat** bubble: "Most members upgrade to VIP 2 today" | `deposit_submit {round: 2}`, `chat_open {kind}`, `chat_preview_shown` | H2, H1f |
-| A6 | Withdrawal stage | `allowed`: withdraw ₹200 → succeeds. `not_offered`: portfolio only | Same | `withdraw_offer_shown`, `withdraw_click`, `withdraw_skip` | H6 |
-| A7 | Deposit 3 | "Add more?" + Help & FAQ link | Same + mentor chat | `deposit_submit {round: 3}`, `chat_open` | H6, H1f |
-| A8 | Scripted loss | −30% "market correction"; "Top up to recover" / "Leave" | Same | `loss_shown`, `topup_click`, `topup_submit`, `topup_cancel`, `topup_decline` | H4 |
-| A9 | Final withdrawal | Withdrawal processes normally (or "Leave it in the app") | Withdrawal **blocked by a 10% "processing tax"**: "Pay fee" / "Don't pay" (simulated) | `withdraw_final_click`, `withdraw_final_keep`, `fee_shown`, `fee_pay_click`, `fee_decline_click` | H1g |
-| A10 | End of session | "Session complete" → survey | Same | `screen_view` | — |
-
-Every app screen can be passed without investing. The countdown restarts at zero ("New slots opening…")
-and never blocks progress.
-
-## Surveys
-
-| Step | Pages | Content | Hypothesis |
-| --- | --- | --- | --- |
-| UI/UX survey | 8 | For each feature, a re-render from the participant's own version (fraud element or plain counterpart), rated 1–7 for urgency, trust and temptation: timer & slots / plan card, bonus / welcome card, VIP tiers / plan list, regulator badge & certificate / About page, ticker & testimonials / plans screen, mentor chat / Help & FAQ, withdrawal tax / withdrawal confirmation. Then overall trust and overall urgency. | H1a–H1g, H1, H6 (trust) |
-| General survey | 13 | CRT (3) · loss-aversion gambles (6) · stake scenarios ₹500 / ₹5,000 / ₹50,000 in random order · referral scenario (friend or ad) · herd/FOMO (5) · money-source scenario (app profit or own money; willingness + ₹0–2,000) · self-rated literacy · Big Three literacy · susceptibility (5) · experience & exposure (4) · demographics (+ optional comment) | H1 (CRT), H3, H4, H5, H7, H8, H9 |
-
-## After the surveys
-
-| Step | Screen | Shows | Logs |
-| --- | --- | --- | --- |
-| Debrief | Reveals the simulated fraud app, lists the eight manipulative features (adapted to the version seen), explains scripted outcomes, protection tips (official regulator check, never pay to withdraw, cybercrime.gov.in / 1930), "Withdraw my data" | `data_withdraw` → `participants.withdrawn = 1` |
-| Thank you | End message (different text after a withdrawal) | `screen_view` |
+- Every money screen can be passed without investing; skipping is logged.
+- Countdowns reset at zero and never block progress.
+- Toasts sit in a reserved lane; confetti, coins and the crash flash stay in the content area under the sticky
+  bars; nothing ever covers a button or an amount field (checked by `npm run smoke`).
+- Amounts are capped by the wallet balance; one question per screen in S1, S5 and S13.
+- A page refresh resumes on the same screen without repeating any scripted result.

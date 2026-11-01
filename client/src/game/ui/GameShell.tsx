@@ -8,8 +8,8 @@ import {
   TOASTS,
   TRUST,
   type Skin,
+  RESEARCH_FOOTER,
 } from '../../config/game';
-import { RESEARCH_FOOTER } from '../../config/session';
 import { logEvent } from '../../lib/logger';
 import { toNextVip, vipLevel } from '../economy';
 import { useGame } from '../GameProvider';

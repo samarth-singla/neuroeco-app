@@ -3,7 +3,7 @@ import request from 'supertest';
 import { basicAuth, makeApp } from './helpers';
 import { all } from '../src/db';
 
-/** Splits one CSV line, respecting quoted fields (stake_order contains commas). */
+/** Splits one CSV line, respecting quoted fields (order columns contain commas). */
 function cells(line: string): string[] {
   const out: string[] = [];
   let cell = '';

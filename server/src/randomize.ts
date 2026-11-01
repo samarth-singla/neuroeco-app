@@ -17,9 +17,6 @@ export type FactorName = keyof typeof FACTORS;
 export type Assignment = { [F in FactorName]: (typeof FACTORS)[F][number] };
 export type LevelCounts = { [F in FactorName]?: Record<string, number> };
 
-/** v1 survey: stake levels for the H3 scenarios (kept until the v1 flow is removed). */
-export const STAKES = [500, 5000, 50000] as const;
-
 export type Rng = () => number;
 
 export function pickBalanced<T extends string>(
@@ -50,11 +47,8 @@ export function shuffle<T>(items: readonly T[], rng: Rng = Math.random): T[] {
   return arr;
 }
 
-// DECISION: order factors (v1 stakes, flash deals, spins) are plain random permutations per
-// participant, not balanced; they are order controls, stored per participant.
-export function shuffledStakes(rng: Rng = Math.random): number[] {
-  return shuffle(STAKES, rng);
-}
+// DECISION: order factors (flash deals, spins) are plain random permutations per participant,
+// not balanced; they are order controls, stored per participant.
 
 /** Game: flash-deal sizes (₹500 / ₹3,000 / ₹8,000) in the order shown (H3). */
 export function shuffledDeals(rng: Rng = Math.random): number[] {

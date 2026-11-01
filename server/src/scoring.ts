@@ -81,9 +81,6 @@ export function meanOf(a: Answers, ids: string[]): number | null {
   return (vals as number[]).reduce((s, v) => s + v, 0) / vals.length;
 }
 
-export const HERD_ITEMS = ['herd_1', 'herd_2', 'herd_3', 'herd_4', 'herd_5'];
-export const SUSCEPTIBILITY_ITEMS = ['sus_1', 'sus_2', 'sus_3', 'sus_4', 'sus_5'];
-
 /** z-scores over a sample (sample SD, n − 1). Null in → null out; all null if SD is 0 or n < 2. */
 export function zScores(values: (number | null)[]): (number | null)[] {
   const present = values.filter((v): v is number => v !== null);

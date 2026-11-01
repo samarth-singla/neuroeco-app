@@ -1,7 +1,8 @@
 import { SPINS } from '../config/game';
 import { initialGame, type GameAssignment, type GameState } from '../game/reducer';
 import type { SavedGame } from '../game/GameProvider';
-import { FAKE_ID } from './seed';
+
+export const FAKE_ID = '11111111-2222-4333-8444-555555555555';
 
 export function gameAssignment(over: Partial<GameAssignment> = {}): GameAssignment {
   return {
@@ -31,7 +32,7 @@ export function savedGame(): SavedGame {
   return JSON.parse(sessionStorage.getItem('neuroeco:game:v1')!) as SavedGame;
 }
 
-/** Fake-API assignment shape (adds the v1 stake order the type requires). */
+/** Fake-API assignment shape */
 export function apiAssignment(a: GameAssignment) {
-  return { ...a, stake_order: [500, 5000, 50000] };
+  return { ...a };
 }

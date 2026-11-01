@@ -617,3 +617,31 @@ service sleeps or redeploys), so a local SQLite file would lose data.
 **Open**
 - A player who was mid-way through the old survey flow when this deploys will see the game's consent screen after a
   refresh (their partial v1 data stays in the raw exports).
+
+## Redesign Phase 7 — Cleanup and report update
+
+**Status:** done
+
+**Built**
+- Removed the v1 flow: 10 session screens, feature components, UI/UX and general survey (`config/survey.ts`,
+  `SurveyPage`, `Question`), v1 debrief, study state, wallet, storage, `config/session.ts`, and their tests.
+  `App.tsx` now renders only the game. Kept and moved: consent screen (+ `config/study.ts` trimmed to the consent
+  text), `components/StudyLayout.tsx`, `RESEARCH_FOOTER` (now in `config/game.ts`).
+- Server: removed the v1 stake order and survey item lists; the legacy `stake_order` column is filled with ''.
+- New game tests replacing the v1 ones: consent (no fraud framing, both boxes, declining creates no record,
+  `?pilot=1`) and the countdown (ticks, resets at zero, never blocks).
+- `scripts/browser-smoke.mjs` (`npm run smoke`) rewritten for the game: both skins at 360 px, refresh in the middle
+  of the trading rounds, hit-test of every button on every screen, dead-end detection. Passes against the local
+  (scratch-database) server.
+- Docs: `README.md` (game description, exports, config table, prize-draw switch, project layout),
+  `docs/screens.md` (every stage, per-skin differences, logged events, hypotheses), `docs/qa-checklist.md`
+  (game checks), `hypothesis-report.md` per REDESIGN_PLAN §6 — H3/H5/H7 sources = prototype logs with behavioural
+  DVs, H4 λ from the bonus spins, H8 susceptibility = trap score, H1c VIP promise note, H1d fictional "NDIA", and the
+  "identical mechanics and payoffs" line under H1. Hypothesis statements unchanged.
+- Lint, typecheck, production build, 45 server + 86 client tests, simulation and smoke test all pass.
+
+**Decisions**
+- `// DECISION:` The H1 sub-hypothesis test line in `hypothesis-report.md` now names the S13 yes/no "Did this push
+  you to invest?" reactions (plus behaviour) instead of the three v1 rating scales, since that is what the game
+  measures (REDESIGN_PLAN S13). Statements are unchanged.
+- `// DECISION:` The `?game=` switch was removed with the v1 flow; every link runs the game.

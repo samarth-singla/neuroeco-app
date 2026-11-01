@@ -18,8 +18,9 @@ A neuroeconomic perspective · Samarth Singla, Aishani Sood · 2026-10-23
 - **DVs:** Decision time (seconds), invested (yes/no), amount invested, verification click (yes/no), urgency and trust ratings (1–7)
 - **Moderator:** CRT score (Cognitive Reflection Test, 0–3)
 - **Controls:** Age, gender, investing experience, trading-app use
+- **Design note:** Both skins share identical mechanics and payoffs; only presentation differs.
 
-**Source:** Prototype logs + UI/UX survey
+**Source:** Prototype logs + in-game quick reactions
 
 **Test:** Mann-Whitney U (decision time, amount); chi-square (invested, verified); regression with app version × CRT interaction
 
@@ -29,13 +30,13 @@ A neuroeconomic perspective · Samarth Singla, Aishani Sood · 2026-10-23
 | --- | --- | --- | --- |
 | H1a | Countdown timers and "only 3 slots left" on investment plans | Urgency, scarcity | Faster decisions, more investing |
 | H1b | Sign-up bonus credited to the wallet, withdrawable only after a first deposit | Endowment effect, reciprocity | Higher first-deposit rate |
-| H1c | VIP levels: bigger deposits unlock higher daily returns | Goal-gradient, status, sunk cost | Larger deposits to reach the next tier |
-| H1d | Fake regulatory credentials: "SEBI registered" badges, certificates, names close to real brokers | Authority bias | Higher trust, fewer verification checks |
+| H1c | VIP levels: bigger deposits unlock higher daily returns (in the prototype, VIP tiers only promise higher returns; actual returns are identical in both skins) | Goal-gradient, status, sunk cost | Larger deposits to reach the next tier |
+| H1d | Fake regulatory credentials: "SEBI registered" badges, certificates, names close to real brokers (the prototype uses a fictional regulator, "NDIA") | Authority bias | Higher trust, fewer verification checks |
 | H1e | Live withdrawal ticker and screenshot testimonials | Social proof, FOMO | More investing, faster decisions |
 | H1f | "Customer service" or mentor chat that nudges users to deposit | Authority, social trust | Higher deposit after the nudge |
 | H1g | Withdrawal blocked by a "tax", "processing fee" or account freeze until an extra payment | Endowment effect, loss aversion, sunk cost | Willingness to pay to unlock |
 
-Each sub-hypothesis is tested through feature-level urgency, trust and temptation ratings (plain vs fraud-style, Mann-Whitney U per feature). These results form the design-vulnerability (UX) map.
+Each sub-hypothesis is tested through the feature-level quick reaction "Did this push you to invest?" (yes/no per feature, plain vs fraud-style, chi-square per feature) together with the behaviour linked to each feature in the prototype logs. These results form the design-vulnerability (UX) map.
 
 ---
 
@@ -68,10 +69,10 @@ Each sub-hypothesis is tested through feature-level urgency, trust and temptatio
 
 **Variables**
 
-- **IV:** Stake level (₹500 / ₹5,000 / ₹50,000, within-subject)
-- **DVs:** Willingness to invest (1–7), would verify first (yes/no)
+- **IV:** Stake level (₹500 / ₹3,000 / ₹8,000 flash deals, within-subject, random order)
+- **DVs:** Invested in each flash deal (yes/no), opened the deal's details before deciding (yes/no), decision time
 
-**Source:** General survey
+**Source:** Prototype logs
 
 **Test:** Friedman test; Cochran's Q for verification
 
@@ -87,11 +88,11 @@ Each sub-hypothesis is tested through feature-level urgency, trust and temptatio
 
 **Variables**
 
-- **IV:** Loss aversion λ (from a 50-50 gamble task)
+- **IV:** Loss aversion λ (from the in-game bonus spins: six 50-50 offers, lose ₹100 vs win ₹50–₹300)
 - **DVs:** Post-loss top-up (yes/no), top-up amount
 - **Controls:** App version, investing experience
 
-**Source:** General survey + prototype logs
+**Source:** Prototype logs
 
 **Test:** Logistic regression (top-up); OLS (amount)
 
@@ -107,11 +108,11 @@ Each sub-hypothesis is tested through feature-level urgency, trust and temptatio
 
 **Variables**
 
-- **IV:** Referral source (friend / ad, randomly assigned)
-- **DVs:** Willingness to join (1–7), would verify first (yes/no)
+- **IV:** Referral source (friend / ad, randomly assigned) for the in-game "Diamond Pool" invite
+- **DVs:** Joined the pool (yes/no), opened the pool details before deciding (yes/no), decision time
 - **Moderator:** Herd / FOMO score
 
-**Source:** General survey
+**Source:** Prototype logs
 
 **Test:** Mann-Whitney U; chi-square
 
@@ -146,10 +147,10 @@ Each sub-hypothesis is tested through feature-level urgency, trust and temptatio
 
 **Variables**
 
-- **IV:** Money source (app profit / own money, same amount, randomly assigned)
-- **DVs:** Willingness to reinvest (1–7), amount reinvested
+- **IV:** Money source (app profit / own money, same amount, randomly assigned): the in-game Gold Plan offer of ₹2,000 from the Profit wallet vs the Main wallet
+- **DVs:** Accepted the offer (yes/no), amount reinvested (₹0–2,000)
 
-**Source:** General survey
+**Source:** Prototype logs
 
 **Test:** Mann-Whitney U
 
@@ -166,10 +167,10 @@ Each sub-hypothesis is tested through feature-level urgency, trust and temptatio
 **Variables**
 
 - **IVs:** Financial literacy score (Big Three questions), overconfidence score, prior financial education (yes/no)
-- **DVs:** Susceptibility index (survey), victimization yes/no (online dataset)
+- **DVs:** Susceptibility = in-game trap score (number of scam traps fallen for, 0–10), victimization yes/no (online dataset)
 - **Controls:** Age, gender, income, investing experience
 
-**Source:** General survey + online dataset
+**Source:** Prototype logs and in-game profile + online dataset
 
 **Test:** Logistic regression (victimization); OLS (susceptibility index)
 

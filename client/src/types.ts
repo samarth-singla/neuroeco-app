@@ -1,27 +1,17 @@
-export type AppVersion = 'plain' | 'fraud';
-
+/** Assignment returned by the server for a new participant (balanced factors + order factors). */
 export interface Assignment {
-  app_version: AppVersion;
+  /** Skin: `plain` = honest "ZenTrade", `fraud` = "ZenTrade X" (H1) */
+  app_version: 'plain' | 'fraud';
   round1_outcome: 'small_win' | 'flat';
   withdrawal_offer: 'allowed' | 'not_offered';
+  /** Diamond Pool invite source (H5) */
   referral_source: 'friend' | 'ad';
+  /** Gold Plan framing: from Profit wallet (`profit`) or Main wallet (`own`) (H7) */
   money_source: 'profit' | 'own';
-  /** H3 stake amounts in the order this participant sees them */
-  stake_order: number[];
-  /** Game: flash-deal sizes in the order shown (H3) */
+  /** Flash-deal sizes in the order shown (H3) */
   deal_order?: number[];
-  /** Game: bonus-spin gains in the order shown (H4) */
+  /** Bonus-spin gains in the order shown (H4) */
   spin_order?: number[];
 }
 
-export type AppScreen = 'A1' | 'A2' | 'A3' | 'A4' | 'A5' | 'A6' | 'A7' | 'A8' | 'A9' | 'A10';
-
-/**
- * Where the participant is. Stored on the server (`current_step`) and in sessionStorage.
- * `app:A1`…`app:A10` are the app screens, `uiux:<n>` and `survey:<n>` are survey pages.
- */
-export type Step =
-  `app:${AppScreen}` | `uiux:${number}` | `survey:${number}` | 'debrief' | 'thanks';
-
 export type AnswerValue = string | number;
-export type Answers = Record<string, AnswerValue>;

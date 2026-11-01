@@ -31,7 +31,8 @@ describe('participants', () => {
     expect(['allowed', 'not_offered']).toContain(p.assignment.withdrawal_offer);
     expect(['friend', 'ad']).toContain(p.assignment.referral_source);
     expect(['profit', 'own']).toContain(p.assignment.money_source);
-    expect(p.assignment.stake_order).toHaveLength(3);
+    expect(p.assignment.deal_order).toHaveLength(3);
+    expect(p.assignment.spin_order).toHaveLength(6);
   });
 
   it('resumes and updates the current step', async () => {

@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType } from 'react';
-import { StudyLayout } from '../components/AppShell';
+import { StudyLayout } from '../components/StudyLayout';
 import { PRIZE_DRAW } from '../config/game';
 import { api } from '../lib/api';
 import { Consent } from '../screens/Consent';

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { all, get, openDb } from '../src/db';
 import { createParticipant } from '../src/store';
-import { FACTORS, pickBalanced, shuffledStakes, STAKES, type FactorName } from '../src/randomize';
+import { FACTORS, pickBalanced, type FactorName } from '../src/randomize';
 
 function seeded(seed: number) {
   // Small deterministic PRNG (mulberry32) so failures are reproducible
@@ -60,13 +60,5 @@ describe('balanced randomization over the database', () => {
       'SELECT app_version, round1_outcome, withdrawal_offer, COUNT(*) AS n FROM participants GROUP BY 1, 2, 3',
     );
     expect(cells).toHaveLength(8);
-  });
-});
-
-describe('shuffledStakes', () => {
-  it('returns a permutation of the three stake levels', () => {
-    for (let i = 0; i < 20; i++) {
-      expect([...shuffledStakes()].sort((a, b) => a - b)).toEqual([...STAKES]);
-    }
   });
 });
