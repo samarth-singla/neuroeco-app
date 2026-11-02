@@ -882,3 +882,22 @@ header updated at the tap, but the result card only appeared after the 7-second 
 **Decisions**
 - `// DECISION:` The money model is unchanged (stake stays in Main, gain → Profit). Only the display during the chart
   shows the stake as "in trade", which explains why Main ends unchanged after a winning round.
+
+---
+
+## Hypothesis report update (H1 tests)
+
+**Status:** done (report only; the app is unchanged)
+
+**Changed in `hypothesis-report.md` (under H1)**
+- Per-feature test (H1a–H1g): now "feature swipe cards, fraud skin only: share of players saying each feature
+  pushed them to invest" (with the linked behaviour). This replaces the plain-vs-fraud chi-square per feature, which
+  stopped being possible when the honest skin lost the swipe cards (Playtest fixes 2).
+- New note: the trap score is compared across skins using only the 8 traps both skins share; the mentor-chat and
+  withdrawal-tax traps exist only in the fraud skin.
+
+**Note for the analysis**
+- `wide.csv` has no ready-made shared-8 column. `trap_score` is the full score (out of 10 fraud / 8 honest). For the
+  cross-skin comparison, sum the 8 shared trap flags: `trap_hook`, `trap_vip`, `trap_deal_no_details`,
+  `trap_pool_no_details`, `trap_crash_topup`, `trap_no_verify`, `trap_trust_after_withdrawal`, `trap_reinvest`.
+  For honest players this equals `trap_score`.

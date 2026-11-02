@@ -36,7 +36,9 @@ A neuroeconomic perspective · Samarth Singla, Aishani Sood · 2026-10-23
 | H1f | "Customer service" or mentor chat that nudges users to deposit | Authority, social trust | Higher deposit after the nudge |
 | H1g | Withdrawal blocked by a "tax", "processing fee" or account freeze until an extra payment | Endowment effect, loss aversion, sunk cost | Willingness to pay to unlock |
 
-Each sub-hypothesis is tested through the feature-level quick reaction "Did this push you to invest?" (yes/no per feature, plain vs fraud-style, chi-square per feature) together with the behaviour linked to each feature in the prototype logs. These results form the design-vulnerability (UX) map.
+Each sub-hypothesis is tested through the feature swipe cards, fraud skin only: share of players saying each feature pushed them to invest, together with the behaviour linked to each feature in the prototype logs. These results form the design-vulnerability (UX) map.
+
+**Trap score across skins:** the trap score is compared across skins using only the 8 traps both skins share (the mentor-chat and withdrawal-tax traps exist only in the fraud skin).
 
 ---
 
