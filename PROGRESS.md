@@ -901,3 +901,18 @@ header updated at the tap, but the result card only appeared after the 7-second 
   cross-skin comparison, sum the 8 shared trap flags: `trap_hook`, `trap_vip`, `trap_deal_no_details`,
   `trap_pool_no_details`, `trap_crash_topup`, `trap_no_verify`, `trap_trust_after_withdrawal`, `trap_reinvest`.
   For honest players this equals `trap_score`.
+
+---
+
+## Official data collection starts (2026-11-02)
+
+**Status:** done
+
+- All team test data was deleted so the study starts with a clean record:
+  - live Turso database: 11 participants, 629 events and 151 responses removed. The tables stay, and the event id
+    counter restarts at 1;
+  - local SQLite test files in `data/` were deleted.
+- A backup of everything deleted is kept outside the repo, in `../test-data-backup-2026-11-02/`
+  (`turso-live-backup.json` plus copies of the local files). It is test data only; leave it out of the analysis.
+- Every participant in the database from now on is part of the official study (any pilot runs still need
+  `is_pilot` / exclusion as described in `APP_REPORT.md`).
