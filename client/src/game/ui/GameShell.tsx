@@ -13,7 +13,7 @@ import {
   RESEARCH_FOOTER,
 } from '../../config/game';
 import { logEvent } from '../../lib/logger';
-import { formatINR, toNextVip, vipLevel } from '../economy';
+import { formatINR, toNextVip, vipLevel, type Wallets as GameWallets } from '../economy';
 import { useGame } from '../GameProvider';
 import { progressOf, stageOf } from '../steps';
 import { Confetti, Money, Sheet } from './kit';
@@ -155,9 +155,22 @@ function SoundToggle() {
   );
 }
 
-function Wallets() {
+/**
+ * What the header shows while a round's chart is still running: the wallets as they were before the
+ * trade, with the stake taken out of Main as "in trade". When the chart ends the override is dropped,
+ * so Main, Profit, the VIP bar and the result card all update together. Display only: the game
+ * state (and the logged events) already hold the settled values.
+ */
+export interface WalletDisplay {
+  wallets: GameWallets;
+  inTrade: number;
+  totalDeposited: number;
+}
+
+function Wallets({ display }: { display?: WalletDisplay }) {
   const { game, skin } = useGame();
-  const w = game.wallets;
+  const w = display?.wallets ?? game.wallets;
+  const inTrade = display?.inTrade ?? 0;
   const fraud = skin === 'fraud';
   const cell = fraud ? 'rounded-xl bg-white/5 px-2 py-1.5' : 'rounded-lg bg-slate-800 px-2 py-1.5';
   const label = fraud
@@ -169,11 +182,19 @@ function Wallets() {
         <div className={cell}>
           <div className={label}>Main</div>
           <Money
-            value={w.main}
+            value={w.main - inTrade}
             className={
               fraud ? 'text-sm font-black text-white' : 'text-sm font-semibold text-slate-50'
             }
           />
+          {inTrade > 0 && (
+            <div
+              className={`text-[10px] font-semibold ${fraud ? 'animate-pulse text-gold-300' : 'text-slate-300'}`}
+              data-testid="in-trade"
+            >
+              {formatINR(inTrade)} in trade
+            </div>
+          )}
         </div>
         <div className={cell}>
           <div className={label}>Profit</div>
@@ -213,9 +234,7 @@ function Wallets() {
  * level and its promised daily rate (H1c). A level-up shows a banner (and confetti in the content
  * area) for a few seconds; the higher rate always starts "next cycle", so payoffs never change.
  */
-function VipBar({ celebrating }: { celebrating: number | null }) {
-  const { game } = useGame();
-  const total = game.totalDeposited;
+function VipBar({ celebrating, total }: { celebrating: number | null; total: number }) {
   const vip = vipLevel(total);
   const next = toNextVip(total);
   const nextTier = next ? ECONOMY.vipTiers.find((t) => t.level === next.level) : undefined;
@@ -295,19 +314,24 @@ export function GameShell({
   actions,
   market = true,
   inert = false,
+  display,
 }: {
   children: ReactNode;
   actions?: ReactNode;
   market?: boolean;
   inert?: boolean;
+  /** Pre-trade wallets to show while a round's chart is running (see WalletDisplay) */
+  display?: WalletDisplay;
 }) {
   const { game, skin, dispatch } = useGame();
   const fraud = skin === 'fraud';
   const [cert, setCert] = useState(false);
+  const total = display?.totalDeposited ?? game.totalDeposited;
 
   // Fraud: celebrate each VIP level once (state, so a level reached just before a screen change
   // is celebrated on the next screen). The vip_level_up event itself is logged by the reducer.
-  const level = vipLevel(game.totalDeposited);
+  // While a round is still trading, the level-up waits for the result.
+  const level = vipLevel(total);
   const celebrating = fraud && market && level > (game.vipCelebrated ?? 0) ? level : null;
   useEffect(() => {
     if (celebrating === null || inert) return;
@@ -377,8 +401,8 @@ export function GameShell({
           </div>
           {fraud && market && <Ticker />}
           {fraud && market && <ToastLane screen={game.step} />}
-          {market && <Wallets />}
-          {fraud && market && <VipBar celebrating={celebrating} />}
+          {market && <Wallets display={display} />}
+          {fraud && market && <VipBar celebrating={celebrating} total={total} />}
           <LevelBar step={game.step} skin={skin} />
         </header>
 

@@ -5,7 +5,7 @@ import { formatINR, roundRate, toNextVip, vipLevel } from '../economy';
 import { useGame } from '../GameProvider';
 import { stepIndex } from '../steps';
 import { LiveChart } from '../ui/Chart';
-import { GameShell } from '../ui/GameShell';
+import { GameShell, type WalletDisplay } from '../ui/GameShell';
 import { AmountPicker, Celebrate, CtaButton, Panel, SkipButton, validAmount } from '../ui/kit';
 import { play } from '../ui/sound';
 
@@ -30,12 +30,18 @@ export function Round() {
   );
   const [nudged, setNudged] = useState(false);
   const [animating, setAnimating] = useState(false);
+  // While the chart runs, the header shows the wallets from before the trade with the stake "in
+  // trade"; Main, Profit and the result card then update together when the chart ends.
+  const [pending, setPending] = useState<WalletDisplay | null>(null);
   const rate = roundRate(round, assignment.round1_outcome);
   const plan = PLANS.find((p) => p.id === game.planId);
 
   useEffect(() => {
     if (!animating) return;
-    const id = setTimeout(() => setAnimating(false), ECONOMY.rounds.chartMs);
+    const id = setTimeout(() => {
+      setAnimating(false);
+      setPending(null);
+    }, ECONOMY.rounds.chartMs);
     return () => clearTimeout(id);
   }, [animating]);
 
@@ -45,6 +51,11 @@ export function Round() {
 
   function invest() {
     const { decision_ms } = decide();
+    setPending({
+      wallets: game.wallets,
+      inTrade: Math.min(amount, game.wallets.main),
+      totalDeposited: game.totalDeposited,
+    });
     dispatch({ type: 'round_invest', round, amount, at: Date.now(), decisionMs: decision_ms });
     setAnimating(true);
   }
@@ -94,7 +105,7 @@ export function Round() {
   }
 
   return (
-    <GameShell actions={actions}>
+    <GameShell actions={actions} display={animating && pending ? pending : undefined}>
       {showResult && settled.amount > 0 && settled.gain > 0 && (
         <Celebrate skin={skin} big={round === 1} />
       )}

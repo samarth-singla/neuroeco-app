@@ -145,6 +145,46 @@ describe('fraud skin VIP system', () => {
   });
 });
 
+describe('round: stake shown "in trade" while the chart runs', () => {
+  for (const skin of ['fraud', 'plain'] as const) {
+    it(`${skin}: Main, Profit and the result card update together when the chart ends`, async () => {
+      ECONOMY.rounds.chartMs = 1500;
+      try {
+        const a = gameAssignment({ app_version: skin, round1_outcome: 'small_win' });
+        installFakeApi(apiAssignment(a));
+        seedGame('g:round:1', a);
+        render(<App />);
+        const wallets = await screen.findByTestId('wallets');
+        const profitBefore = skin === 'fraud' ? '₹0' : '₹500';
+        fireEvent.change(screen.getByLabelText(/Invest this round/), { target: { value: '1000' } });
+        fireEvent.click(screen.getByRole('button', { name: /INVEST NOW|^Invest/ }));
+
+        // During the chart: stake out of Main, Profit unchanged, no result yet
+        expect(await within(wallets).findByTestId('in-trade')).toHaveTextContent('₹1,000 in trade');
+        await waitFor(() => expect(wallets).toHaveTextContent('₹9,000'));
+        expect(wallets).toHaveTextContent(profitBefore);
+        expect(screen.queryByTestId('round-result')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('vip-level-up')).not.toBeInTheDocument();
+        // ...while the game state already holds the settled result (logged at the tap)
+        expect(savedGame().game.rounds[1]).toMatchObject({ amount: 1000, gain: 80 });
+
+        // When the chart ends: result card, Main back to ₹10,000, gain in Profit
+        expect(await screen.findByTestId('round-result', {}, { timeout: 3000 })).toHaveTextContent(
+          '+₹80',
+        );
+        expect(within(wallets).queryByTestId('in-trade')).not.toBeInTheDocument();
+        await waitFor(() => {
+          expect(wallets).toHaveTextContent('₹10,000');
+          // fraud: the ₹500 bonus unlocks with the first deposit
+          expect(wallets).toHaveTextContent('₹580'); // 500 bonus + 80 gain in both skins
+        });
+      } finally {
+        ECONOMY.rounds.chartMs = 20;
+      }
+    });
+  }
+});
+
 describe('honest skin cash-out', () => {
   it('processes instantly and moves straight on to the sliders (no extra screen)', async () => {
     const a = gameAssignment({ app_version: 'plain' });

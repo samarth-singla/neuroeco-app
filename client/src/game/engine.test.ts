@@ -153,8 +153,7 @@ describe('steps', () => {
       'lit_inflation',
       'lit_diversification',
     ]);
-    expect(ECONOMY.rounds.chartMs).toBeGreaterThanOrEqual(6000);
-    expect(ECONOMY.rounds.chartMs).toBeLessThanOrEqual(8000);
+    expect(ECONOMY.rounds.chartMs).toBe(3000);
   });
   it('has 4 rounds: round 1 randomized, round 2 unchanged, all later rounds net positive', () => {
     expect(ECONOMY.rounds.count).toBe(4);

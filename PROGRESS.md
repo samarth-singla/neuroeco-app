@@ -855,3 +855,30 @@ screen, 1½ min on the report card), a full play takes about **7½–8 minutes i
 - A player mid-game when this deploys whose saved step no longer exists (an old `g:spin:2`, `g:brain:4`,
   `g:deal:1`, or an honest player on `g:chat` / a feature card) restarts at consent as a new participant. Reset the
   database before real collection as planned.
+
+---
+
+## Playtest fixes 3 — clearer round results
+
+**Status:** done
+
+**Why:** in playtests Main looked frozen at ₹10,000 through all four rounds, and the result felt slow. Both were
+by design: a round stake stays in Main, a gain goes to Profit, a loss comes off Main, and every round is ≥ 0%. The
+header updated at the tap, but the result card only appeared after the 7-second chart.
+
+**Changed**
+- While a round's chart runs, the header shows the wallets from before the trade, with the stake taken out of Main
+  and labelled "₹X in trade". When the chart ends, the stake returns to Main, the gain counts up into Profit, and the
+  result card, the VIP bar and any VIP level-up banner all appear at the same moment. Display only
+  (`WalletDisplay` in `ui/GameShell.tsx`, set by `stages/Round.tsx`): the game state and the logged
+  `round_invest` event still hold the settled result from the tap, so payoffs and data are unchanged.
+- Round chart animation: 3 s (was 7 s), both skins.
+- The animated counters (`useCountUp`) now time themselves with `performance.now()` instead of the frame timestamp.
+  When the two clocks differed (seen in the test browser), a counter could briefly run backwards or stall.
+- `docs/screens.md` updated. New tests (both skins): during the chart Main shows ₹9,000 with "₹1,000 in trade",
+  Profit is unchanged and there is no result; when it ends the result card shows +₹80, Main is back to ₹10,000 and
+  Profit is ₹580.
+
+**Decisions**
+- `// DECISION:` The money model is unchanged (stake stays in Main, gain → Profit). Only the display during the chart
+  shows the stake as "in trade", which explains why Main ends unchanged after a winning round.

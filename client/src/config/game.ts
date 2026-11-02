@@ -46,8 +46,11 @@ export const ECONOMY = {
      * the market crash (S11) remains the scripted loss.
      */
     later: { 2: 0.06, 3: 0.1, 4: 0.12 } as Record<number, number>,
-    /** Length of the chart animation after Invest/Skip (same for invest and skip, both skins) */
-    chartMs: 7000,
+    /**
+     * Length of the chart animation after Invest/Skip (same for invest and skip, both skins). The
+     * result card and the wallet update appear together when it ends.
+     */
+    chartMs: 3000,
   },
   /**
    * Paid to the Profit wallet after the last round in both skins, so every player — even one who

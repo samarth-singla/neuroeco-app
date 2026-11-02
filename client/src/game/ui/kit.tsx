@@ -261,8 +261,9 @@ export function useCountUp(value: number, ms = 700): number {
     const start = performance.now();
     const a = from.current;
     let raf = 0;
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - start) / ms);
+    // performance.now() rather than the frame timestamp: the two clocks can differ
+    const tick = () => {
+      const p = Math.min(1, Math.max(0, (performance.now() - start) / ms));
       const eased = 1 - (1 - p) ** 3;
       setShown(Math.round(a + (value - a) * eased));
       if (p < 1) raf = requestAnimationFrame(tick);
