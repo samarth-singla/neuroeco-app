@@ -176,3 +176,16 @@ figures; `run_all.py` rebuilds it every run.
   any output, and that the page has no external resources.
 - Housekeeping: `eslint.config.js` reformatted with prettier; the Step 1 commit had left it unformatted (the npm
   notices hid the prettier warning).
+
+## Final check — clean rebuild (2026-11-09)
+
+- All generated outputs and Python caches were deleted, then `analysis/.venv/Scripts/python analysis/run_all.py` was
+  run once (≈10 s). It rebuilt results.json, ANALYSIS_REPORT.md, index.html, 20 figures and 47 tables, and the
+  output check passed. Compared with the committed outputs, only the "generated at" timestamp changed: the figures
+  and tables are byte-identical, so the pipeline is reproducible.
+- The files in `data/` were only read (modification times unchanged).
+
+**Scorecard (pre-registered rules, raw p):** SUPPORTED: H1d (fraud players verified far less). NOT SUPPORTED: H1
+(p = 0.102, predicted direction), H1a, H1b, H1c, H1e, H1f, H2, H3, H4 (opposite direction, p = 0.084), H5, H6, H7,
+H8 (app evidence only). NOT TESTABLE: H1g. DESCRIPTIVE: H1h. EXPLORATORY: H9 (app). PENDING: H8 and H9 dataset
+parts. Read every skin result with the differential attrition in mind (fraud 35% vs honest 63% completed).
