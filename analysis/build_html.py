@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import base64
 import html
+import io
 import os
 import re
 
@@ -59,12 +60,28 @@ def table(rows: list[dict], cls: str = "") -> str:
     return f'<div class="tablewrap"><table class="{cls}"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'
 
 
+MAX_FIG_WIDTH = 1500
+
+
+def compress_png(path: str) -> bytes:
+    """Downscale wide figures and reduce them to a 128-colour palette PNG (text stays sharp on the flat dark
+    background); keeps the page small enough to open quickly from disk."""
+    from PIL import Image
+
+    im = Image.open(path).convert("RGB")
+    if im.width > MAX_FIG_WIDTH:
+        im = im.resize((MAX_FIG_WIDTH, round(im.height * MAX_FIG_WIDTH / im.width)), Image.LANCZOS)
+    im = im.quantize(colors=128, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    buf = io.BytesIO()
+    im.save(buf, format="PNG", optimize=True)
+    return buf.getvalue()
+
+
 def fig(name: str, alt: str) -> str:
     path = os.path.join(FIGURES, name + ".png")
     if not os.path.exists(path):
         return f'<p class="missing">Figure missing: {html.escape(name)}</p>'
-    with open(path, "rb") as f:
-        b64 = base64.b64encode(f.read()).decode()
+    b64 = base64.b64encode(compress_png(path)).decode()
     return f'<figure><img alt="{html.escape(alt)}" src="data:image/png;base64,{b64}"></figure>'
 
 
@@ -201,8 +218,17 @@ def build(r: R) -> str:
                             kicker="Summary"))
     sections.append(section("limitations", "Limitations", bullets(limitations(r)), kicker="Read with care"))
 
-    return TEMPLATE.replace("{{TITLE}}", html.escape(m["title"])).replace("{{NAV}}", "".join(nav)) \
-        .replace("{{SUBNAV}}", h1_sub).replace("{{HEADER}}", header).replace("{{SECTIONS}}", "\n".join(sections))
+    page = TEMPLATE.replace("{{NAV}}", "".join(nav)).replace("{{SUBNAV}}", h1_sub).replace("{{HEADER}}", header) \
+        .replace("{{SECTIONS}}", "\n".join(sections))
+    return re.sub(r"var\(--([a-z0-9-]+)\)", lambda mt: TOKENS[mt.group(1)], page)
+
+
+# Colours and sizes, written into the CSS as plain values at build time (older viewers ignore CSS variables).
+TOKENS = {
+    "bg": "#121211", "surface": "#1a1a19", "surface-2": "#232321", "line": "#383835", "ink": "#f0efec",
+    "ink-2": "#c3c2b7", "ink-3": "#9a998f", "accent": "#d95926", "blue": "#3987e5", "good": "#0ca30c",
+    "warn": "#fab219", "bad": "#d03b3b", "grey": "#6f6e68", "radius": "14px", "maxw": "1180px",
+}
 
 
 TEMPLATE = """<!doctype html>
@@ -212,13 +238,6 @@ TEMPLATE = """<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Study Results</title>
 <style>
-:root {
-  --bg: #121211; --surface: #1a1a19; --surface-2: #232321; --line: #383835;
-  --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #9a998f;
-  --accent: #d95926; --blue: #3987e5;
-  --good: #0ca30c; --warn: #fab219; --bad: #d03b3b; --grey: #6f6e68;
-  --radius: 14px; --maxw: 1180px;
-}
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 120px; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.6 system-ui, -apple-system, "Segoe UI",
@@ -290,13 +309,11 @@ table.tests td:nth-child(4) { min-width: 150px; }
 details summary { cursor: pointer; color: var(--ink-2); margin-top: 12px; }
 li { margin: 4px 0; }
 .missing { color: var(--bad); }
-.pm-hint { display: none; }
-/* Present mode: one section at a time, arrow keys to move */
-body.present main > .slide { display: none; margin: 18px 0; }
-body.present main > .slide.current { display: block; min-height: calc(100vh - 140px); }
+/* Present mode is switched on by the script only; the script itself shows and hides sections. */
 body.present { font-size: 20px; }
-body.present .pm-hint { display: block; position: fixed; right: 16px; bottom: 12px; color: var(--ink-3);
-  font-size: 13px; background: var(--surface-2); padding: 4px 10px; border-radius: 999px; }
+body.present main > .slide.current { margin: 18px 0; min-height: calc(100vh - 140px); }
+.pm-hint { position: fixed; right: 16px; bottom: 12px; color: var(--ink-3); font-size: 13px;
+  background: var(--surface-2); padding: 4px 10px; border-radius: 999px; }
 @media (max-width: 760px) {
   body { font-size: 16px; }
   .slide { padding: 18px 16px; }
@@ -307,58 +324,108 @@ body.present .pm-hint { display: block; position: fixed; right: 16px; bottom: 12
 </style>
 </head>
 <body>
-<nav class="top" aria-label="Sections"><div class="inner">{{NAV}}<button id="pm" type="button"
-  aria-pressed="false">Present mode</button><div class="sub">H1 parts: {{SUBNAV}}</div></div></nav>
+<nav class="top" aria-label="Sections"><div class="inner">{{NAV}}<div class="sub">H1 parts: {{SUBNAV}}</div></div></nav>
 <main>
 {{HEADER}}
 {{SECTIONS}}
 </main>
-<div class="pm-hint">← → move · Esc exits present mode</div>
 <script>
+/* Progressive enhancement only: every section is visible without this script. It adds a present-mode button,
+   arrow-key navigation and the nav highlight. Any error restores the full page. Plain ES2017, no modules. */
 (function () {
-  var slides = Array.prototype.slice.call(document.querySelectorAll('main > .slide'));
-  var btn = document.getElementById('pm');
-  var cur = 0;
-  var links = Array.prototype.slice.call(document.querySelectorAll('nav.top a'));
-  function mark(id) { links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('href') === '#' + id); }); }
-  function show(i) {
-    cur = Math.max(0, Math.min(slides.length - 1, i));
-    slides.forEach(function (s, j) { s.classList.toggle('current', j === cur); });
-    mark(slides[cur].id);
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  'use strict';
+  function revealAll() {
+    try {
+      var all = document.querySelectorAll('main > .slide');
+      for (var k = 0; k < all.length; k++) { all[k].style.display = ''; all[k].classList.remove('current'); }
+      document.body.classList.remove('present');
+      var h = document.querySelector('.pm-hint');
+      if (h) { h.hidden = true; }
+    } catch (e) { /* nothing more to do */ }
   }
-  function indexOfId(id) { for (var i = 0; i < slides.length; i++) { if (slides[i].id === id) return i; } return -1; }
-  function setPresent(on) {
-    document.body.classList.toggle('present', on);
-    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    btn.textContent = on ? 'Exit present mode' : 'Present mode';
-    if (on) { show(cur); }
-  }
-  btn.addEventListener('click', function () { setPresent(!document.body.classList.contains('present')); });
-  document.addEventListener('keydown', function (e) {
-    if (!document.body.classList.contains('present')) return;
-    if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); show(cur + 1); }
-    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(cur - 1); }
-    else if (e.key === 'Escape') { setPresent(false); }
-  });
-  document.addEventListener('click', function (e) {
-    var a = e.target.closest('a[href^="#"]');
-    if (!a) return;
-    var id = a.getAttribute('href').slice(1);
-    var i = indexOfId(id);
-    if (i < 0) return;
-    cur = i;
-    if (document.body.classList.contains('present')) { e.preventDefault(); show(i); }
-  });
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (!en.isIntersecting || document.body.classList.contains('present')) return;
-        cur = Math.max(0, indexOfId(en.target.id));
-        mark(en.target.id);
+  try {
+    var slides = Array.prototype.slice.call(document.querySelectorAll('main > .slide'));
+    var inner = document.querySelector('nav.top .inner');
+    if (!slides.length || !inner) { return; }
+    var links = Array.prototype.slice.call(document.querySelectorAll('nav.top a'));
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'pm';
+    btn.textContent = 'Present mode';
+    btn.setAttribute('aria-pressed', 'false');
+    inner.insertBefore(btn, inner.querySelector('.sub'));
+    var hint = document.createElement('div');
+    hint.className = 'pm-hint';
+    hint.textContent = '← → move · Esc exits present mode';
+    hint.hidden = true;
+    document.body.appendChild(hint);
+    var cur = 0;
+    var present = false;
+
+    var mark = function (id) {
+      links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('href') === '#' + id); });
+    };
+    var toTop = function () {
+      try { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); } catch (e) { window.scrollTo(0, 0); }
+    };
+    var render = function () {
+      slides.forEach(function (s, j) {
+        s.style.display = (!present || j === cur) ? '' : 'none';
+        s.classList.toggle('current', present && j === cur);
       });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    slides.forEach(function (s) { io.observe(s); });
+    };
+    var show = function (i) {
+      cur = Math.max(0, Math.min(slides.length - 1, i));
+      render();
+      mark(slides[cur].id);
+      toTop();
+    };
+    var indexOfId = function (id) {
+      for (var i = 0; i < slides.length; i++) { if (slides[i].id === id) { return i; } }
+      return -1;
+    };
+    var setPresent = function (on) {
+      try {
+        present = on;
+        document.body.classList.toggle('present', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.textContent = on ? 'Exit present mode' : 'Present mode';
+        hint.hidden = !on;
+        if (on) { show(cur); } else { render(); slides[cur].scrollIntoView(); }
+      } catch (e) { revealAll(); }
+    };
+    btn.addEventListener('click', function () { setPresent(!present); });
+    document.addEventListener('keydown', function (e) {
+      try {
+        if (!present) { return; }
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); show(cur + 1); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(cur - 1); }
+        else if (e.key === 'Escape') { setPresent(false); }
+      } catch (err) { revealAll(); }
+    });
+    document.addEventListener('click', function (e) {
+      try {
+        var a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null;
+        if (!a) { return; }
+        var i = indexOfId(a.getAttribute('href').slice(1));
+        if (i < 0) { return; }
+        cur = i;
+        if (present) { e.preventDefault(); show(i); }
+      } catch (err) { revealAll(); }
+    });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting || present) { return; }
+          cur = Math.max(0, indexOfId(en.target.id));
+          mark(en.target.id);
+        });
+      }, { rootMargin: '-45% 0px -50% 0px' });
+      slides.forEach(function (s) { io.observe(s); });
+    }
+  } catch (err) {
+    revealAll();
+    if (window.console && console.error) { console.error('results page script error:', err); }
   }
 })();
 </script>

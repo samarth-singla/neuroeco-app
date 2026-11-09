@@ -189,3 +189,40 @@ figures; `run_all.py` rebuilds it every run.
 (p = 0.102, predicted direction), H1a, H1b, H1c, H1e, H1f, H2, H3, H4 (opposite direction, p = 0.084), H5, H6, H7,
 H8 (app evidence only). NOT TESTABLE: H1g. DESCRIPTIVE: H1h. EXPLORATORY: H9 (app). PENDING: H8 and H9 dataset
 parts. Read every skin result with the differential attrition in mind (fraud 35% vs honest 63% completed).
+
+---
+
+## Final 1 — results page: blank-page fix (2026-11-09)
+
+**Status:** done. `analysis/build_html.py` and `scripts/check-results-html.mjs` changed.
+
+**Cause investigation.** The previously committed `results/index.html` was opened from disk (file://) in
+Playwright Chromium, Firefox and WebKit (and Edge earlier), with JavaScript on and off. In every case all 23 sections
+and 23 figures rendered, the console showed no errors, and no section was hidden by CSS (the only hiding rule applied
+after the script added a `present` class). The HTML validated (balanced tags, no stray markup, UTF-8 with
+`<meta charset="utf-8">` in the first bytes). The blank page could therefore not be reproduced in any standard
+browser engine. Likely causes, none of which the old page guarded against:
+- the file was opened in a viewer that is not a modern browser: the Windows Explorer preview pane or an embedded
+  editor preview. These use older engines that ignore CSS variables, and the whole old colour scheme was built on
+  CSS variables. Some of them also block scripts or `data:` images;
+- a copy that is not the generated file, for example GitHub's page saved with "Save link as", or the GitHub file
+  view, which does not render a 2.4 MB HTML file;
+- the very large embedded images (2.4 MB page) loading slowly from a synced or network folder.
+
+**Fix (progressive enhancement).**
+- All content (scorecard, sections, figures, tables) is in the HTML and visible without JavaScript. No CSS rule
+  hides a section; only the script hides sections in present mode, by setting styles after it has loaded.
+- The present-mode button and the keyboard hint are created by the script, so nothing dead appears without it.
+- All JavaScript is plain ES2017 (no modules, no top-level await, no external scripts) inside try/catch. Any error
+  calls `revealAll()`, which shows every section again.
+- Colours are written into the CSS as plain values at build time (no CSS variables), so older viewers still get the
+  dark theme.
+- The page is UTF-8 with `<meta charset="utf-8">`; ₹ renders in every engine (checked).
+- Embedded PNGs are downscaled to at most 1,500 px wide and saved as 128-colour palette PNGs: the page went from
+  2.46 MB to **1.10 MB**.
+
+**Test.** `npm run check:results` opens the file via file:// in Chromium, Firefox and WebKit, with JavaScript
+enabled and disabled, at 1366×768 and 1920×1080 (12 runs). Result: 23/23 sections and 23/23 figures visible in
+every run, no errors, no external requests, no horizontal scroll, no clipped or overlapping cards. Present mode
+works (with JavaScript) and Esc restores every section. Screenshots were checked by eye. The Firefox and WebKit
+engines were installed once with `npx playwright-core install firefox webkit`.

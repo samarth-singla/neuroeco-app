@@ -16,3 +16,4 @@ coverage/
 __pycache__/
 *.pyc
 results-html-shots/
+data/external/*/
