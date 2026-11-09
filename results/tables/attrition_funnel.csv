@@ -1,0 +1,15 @@
+milestone,step,honest,fraud
+Consented,g:profile:0,62,62
+Profile done (home),g:home,57,54
+Round 1,g:round:1,50,43
+Round 2,g:round:2,46,37
+Round 3,g:round:3,45,35
+Round 4,g:round:4,43,34
+Flash deals,g:deal,43,31
+Pool invite,g:pool,43,31
+Test withdrawal,g:withdraw,43,31
+Gold Plan,g:reinvest,42,29
+Market crash,g:crash,41,27
+Cash out,g:cashout,41,26
+Trust/urgency sliders,g:react:7,40,22
+Report card (completed),g:report,39,22

@@ -45,3 +45,22 @@ analysis/.venv/Scripts/python analysis/run_all.py
 - One player has duplicated round events (identical amounts, from a double tap or refresh). The first event is used,
   which reproduces `wide.csv` exactly. The S3 decision time from `events.csv` also matches `wide.csv` exactly for all
   61 completers.
+
+## Step 3 — Attrition and intention-to-treat (2026-11-09)
+
+**Status:** done. Module `analysis/attrition.py`; tables `results/tables/attrition_*.csv`; figure
+`results/figures/attrition_funnel.png`; section `attrition` and tests `ATT.*`, `H1.itt.*`, `H2.itt.*` in
+`results.json`.
+
+- **Differential attrition (critical):** fraud 22 of 62 completed (35%) vs honest 39 of 62 (63%); Fisher p = 0.004,
+  OR of completing (fraud vs honest) 0.32 [0.16, 0.67]. No other randomized factor changed completion (all p ≥ 0.47).
+- Where drop-outs stopped (fraud vs honest): during the profile 8 vs 5; on the home screen 11 vs 6 (all 11 fraud
+  players had closed the VIP pop-up; nobody in either skin who stopped there made the S3 decision); later in the
+  game 21 vs 12. The fraud curve also drops between "Cash out" and the sliders, where only the fraud skin has the
+  tax block and the 7 feature cards.
+- Note: the profile screens are not identical across skins (fraud has the neon look and the avatar picker), so
+  "before the home screen" means before any money or game mechanic, not before any visual difference.
+- ITT sample (everyone who reached `g:home`): honest 57, fraud 54 (50 non-completers added). The H1 and H2 reruns
+  are stored as robustness tests; the comparison with the completer results is part of Step 4 and the report.
+- Implementation notes: the first event per participant and round is used (one duplicated player). Reaching
+  `g:home` = a `screen_view` on `g:home`, or `current_step` at or past `g:home`.

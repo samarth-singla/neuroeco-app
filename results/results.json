@@ -1,7 +1,7 @@
 {
  "meta": {
   "title": "Behavioral Mechanics of App-Based Investment Frauds",
-  "generated_at": "2026-11-09 09:21 UTC",
+  "generated_at": "2026-11-09 09:23 UTC",
   "consented": 124,
   "consented_by_skin": {
    "honest": 62,
@@ -21,7 +21,296 @@
   }
  },
  "hypotheses": [],
- "tests": [],
+ "tests": [
+  {
+   "id": "ATT.completion_skin",
+   "hypothesis": "attrition",
+   "role": "check",
+   "outcome": "completed",
+   "prediction": "(check) completion does not depend on skin",
+   "test": "Fisher's exact test (two-sided)",
+   "statistic_name": "OR",
+   "statistic": 0.3243589743589744,
+   "p": 0.003872834388516406,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio of completing (fraud vs honest)",
+   "effect": 0.3243589743589744,
+   "ci_low": 0.15596054417474625,
+   "ci_high": 0.674585644746946,
+   "n": {
+    "honest": 62,
+    "fraud": 62
+   },
+   "summary": {
+    "honest": {
+     "consented": 62,
+     "completed": 39,
+     "rate": 0.6290322580645161,
+     "ci_low": 0.5045796412346053,
+     "ci_high": 0.7384283401585889
+    },
+    "fraud": {
+     "consented": 62,
+     "completed": 22,
+     "rate": 0.3548387096774194,
+     "ci_low": 0.24742732851049892,
+     "ci_high": 0.4791886924221576
+    }
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H1.itt.invested_r1",
+   "hypothesis": "H1",
+   "role": "robustness",
+   "outcome": "invested_r1",
+   "prediction": "fraud > honest (ITT: everyone who reached home)",
+   "test": "Fisher's exact test (two-sided)",
+   "statistic_name": "OR",
+   "statistic": 2.1,
+   "p": 0.3368088440451513,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio (fraud vs honest)",
+   "effect": 2.1,
+   "ci_low": 0.5048092473607497,
+   "ci_high": 8.735973088956708,
+   "n": {
+    "fraud": 39,
+    "honest": 47
+   },
+   "summary": {
+    "fraud": {
+     "n": 39,
+     "yes": 36,
+     "share": 0.9230769230769231,
+     "ci_low": 0.7967892883204502,
+     "ci_high": 0.9734926046962202
+    },
+    "honest": {
+     "n": 47,
+     "yes": 40,
+     "share": 0.851063829787234,
+     "ci_low": 0.7231437757640644,
+     "ci_high": 0.9259328000356828
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater",
+   "risk_difference": 0.07201309328968908
+  },
+  {
+   "id": "H1.itt.decision_time",
+   "hypothesis": "H1",
+   "role": "robustness",
+   "outcome": "decision_time_first_invest",
+   "prediction": "fraud < honest (ITT: everyone who reached home)",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 1116.0,
+   "p": 0.8853431059213348,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": 0.017783857729138167,
+   "ci_low": -0.22482900136798906,
+   "ci_high": 0.25125398996808024,
+   "n": {
+    "fraud": 43,
+    "honest": 51
+   },
+   "summary": {
+    "fraud": {
+     "n": 43,
+     "mean": 33.50409302325581,
+     "median": 19.288,
+     "q1": 13.7095,
+     "q3": 35.308,
+     "min": 1.23,
+     "max": 172.222
+    },
+    "honest": {
+     "n": 51,
+     "mean": 27.052960784313726,
+     "median": 19.804,
+     "q1": 14.259,
+     "q3": 30.5485,
+     "min": 3.181,
+     "max": 134.325
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "less"
+  },
+  {
+   "id": "H1.itt.r1_amount",
+   "hypothesis": "H1",
+   "role": "robustness",
+   "outcome": "r1_amount",
+   "prediction": "fraud > honest (ITT: everyone who reached home)",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 1152.5,
+   "p": 0.036797330925999246,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": 0.2575013638843426,
+   "ci_low": 0.029446262956901257,
+   "ci_high": 0.4844653573376977,
+   "n": {
+    "fraud": 39,
+    "honest": 47
+   },
+   "summary": {
+    "fraud": {
+     "n": 39,
+     "mean": 2800.0,
+     "median": 1000.0,
+     "q1": 750.0,
+     "q3": 3500.0,
+     "min": 0.0,
+     "max": 10000.0
+    },
+    "honest": {
+     "n": 47,
+     "mean": 1353.1914893617022,
+     "median": 1000.0,
+     "q1": 500.0,
+     "q3": 2000.0,
+     "min": 0.0,
+     "max": 10000.0
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H2.itt.escalation_ratio",
+   "hypothesis": "H2",
+   "role": "robustness",
+   "outcome": "escalation_ratio",
+   "prediction": "small_win > flat (ITT: everyone who played round 2 with r1 > 0)",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 592.0,
+   "p": 0.5137712228821427,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (small_win vs flat)",
+   "effect": -0.08641975308641975,
+   "ci_low": -0.33103780864197535,
+   "ci_high": 0.1775270061728392,
+   "n": {
+    "small_win": 36,
+    "flat": 36
+   },
+   "summary": {
+    "small_win": {
+     "n": 36,
+     "mean": 1.8194444444444444,
+     "median": 1.0,
+     "q1": 1.0,
+     "q3": 1.25,
+     "min": 0.0,
+     "max": 20.0
+    },
+    "flat": {
+     "n": 36,
+     "mean": 2.1041666666666665,
+     "median": 1.0,
+     "q1": 0.5,
+     "q3": 2.0,
+     "min": 0.0,
+     "max": 20.0
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "small_win",
+    "flat"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H2.itt.r2_amount",
+   "hypothesis": "H2",
+   "role": "robustness",
+   "outcome": "r2_amount",
+   "prediction": "small_win > flat (ITT: everyone who played round 2)",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 700.5,
+   "p": 0.25814590623141553,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (small_win vs flat)",
+   "effect": -0.1446886446886447,
+   "ci_low": -0.39197191697191697,
+   "ci_high": 0.10871489621489597,
+   "n": {
+    "small_win": 39,
+    "flat": 42
+   },
+   "summary": {
+    "small_win": {
+     "n": 39,
+     "mean": 2251.2820512820513,
+     "median": 1000.0,
+     "q1": 500.0,
+     "q3": 2000.0,
+     "min": 0.0,
+     "max": 10000.0
+    },
+    "flat": {
+     "n": 42,
+     "mean": 2761.904761904762,
+     "median": 1500.0,
+     "q1": 500.0,
+     "q3": 4750.0,
+     "min": 0.0,
+     "max": 10000.0
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "small_win",
+    "flat"
+   ],
+   "predicted": "greater"
+  }
+ ],
  "sections": {
   "checks": {
    "factor_counts": [
@@ -170,6 +459,419 @@
     "rounds": 2
    },
    "overconfidence_recomputed_n": 61
+  },
+  "attrition": {
+   "consented": 124,
+   "completed": 61,
+   "completion_by_factor": [
+    {
+     "factor": "skin",
+     "level": "fraud",
+     "consented": 62,
+     "completed": 22,
+     "completion_rate": 0.3548387096774194,
+     "ci_low": 0.24742732851049892,
+     "ci_high": 0.4791886924221576,
+     "odds_ratio_first_vs_second": 0.3243589743589744,
+     "or_ci_low": 0.15596054417474625,
+     "or_ci_high": 0.674585644746946,
+     "fisher_p": 0.003872834388516406
+    },
+    {
+     "factor": "skin",
+     "level": "honest",
+     "consented": 62,
+     "completed": 39,
+     "completion_rate": 0.6290322580645161,
+     "ci_low": 0.5045796412346053,
+     "ci_high": 0.7384283401585889,
+     "odds_ratio_first_vs_second": 0.3243589743589744,
+     "or_ci_low": 0.15596054417474625,
+     "or_ci_high": 0.674585644746946,
+     "fisher_p": 0.003872834388516406
+    },
+    {
+     "factor": "round1_outcome",
+     "level": "flat",
+     "consented": 62,
+     "completed": 32,
+     "completion_rate": 0.5161290322580645,
+     "ci_low": 0.39447459605660673,
+     "ci_high": 0.6359014016175426,
+     "odds_ratio_first_vs_second": 1.2137931034482758,
+     "or_ci_low": 0.5997628411236797,
+     "or_ci_high": 2.4564604489639974,
+     "fisher_p": 0.719570855636793
+    },
+    {
+     "factor": "round1_outcome",
+     "level": "small_win",
+     "consented": 62,
+     "completed": 29,
+     "completion_rate": 0.46774193548387094,
+     "ci_low": 0.3490883297333416,
+     "ci_high": 0.5901596749183599,
+     "odds_ratio_first_vs_second": 1.2137931034482758,
+     "or_ci_low": 0.5997628411236797,
+     "or_ci_high": 2.4564604489639974,
+     "fisher_p": 0.719570855636793
+    },
+    {
+     "factor": "pool_source",
+     "level": "ad",
+     "consented": 62,
+     "completed": 31,
+     "completion_rate": 0.5,
+     "ci_low": 0.37922741194566073,
+     "ci_high": 0.6207725880543392,
+     "odds_ratio_first_vs_second": 1.0666666666666667,
+     "or_ci_low": 0.5274519087579128,
+     "or_ci_high": 2.157121358148292,
+     "fisher_p": 1.0
+    },
+    {
+     "factor": "pool_source",
+     "level": "friend",
+     "consented": 62,
+     "completed": 30,
+     "completion_rate": 0.4838709677419355,
+     "ci_low": 0.36409859838245745,
+     "ci_high": 0.6055254039433934,
+     "odds_ratio_first_vs_second": 1.0666666666666667,
+     "or_ci_low": 0.5274519087579128,
+     "or_ci_high": 2.157121358148292,
+     "fisher_p": 1.0
+    },
+    {
+     "factor": "withdrawal_offer",
+     "level": "allowed",
+     "consented": 62,
+     "completed": 33,
+     "completion_rate": 0.532258064516129,
+     "ci_low": 0.4098403250816401,
+     "ci_high": 0.6509116702666584,
+     "odds_ratio_first_vs_second": 1.3817733990147782,
+     "or_ci_low": 0.6817579200849383,
+     "or_ci_high": 2.800550855334368,
+     "fisher_p": 0.47260200690783205
+    },
+    {
+     "factor": "withdrawal_offer",
+     "level": "not_offered",
+     "consented": 62,
+     "completed": 28,
+     "completion_rate": 0.45161290322580644,
+     "ci_low": 0.3341971316759952,
+     "ci_high": 0.5746748753015569,
+     "odds_ratio_first_vs_second": 1.3817733990147782,
+     "or_ci_low": 0.6817579200849383,
+     "or_ci_high": 2.800550855334368,
+     "fisher_p": 0.47260200690783205
+    },
+    {
+     "factor": "reinvest_framing",
+     "level": "main",
+     "consented": 62,
+     "completed": 32,
+     "completion_rate": 0.5161290322580645,
+     "ci_low": 0.39447459605660673,
+     "ci_high": 0.6359014016175426,
+     "odds_ratio_first_vs_second": 1.2137931034482758,
+     "or_ci_low": 0.5997628411236797,
+     "or_ci_high": 2.4564604489639974,
+     "fisher_p": 0.719570855636793
+    },
+    {
+     "factor": "reinvest_framing",
+     "level": "profit",
+     "consented": 62,
+     "completed": 29,
+     "completion_rate": 0.46774193548387094,
+     "ci_low": 0.3490883297333416,
+     "ci_high": 0.5901596749183599,
+     "odds_ratio_first_vs_second": 1.2137931034482758,
+     "or_ci_low": 0.5997628411236797,
+     "or_ci_high": 2.4564604489639974,
+     "fisher_p": 0.719570855636793
+    }
+   ],
+   "completion_skin": {
+    "honest": {
+     "consented": 62,
+     "completed": 39,
+     "rate": 0.6290322580645161,
+     "ci_low": 0.5045796412346053,
+     "ci_high": 0.7384283401585889
+    },
+    "fraud": {
+     "consented": 62,
+     "completed": 22,
+     "rate": 0.3548387096774194,
+     "ci_low": 0.24742732851049892,
+     "ci_high": 0.4791886924221576
+    }
+   },
+   "completion_skin_p": 0.003872834388516406,
+   "completion_skin_or": [
+    0.3243589743589744,
+    0.15596054417474625,
+    0.674585644746946
+   ],
+   "funnel": [
+    {
+     "milestone": "Consented",
+     "step": "g:profile:0",
+     "skin": "honest",
+     "reached": 62,
+     "share_of_consented": 1.0
+    },
+    {
+     "milestone": "Consented",
+     "step": "g:profile:0",
+     "skin": "fraud",
+     "reached": 62,
+     "share_of_consented": 1.0
+    },
+    {
+     "milestone": "Profile done (home)",
+     "step": "g:home",
+     "skin": "honest",
+     "reached": 57,
+     "share_of_consented": 0.9193548387096774
+    },
+    {
+     "milestone": "Profile done (home)",
+     "step": "g:home",
+     "skin": "fraud",
+     "reached": 54,
+     "share_of_consented": 0.8709677419354839
+    },
+    {
+     "milestone": "Round 1",
+     "step": "g:round:1",
+     "skin": "honest",
+     "reached": 50,
+     "share_of_consented": 0.8064516129032258
+    },
+    {
+     "milestone": "Round 1",
+     "step": "g:round:1",
+     "skin": "fraud",
+     "reached": 43,
+     "share_of_consented": 0.6935483870967742
+    },
+    {
+     "milestone": "Round 2",
+     "step": "g:round:2",
+     "skin": "honest",
+     "reached": 46,
+     "share_of_consented": 0.7419354838709677
+    },
+    {
+     "milestone": "Round 2",
+     "step": "g:round:2",
+     "skin": "fraud",
+     "reached": 37,
+     "share_of_consented": 0.5967741935483871
+    },
+    {
+     "milestone": "Round 3",
+     "step": "g:round:3",
+     "skin": "honest",
+     "reached": 45,
+     "share_of_consented": 0.7258064516129032
+    },
+    {
+     "milestone": "Round 3",
+     "step": "g:round:3",
+     "skin": "fraud",
+     "reached": 35,
+     "share_of_consented": 0.5645161290322581
+    },
+    {
+     "milestone": "Round 4",
+     "step": "g:round:4",
+     "skin": "honest",
+     "reached": 43,
+     "share_of_consented": 0.6935483870967742
+    },
+    {
+     "milestone": "Round 4",
+     "step": "g:round:4",
+     "skin": "fraud",
+     "reached": 34,
+     "share_of_consented": 0.5483870967741935
+    },
+    {
+     "milestone": "Flash deals",
+     "step": "g:deal",
+     "skin": "honest",
+     "reached": 43,
+     "share_of_consented": 0.6935483870967742
+    },
+    {
+     "milestone": "Flash deals",
+     "step": "g:deal",
+     "skin": "fraud",
+     "reached": 31,
+     "share_of_consented": 0.5
+    },
+    {
+     "milestone": "Pool invite",
+     "step": "g:pool",
+     "skin": "honest",
+     "reached": 43,
+     "share_of_consented": 0.6935483870967742
+    },
+    {
+     "milestone": "Pool invite",
+     "step": "g:pool",
+     "skin": "fraud",
+     "reached": 31,
+     "share_of_consented": 0.5
+    },
+    {
+     "milestone": "Test withdrawal",
+     "step": "g:withdraw",
+     "skin": "honest",
+     "reached": 43,
+     "share_of_consented": 0.6935483870967742
+    },
+    {
+     "milestone": "Test withdrawal",
+     "step": "g:withdraw",
+     "skin": "fraud",
+     "reached": 31,
+     "share_of_consented": 0.5
+    },
+    {
+     "milestone": "Gold Plan",
+     "step": "g:reinvest",
+     "skin": "honest",
+     "reached": 42,
+     "share_of_consented": 0.6774193548387096
+    },
+    {
+     "milestone": "Gold Plan",
+     "step": "g:reinvest",
+     "skin": "fraud",
+     "reached": 29,
+     "share_of_consented": 0.46774193548387094
+    },
+    {
+     "milestone": "Market crash",
+     "step": "g:crash",
+     "skin": "honest",
+     "reached": 41,
+     "share_of_consented": 0.6612903225806451
+    },
+    {
+     "milestone": "Market crash",
+     "step": "g:crash",
+     "skin": "fraud",
+     "reached": 27,
+     "share_of_consented": 0.43548387096774194
+    },
+    {
+     "milestone": "Cash out",
+     "step": "g:cashout",
+     "skin": "honest",
+     "reached": 41,
+     "share_of_consented": 0.6612903225806451
+    },
+    {
+     "milestone": "Cash out",
+     "step": "g:cashout",
+     "skin": "fraud",
+     "reached": 26,
+     "share_of_consented": 0.41935483870967744
+    },
+    {
+     "milestone": "Trust/urgency sliders",
+     "step": "g:react:7",
+     "skin": "honest",
+     "reached": 40,
+     "share_of_consented": 0.6451612903225806
+    },
+    {
+     "milestone": "Trust/urgency sliders",
+     "step": "g:react:7",
+     "skin": "fraud",
+     "reached": 22,
+     "share_of_consented": 0.3548387096774194
+    },
+    {
+     "milestone": "Report card (completed)",
+     "step": "g:report",
+     "skin": "honest",
+     "reached": 39,
+     "share_of_consented": 0.6290322580645161
+    },
+    {
+     "milestone": "Report card (completed)",
+     "step": "g:report",
+     "skin": "fraud",
+     "reached": 22,
+     "share_of_consented": 0.3548387096774194
+    }
+   ],
+   "dropout_phase": [
+    {
+     "phase": "during profile (before the home screen)",
+     "honest": 5,
+     "honest_share_of_consented": 0.08064516129032258,
+     "fraud": 8,
+     "fraud_share_of_consented": 0.12903225806451613,
+     "fisher_p_fraud_vs_honest": 0.5592773643635277
+    },
+    {
+     "phase": "on the home screen",
+     "honest": 6,
+     "honest_share_of_consented": 0.0967741935483871,
+     "fraud": 11,
+     "fraud_share_of_consented": 0.1774193548387097,
+     "fisher_p_fraud_vs_honest": 0.29632755040249936
+    },
+    {
+     "phase": "after the home screen (in the game)",
+     "honest": 12,
+     "honest_share_of_consented": 0.1935483870967742,
+     "fraud": 21,
+     "fraud_share_of_consented": 0.3387096774193548,
+     "fisher_p_fraud_vs_honest": 0.10323449532890121
+    }
+   ],
+   "home_dropouts_detail": {
+    "honest": {
+     "n": 6,
+     "made_s3_decision": 0,
+     "closed_vip_popup": 0
+    },
+    "fraud": {
+     "n": 11,
+     "made_s3_decision": 0,
+     "closed_vip_popup": 11
+    }
+   },
+   "itt": {
+    "reached_home": {
+     "honest": 57,
+     "fraud": 54
+    },
+    "with_s3_decision": {
+     "honest": 51,
+     "fraud": 43
+    },
+    "with_round1": {
+     "honest": 47,
+     "fraud": 39
+    },
+    "with_round2": {
+     "small_win": 39,
+     "flat": 42
+    },
+    "non_completers_included": 50
+   }
   }
  },
  "problems": []

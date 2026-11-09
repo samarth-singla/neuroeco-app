@@ -1,0 +1,4 @@
+phase,honest,honest_share_of_consented,fraud,fraud_share_of_consented,fisher_p_fraud_vs_honest
+during profile (before the home screen),5,0.08064516129032258,8,0.12903225806451613,0.5592773643635277
+on the home screen,6,0.0967741935483871,11,0.1774193548387097,0.29632755040249936
+after the home screen (in the game),12,0.1935483870967742,21,0.3387096774193548,0.10323449532890121

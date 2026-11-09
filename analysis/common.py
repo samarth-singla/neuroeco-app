@@ -253,7 +253,7 @@ class Registry:
         hyps = [self.hypotheses[h] for h in order if h in self.hypotheses]
         out = {"meta": meta, "hypotheses": hyps, "tests": self.tests, "sections": self.sections,
                "problems": self.problems}
-        with open(path, "w", encoding="utf-8") as f:
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
             json.dump(_jsonable(out), f, indent=1, ensure_ascii=False)
 
 
@@ -336,7 +336,7 @@ def share_record(reg: Registry, *, id, hypothesis, role, outcome, series: pd.Ser
 
 def save_table(df: pd.DataFrame, name: str) -> str:
     path = os.path.join(TABLES, name + ".csv")
-    df.to_csv(path, index=False, encoding="utf-8")
+    df.to_csv(path, index=False, encoding="utf-8", lineterminator="\n")
     return path
 
 

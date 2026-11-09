@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import attrition  # noqa: E402
 import checks  # noqa: E402
 from common import FIGURES, RESULTS, TABLES, Registry, ensure_dirs, prepare_wide, read_csv, style  # noqa: E402
 
@@ -57,6 +58,7 @@ def main() -> None:
     df = prepare_wide()
 
     checks.run(reg, df)
+    attrition.run(reg, df)
 
     reg.save(os.path.join(RESULTS, "results.json"), meta(df))
     print("done:", os.path.join(RESULTS, "results.json"))
