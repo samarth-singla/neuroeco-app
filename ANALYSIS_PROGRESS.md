@@ -117,3 +117,23 @@ figure per hypothesis in `results/figures/`, every test in `results/results.json
   risk-attitude column). No synthetic data was written to `data/` or `results/`. The test exposed and fixed two
   figure issues: tick-label clutter on the log axis, and point offsets when there is a single bias.
 - `pyyaml` was added to `analysis/requirements.txt` to read the config.
+
+## Step 5 — Survey (2026-11-09)
+
+**Status:** done. Module `analysis/survey.py`; tables `results/tables/survey_*.csv`; figures
+`survey_tricks_seen.png`, `survey_what_stopped.png`, `survey_vs_app.png`; section `survey` in results.json.
+
+- Cleaning follows C5, adapted to the real headers (matched by their "Q1." … "Q11." prefixes). The one
+  non-consenting row was dropped, leaving 45 respondents (2026-11-02 to 2026-11-09).
+- Deviation from the C5 recipe: its launch-date filter (`>= 2026-11-03`) would drop the 14 responses from
+  2026-11-02, the day collection started (the app database was reset that day). The prompt asks to drop only the
+  non-consenting row, so the filter uses 2026-11-02 and drops nothing.
+- Branching checks pass (nobody answered Section B without Q1 = Yes or Q6–Q11 after Q5 = No). Nobody ticked "None"
+  together with another trick.
+- Results: approached 34 of 43 who answered yes or no (79%; the 2 "Not sure" are blank). Most-seen tricks: countdown
+  timer, live withdrawal messages, very high returns, referral bonus. Main channel: social media ads (17 of 34); a
+  friend/family referral only 1 of 34. Invested: 3 of 34 approached, reported as counts only.
+- "What stopped you" was answered by 24 of 31 approached non-investors. Top reasons: too good to be true (13) and
+  not interested (12); 7 checked and found it unregistered.
+- The survey-vs-app figure pairs the 7 features both measure. The app timer card covers the countdown and the slots
+  counter, so its survey counterpart is "timer OR slots".

@@ -1,7 +1,7 @@
 {
  "meta": {
   "title": "Behavioral Mechanics of App-Based Investment Frauds",
-  "generated_at": "2026-11-09 09:35 UTC",
+  "generated_at": "2026-11-09 09:36 UTC",
   "consented": 124,
   "consented_by_skin": {
    "honest": 62,
@@ -3728,6 +3728,409 @@
      "weights.column"
     ]
    }
+  },
+  "survey": {
+   "rows_in_file": 46,
+   "non_consenting_dropped": 1,
+   "dropped_before_launch": 0,
+   "first_response": "2026-11-02",
+   "last_response": "2026-11-09",
+   "none_with_other_options": 0,
+   "branching_q1_not_yes_but_answered_section_b": 0,
+   "branching_q5_no_but_answered_q6_q11": 0,
+   "q1_counts": {
+    "Yes": 34,
+    "No": 9,
+    "Not sure": 2
+   },
+   "respondents": 45,
+   "approached": {
+    "yes": 34,
+    "n": 43,
+    "share": 0.7906976744186046,
+    "ci_low": 0.6479435728926356,
+    "ci_high": 0.885771657790044
+   },
+   "approached_past_12m": {
+    "yes": 23,
+    "n": 34,
+    "share": 0.6764705882352942,
+    "ci_low": 0.508428945939082,
+    "ci_high": 0.808683564359745
+   },
+   "tricks_seen": [
+    {
+     "variable": "sv_seen_timer",
+     "trick": "Countdown timer / \"offer ends soon\"",
+     "yes": 26,
+     "n": 45,
+     "share": 0.5777777777777777,
+     "ci_low": 0.4330078870920313,
+     "ci_high": 0.710312975327297
+    },
+    {
+     "variable": "sv_seen_social",
+     "trick": "Live withdrawal messages / testimonials",
+     "yes": 24,
+     "n": 45,
+     "share": 0.5333333333333333,
+     "ci_low": 0.3907745474012537,
+     "ci_high": 0.670648679349887
+    },
+    {
+     "variable": "sv_seen_high_returns",
+     "trick": "Very high / \"guaranteed\" returns",
+     "yes": 23,
+     "n": 45,
+     "share": 0.5111111111111111,
+     "ci_low": 0.3700446464458318,
+     "ci_high": 0.650429762471215
+    },
+    {
+     "variable": "sv_seen_referral",
+     "trick": "Referral bonus / \"your friend joined\"",
+     "yes": 23,
+     "n": 45,
+     "share": 0.5111111111111111,
+     "ci_low": 0.3700446464458318,
+     "ci_high": 0.650429762471215
+    },
+    {
+     "variable": "sv_seen_slots",
+     "trick": "\"Only X slots left\"",
+     "yes": 20,
+     "n": 45,
+     "share": 0.4444444444444444,
+     "ci_low": 0.30938930034997575,
+     "ci_high": 0.5882386550647896
+    },
+    {
+     "variable": "sv_seen_locked_bonus",
+     "trick": "Sign-up bonus locked until deposit",
+     "yes": 17,
+     "n": 45,
+     "share": 0.37777777777777777,
+     "ci_low": 0.2510808467213791,
+     "ci_high": 0.5237006551911046
+    },
+    {
+     "variable": "sv_seen_mentor",
+     "trick": "Mentor / advisor / \"support\" pushing deposits",
+     "yes": 9,
+     "n": 45,
+     "share": 0.2,
+     "ci_low": 0.10896126807831281,
+     "ci_high": 0.3382296911614202
+    },
+    {
+     "variable": "sv_seen_vip",
+     "trick": "VIP levels / higher returns for bigger deposits",
+     "yes": 8,
+     "n": 45,
+     "share": 0.17777777777777778,
+     "ci_low": 0.09294389514104145,
+     "ci_high": 0.3132982462645977
+    },
+    {
+     "variable": "sv_seen_badge",
+     "trick": "Registration badge / certificate / regulator logo",
+     "yes": 8,
+     "n": 45,
+     "share": 0.17777777777777778,
+     "ci_low": 0.09294389514104145,
+     "ci_high": 0.3132982462645977
+    },
+    {
+     "variable": "sv_seen_withdraw_block",
+     "trick": "Withdrawal blocked until a fee / tax is paid",
+     "yes": 7,
+     "n": 45,
+     "share": 0.15555555555555556,
+     "ci_low": 0.07745423484758265,
+     "ci_high": 0.2878390887239627
+    },
+    {
+     "variable": "sv_seen_none",
+     "trick": "None of these",
+     "yes": 7,
+     "n": 45,
+     "share": 0.15555555555555556,
+     "ci_low": 0.07745423484758265,
+     "ci_high": 0.2878390887239627
+    }
+   ],
+   "seen_count_mean": 3.6666666666666665,
+   "channels": [
+    {
+     "channel": "Social media ad",
+     "yes": 17,
+     "n": 34,
+     "share": 0.5,
+     "ci_low": 0.3406932564568249,
+     "ci_high": 0.6593067435431751
+    },
+    {
+     "channel": "Messaging group (WhatsApp / Telegram)",
+     "yes": 8,
+     "n": 34,
+     "share": 0.23529411764705882,
+     "ci_low": 0.12436985532639577,
+     "ci_high": 0.3999613792253639
+    },
+    {
+     "channel": "Cold call or SMS",
+     "yes": 6,
+     "n": 34,
+     "share": 0.17647058823529413,
+     "ci_low": 0.08348969045372318,
+     "ci_high": 0.3351373739984275
+    },
+    {
+     "channel": "Other",
+     "yes": 1,
+     "n": 34,
+     "share": 0.029411764705882353,
+     "ci_low": 0.0052109062762689395,
+     "ci_high": 0.14915573292685935
+    },
+    {
+     "channel": "Influencer or celebrity promotion",
+     "yes": 1,
+     "n": 34,
+     "share": 0.029411764705882353,
+     "ci_low": 0.0052109062762689395,
+     "ci_high": 0.14915573292685935
+    },
+    {
+     "channel": "Friend or family referral",
+     "yes": 1,
+     "n": 34,
+     "share": 0.029411764705882353,
+     "ci_low": 0.0052109062762689395,
+     "ci_high": 0.14915573292685935
+    }
+   ],
+   "invested_count": {
+    "yes": 3,
+    "of": 34
+   },
+   "invested_items": [
+    {
+     "question": "Q6",
+     "item": "First amount small (under ₹1,000)",
+     "yes": 2,
+     "no": 1,
+     "dont_remember_or_blank": 0,
+     "of_invested": 3,
+     "bands": null
+    },
+    {
+     "question": "Q7",
+     "item": "App showed profits early on",
+     "yes": 1,
+     "no": 1,
+     "dont_remember_or_blank": 1,
+     "of_invested": 3,
+     "bands": null
+    },
+    {
+     "question": "Q8",
+     "item": "A small withdrawal worked first",
+     "yes": 1,
+     "no": 2,
+     "dont_remember_or_blank": 0,
+     "of_invested": 3,
+     "bands": null
+    },
+    {
+     "question": "Q9",
+     "item": "Reinvested shown profits",
+     "yes": 2,
+     "no": 1,
+     "dont_remember_or_blank": 0,
+     "of_invested": 3,
+     "bands": null
+    },
+    {
+     "question": "Q10",
+     "item": "Put in more after a loss / blocked withdrawal",
+     "yes": 0,
+     "no": 3,
+     "dont_remember_or_blank": 0,
+     "of_invested": 3,
+     "bands": null
+    },
+    {
+     "question": "Q11",
+     "item": "Amount lost (counts per band)",
+     "yes": null,
+     "no": null,
+     "dont_remember_or_blank": null,
+     "of_invested": 3,
+     "bands": "Under ₹1,000: 1; ₹10,001–1,00,000: 1; ₹1,000–10,000: 1"
+    }
+   ],
+   "what_stopped": [
+    {
+     "reason": "It seemed too good to be true",
+     "yes": 13,
+     "n": 24,
+     "share": 0.5416666666666666,
+     "ci_low": 0.3507486535891947,
+     "ci_high": 0.7210866626878901
+    },
+    {
+     "reason": "I just wasn't interested",
+     "yes": 12,
+     "n": 24,
+     "share": 0.5,
+     "ci_low": 0.3142742581957335,
+     "ci_high": 0.6857257418042665
+    },
+    {
+     "reason": "I checked and it wasn't registered / legitimate",
+     "yes": 7,
+     "n": 24,
+     "share": 0.2916666666666667,
+     "ci_low": 0.14914648196960875,
+     "ci_high": 0.4916769366449665
+    },
+    {
+     "reason": "I didn't have money to invest",
+     "yes": 3,
+     "n": 24,
+     "share": 0.125,
+     "ci_low": 0.04344334080123441,
+     "ci_high": 0.31003881270500083
+    },
+    {
+     "reason": "Someone warned me",
+     "yes": 1,
+     "n": 24,
+     "share": 0.041666666666666664,
+     "ci_low": 0.007393456165505796,
+     "ci_high": 0.20241806478655947
+    },
+    {
+     "reason": "Other",
+     "yes": 1,
+     "n": 24,
+     "share": 0.041666666666666664,
+     "ci_low": 0.007393456165505796,
+     "ci_high": 0.20241806478655947
+    }
+   ],
+   "what_stopped_answered": {
+    "answered": 24,
+    "of_non_investors": 31
+   },
+   "survey_vs_app": [
+    {
+     "feature": "Countdown timer / slots left",
+     "survey_variable": "sv_seen_timer_or_slots",
+     "app_variable": "feature_push_timer",
+     "survey_seen_share": 0.6222222222222222,
+     "survey_ci_low": 0.47629934480889535,
+     "survey_ci_high": 0.7489191532786209,
+     "survey_n": 45,
+     "survey_yes": 28,
+     "app_pushed_share": 0.5454545454545454,
+     "app_ci_low": 0.3465979532073493,
+     "app_ci_high": 0.7307970581918668,
+     "app_n": 22,
+     "app_yes": 12
+    },
+    {
+     "feature": "Locked sign-up bonus",
+     "survey_variable": "sv_seen_locked_bonus",
+     "app_variable": "feature_push_bonus",
+     "survey_seen_share": 0.37777777777777777,
+     "survey_ci_low": 0.2510808467213791,
+     "survey_ci_high": 0.5237006551911046,
+     "survey_n": 45,
+     "survey_yes": 17,
+     "app_pushed_share": 0.7272727272727273,
+     "app_ci_low": 0.5184826598759761,
+     "app_ci_high": 0.8684923971201054,
+     "app_n": 22,
+     "app_yes": 16
+    },
+    {
+     "feature": "VIP levels",
+     "survey_variable": "sv_seen_vip",
+     "app_variable": "feature_push_vip",
+     "survey_seen_share": 0.17777777777777778,
+     "survey_ci_low": 0.09294389514104145,
+     "survey_ci_high": 0.3132982462645977,
+     "survey_n": 45,
+     "survey_yes": 8,
+     "app_pushed_share": 0.6818181818181818,
+     "app_ci_low": 0.47318597741042745,
+     "app_ci_high": 0.8363940681864375,
+     "app_n": 22,
+     "app_yes": 15
+    },
+    {
+     "feature": "Badge / certificate",
+     "survey_variable": "sv_seen_badge",
+     "app_variable": "feature_push_regulator",
+     "survey_seen_share": 0.17777777777777778,
+     "survey_ci_low": 0.09294389514104145,
+     "survey_ci_high": 0.3132982462645977,
+     "survey_n": 45,
+     "survey_yes": 8,
+     "app_pushed_share": 0.8181818181818182,
+     "app_ci_low": 0.6148339256287345,
+     "app_ci_high": 0.9269311541657794,
+     "app_n": 22,
+     "app_yes": 18
+    },
+    {
+     "feature": "Social proof (live withdrawals)",
+     "survey_variable": "sv_seen_social",
+     "app_variable": "feature_push_social",
+     "survey_seen_share": 0.5333333333333333,
+     "survey_ci_low": 0.3907745474012537,
+     "survey_ci_high": 0.670648679349887,
+     "survey_n": 45,
+     "survey_yes": 24,
+     "app_pushed_share": 0.36363636363636365,
+     "app_ci_low": 0.19733204670366128,
+     "app_ci_high": 0.57048291909869,
+     "app_n": 22,
+     "app_yes": 8
+    },
+    {
+     "feature": "Mentor / advisor chat",
+     "survey_variable": "sv_seen_mentor",
+     "app_variable": "feature_push_chat",
+     "survey_seen_share": 0.2,
+     "survey_ci_low": 0.10896126807831281,
+     "survey_ci_high": 0.3382296911614202,
+     "survey_n": 45,
+     "survey_yes": 9,
+     "app_pushed_share": 0.5454545454545454,
+     "app_ci_low": 0.3465979532073493,
+     "app_ci_high": 0.7307970581918668,
+     "app_n": 22,
+     "app_yes": 12
+    },
+    {
+     "feature": "Withdrawal blocked by a fee / tax",
+     "survey_variable": "sv_seen_withdraw_block",
+     "app_variable": "feature_push_tax",
+     "survey_seen_share": 0.15555555555555556,
+     "survey_ci_low": 0.07745423484758265,
+     "survey_ci_high": 0.2878390887239627,
+     "survey_n": 45,
+     "survey_yes": 7,
+     "app_pushed_share": 0.6818181818181818,
+     "app_ci_low": 0.47318597741042745,
+     "app_ci_high": 0.8363940681864375,
+     "app_n": 22,
+     "app_yes": 15
+    }
+   ]
   },
   "holm_families": {
    "H1": [

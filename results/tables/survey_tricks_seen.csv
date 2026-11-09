@@ -1,0 +1,12 @@
+variable,trick,yes,n,share,ci_low,ci_high
+sv_seen_timer,"Countdown timer / ""offer ends soon""",26,45,0.5777777777777777,0.4330078870920313,0.710312975327297
+sv_seen_social,Live withdrawal messages / testimonials,24,45,0.5333333333333333,0.3907745474012537,0.670648679349887
+sv_seen_high_returns,"Very high / ""guaranteed"" returns",23,45,0.5111111111111111,0.3700446464458318,0.650429762471215
+sv_seen_referral,"Referral bonus / ""your friend joined""",23,45,0.5111111111111111,0.3700446464458318,0.650429762471215
+sv_seen_slots,"""Only X slots left""",20,45,0.4444444444444444,0.30938930034997575,0.5882386550647896
+sv_seen_locked_bonus,Sign-up bonus locked until deposit,17,45,0.37777777777777777,0.2510808467213791,0.5237006551911046
+sv_seen_mentor,"Mentor / advisor / ""support"" pushing deposits",9,45,0.2,0.10896126807831281,0.3382296911614202
+sv_seen_vip,VIP levels / higher returns for bigger deposits,8,45,0.17777777777777778,0.09294389514104145,0.3132982462645977
+sv_seen_badge,Registration badge / certificate / regulator logo,8,45,0.17777777777777778,0.09294389514104145,0.3132982462645977
+sv_seen_withdraw_block,Withdrawal blocked until a fee / tax is paid,7,45,0.15555555555555556,0.07745423484758265,0.2878390887239627
+sv_seen_none,None of these,7,45,0.15555555555555556,0.07745423484758265,0.2878390887239627
