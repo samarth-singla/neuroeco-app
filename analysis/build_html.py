@@ -12,7 +12,7 @@ import re
 import pandas as pd
 
 from common import FIGURES, RESULTS
-from narrative import (R, VERDICT_CLASS, dataset_block, dataset_headline, ext_done, attrition_bias, attrition_paragraphs, headline, held_lists, ids_for,
+from narrative import (R, VERDICT_CLASS, key_takeaways, plain_answer, dataset_block, dataset_headline, ext_done, attrition_bias, attrition_paragraphs, headline, held_lists, ids_for,
                        itt_changes, limitations, load, n_text, not_justified, pct, result_paragraphs, robustness,
                        test_rows)
 from report import scorecard_rows
@@ -119,7 +119,7 @@ def hyp_section(r: R, hid: str) -> str:
     sp, h = SPEC[hid], r.hyps[hid]
     parts = [f'<div class="verdict-line">{badge(h["verdict"], h.get("label"))}<span>{inline(h["verdict_reason"])}</span></div>']
     parts.append(f'<div class="block"><h3>What we claimed</h3><p>{inline(sp["claim"])}</p></div>')
-    parts.append(f'<div class="block"><h3>How the experiment tests it</h3><p>{inline(sp["how"])}</p></div>')
+    parts.append(f'<div class="block"><h3>How does our experiment test this?</h3><p>{inline(sp["how"])}</p></div>')
     parts.append(f'<div class="block"><h3>The maths</h3><pre class="maths">{html.escape(sp["maths"])}</pre></div>')
     figs = "".join(fig(f, f"{hid} figure") for f in dict.fromkeys(sp["figures"]))
     parts.append(f'<div class="block"><h3>Result</h3>{figs}{paras(result_paragraphs(r, hid))}'
@@ -140,8 +140,8 @@ def hyp_section(r: R, hid: str) -> str:
                 inner.append(fig(item, f"{hid} dataset figure"))
         parts.append('<div class="block dataset">' + "".join(inner) + "</div>")
     nj = not_justified(r, hid)
-    parts.append(f'<div class="block caution"><h3>Verdict and what the data does NOT justify</h3>'
-                 f'<p>{badge(h["verdict"], h.get("label"))}</p>{bullets(nj)}</div>')
+    parts.append(f'<div class="block caution"><h3>What did we claim that the results do not justify?</h3>'
+                 f'<p>{badge(h["verdict"], h.get("label"))} {inline(plain_answer(r, hid))}</p>{bullets(nj)}</div>')
     rob = robustness(r, hid)
     if rob:
         parts.append(f'<div class="block"><h3>Robustness notes</h3>{paras(rob)}</div>')
@@ -157,7 +157,7 @@ def build(r: R) -> str:
     m, s = r.meta, r.s
     sv = s["survey"]
     cs = s["attrition"]["completion_skin"]
-    nav = ['<a href="#scorecard">Scorecard</a>', '<a href="#attrition">Attrition</a>']
+    nav = ['<a href="#takeaways">Takeaways</a>', '<a href="#scorecard">Scorecard</a>', '<a href="#attrition">Attrition</a>']
     nav += [f'<a href="#h-{h}">{h}</a>' for h in ORDER if h in ("H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9")]
     nav += ['<a href="#survey">Survey</a>', '<a href="#limitations">Limitations</a>']
     h1_sub = "".join(f'<a href="#h-{h}">{h}</a>' for h in ORDER if h.startswith("H1") and h != "H1")
@@ -179,6 +179,8 @@ def build(r: R) -> str:
     legend = ('<p class="legend">'
               + " ".join(badge(v) for v in ("SUPPORTED", "PARTLY SUPPORTED", "NOT SUPPORTED", "NOT TESTABLE",
                                             "EXPLORATORY", "PENDING")) + "</p>")
+    sections.append(section("takeaways", "Key takeaways", '<ol class="takeaways">' + "".join(
+        f"<li>{inline(x)}</li>" for x in key_takeaways(r)) + "</ol>", kicker="For the presentation"))
     sections.append(section("scorecard", "Scorecard", legend + f'<div class="cards">{cards}</div>'
                             + table(scorecard_rows(r), "score"), kicker="Every hypothesis at a glance"))
 
@@ -325,6 +327,8 @@ table.tests td:nth-child(4) { min-width: 150px; }
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 details summary { cursor: pointer; color: var(--ink-2); margin-top: 12px; }
 li { margin: 4px 0; }
+ol.takeaways { padding-left: 1.4em; font-size: 1.05em; }
+ol.takeaways li { margin: 10px 0; }
 .missing { color: var(--bad); }
 /* Present mode is switched on by the script only; the script itself shows and hides sections. */
 body.present { font-size: 20px; }

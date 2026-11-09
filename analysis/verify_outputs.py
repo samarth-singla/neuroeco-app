@@ -9,7 +9,7 @@ import os
 import re
 
 from common import FIGURES, RESULTS, TABLES, read_csv
-from narrative import R, headline, load
+from narrative import R, dataset_ids, headline, ids_for, load, test_rows
 from spec import SPEC
 
 UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)
@@ -55,6 +55,35 @@ def run() -> dict:
             if p is not None and p.get("p") is not None and headline(p) not in text:
                 problems.append(f"{name}: primary result of {hid} ({headline(p)}) not found")
 
+    # 2a. every test row (effect, CI, p) shown in the report also appears in the page, and matches results.json
+    n_rows = 0
+    for hid in SPEC:
+        ids = ids_for(r, hid) + (dataset_ids(r, hid) if hid != "H9" else [])
+        for row in test_rows(r, ids):
+            n_rows += 1
+            for key in ("Effect [95% CI]", "p"):
+                val = row[key]
+                if val in ("–", "pending"):
+                    continue
+                for name, text in (("report", report), ("index.html", page_text)):
+                    if val not in text:
+                        problems.append(f"{name}: {hid} {row['Outcome']} {key} '{val}' not found")
+    for t in r.d["tests"]:
+        if t.get("p_holm") is not None and t.get("p") is not None and t["p_holm"] + 1e-12 < t["p"]:
+            problems.append(f"results.json: Holm p smaller than raw p for {t['id']}")
+
+    # 2b. every hypothesis section answers the instructor's two questions; key takeaways present
+    for name, text in (("report", report), ("index.html", page_text)):
+        if "Key takeaways" not in text:
+            problems.append(f"{name}: Key takeaways section missing")
+        for hid in SPEC:
+            tag = f"{hid} — {SPEC[hid]['title']}"
+            sec = text.split(tag, 1)[-1]
+            nxt = min([i for i in (sec.find(" — ", 1),) if i > 0] or [len(sec)])
+            for q in ("How does our experiment test this?", "What did we claim that the results do not justify?"):
+                if q not in sec[:max(nxt, 20000)]:
+                    problems.append(f"{name}: '{q}' missing in {hid}")
+
     # 3. no participant identifiers or raw rows in any output
     ids = set(read_csv("participants.csv")["participant_id"].astype(str))
     for path in glob.glob(os.path.join(RESULTS, "**", "*"), recursive=True):
@@ -68,7 +97,7 @@ def run() -> dict:
     if re.search(r'(src|href)="(https?:)?//', page):
         problems.append("index.html references an external resource")
 
-    out = {"figures": len(glob.glob(os.path.join(FIGURES, "*.png"))),
+    out = {"rows_checked": n_rows, "figures": len(glob.glob(os.path.join(FIGURES, "*.png"))),
            "tables": len(glob.glob(os.path.join(TABLES, "*.csv"))), "problems": problems}
     if problems:
         raise SystemExit("Output check failed:\n- " + "\n- ".join(problems))

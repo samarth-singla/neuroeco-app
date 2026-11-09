@@ -297,3 +297,28 @@ difference after converting with a·z(lit) + b·(z(self) − z(lit)) = (a − b)
 **Fixes along the way.** PyYAML reads the keys `yes:` / `no:` as booleans, so the config uses `yes_codes` /
 `no_codes`. Matplotlib turned "$50K-$100K" into math text, so maths parsing is now off for all figures. `pypdf` was
 installed in the venv only to read the codebook PDFs (not a pipeline requirement).
+
+## Final 3 — Final check, instructor's questions, key takeaways (2026-11-09)
+
+**Status:** done.
+
+- **Instructor's two questions.** Every hypothesis section in the report and on the page now has the headings "How
+  does our experiment test this?" and "What did we claim that the results do not justify?". The second opens with
+  one generated plain sentence set by the verdict. If a NOT SUPPORTED hypothesis still has significant secondary
+  outcomes, the sentence names the parts that held (for H1: verification and trap score). For H9 it names the
+  grouping the US data backs.
+- **Key takeaways** (7 generated bullets) at the top of `ANALYSIS_REPORT.md` and as the second section of
+  `index.html` (after the header, before the scorecard; "Takeaways" added to the navigation). Every number comes
+  from results.json; phrases that depend on the data are conditions in code.
+- **Agreement check strengthened** (`analysis/verify_outputs.py`). Every test row (effect, 95% CI, p) shown in the
+  report must also appear in the page (83 rows), together with every verdict, every primary result, both question
+  headings in every hypothesis section, and the Key takeaways. Holm p is never below raw p. No participant IDs in
+  any output.
+- **Clean rebuild:** all generated outputs and caches deleted, then `run_all.py` (≈17 s with the NFCS data): 22
+  figures, 52 tables, report and page; the output check passed.
+- **Page:** `npm run check:results` passes in Chromium, Firefox and WebKit, with and without JavaScript, at
+  1366×768 and 1920×1080 (24 sections, 25 figures visible in every run, no errors). Size 1.26 MB.
+
+**Final scorecard (pre-registered rules, raw p):** SUPPORTED: H1d, H9 (US dataset; age only). PARTLY SUPPORTED: H8
+(app NOT SUPPORTED + Investor Survey SUPPORTED; State-by-State points the other way). NOT SUPPORTED: H1, H1a, H1b,
+H1c, H1e, H1f, H2, H3, H4, H5, H6, H7. NOT TESTABLE: H1g. DESCRIPTIVE: H1h.

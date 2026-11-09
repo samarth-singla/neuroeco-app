@@ -761,3 +761,127 @@ def dataset_not_justified(r: R, hid: str) -> list[str]:
              + f"; the other groupings show no reliable difference. The 'strongest bias' in each group is a ranking "
                "of point estimates whose CIs overlap, so it is exploratory. US data: it does not show which bias "
                "matters most for Indian students or for age and income groups outside the US.")]
+
+
+# ------------------------------------------------------------------------------------------------ plain words
+
+Q_HOW = "How does our experiment test this?"
+Q_NOT = "What did we claim that the results do not justify?"
+
+
+def _lc(t: str) -> str:
+    """Lower-case the first letter unless the word is an acronym (VIP, NDIA)."""
+    t = t.rstrip(".")
+    return t if len(t) > 1 and t[1].isupper() else t[:1].lower() + t[1:]
+
+
+def plain_answer(r: R, hid: str) -> str:
+    """One plain sentence opening the 'do not justify' part, driven by the verdict."""
+    sp, v = SPEC[hid], r.hyps[hid]["verdict"]
+    claim = _lc(sp["claim"])
+    if v == "SUPPORTED" and hid == "H9" and ext_done(r, hid):
+        sig = [g for g in r.s["external"]["H9"]["groupings"]["lost_all"] if g["p"] < 0.05 and g["differs"]]
+        return ("The US dataset backs the claim for " + (", ".join(g["grouping"] for g in sig) or "no grouping")
+                + " only (see below). The app part is exploratory, and the claim is not shown for "
+                + "".join(f"{g['grouping']}, " for g in r.s["external"]["H9"]["groupings"]["lost_all"] if g not in sig)
+                + "or for Indian students.")
+    if v == "SUPPORTED":
+        return (f"The results back the prediction ({_lc(sp['prediction'])}), but only in the limited sense below; "
+                "they do not prove the broader claim on their own.")
+    if v == "PARTLY SUPPORTED":
+        return (f"The results only partly back our claim that {claim}: some evidence points our way, some does not, "
+                "so the claim cannot be stated as a general fact.")
+    if v == "NOT SUPPORTED":
+        held = [r.t(x) for x in sp.get("secondary", []) if r.t(x) and r.t(x).get("p") is not None
+                and r.t(x)["p"] < 0.05 and r.t(x).get("direction_ok")]
+        if held:
+            return (f"The results do not justify our claim as a whole ({claim}). Only part of it held: "
+                    + "; ".join(f"{label(t['outcome'])} ({headline(t)})" for t in held) + ".")
+        return f"The results do not justify our claim that {claim}."
+    if v == "NOT TESTABLE":
+        return ("Our design cannot test this as a cause-and-effect claim (there is no comparison group), so we can "
+                "only describe what players did.")
+    if v == "DESCRIPTIVE":
+        return "This part only describes what players said; it does not test whether the features caused anything."
+    if v == "EXPLORATORY":
+        return "This part is exploratory: it can suggest patterns to test later, not confirm the claim."
+    return "This part cannot be judged yet (the external dataset is pending)."
+
+
+def key_takeaways(r: R) -> list[str]:
+    """5-7 presentation bullets, every number from results.json."""
+    s, out = r.s, []
+    cs, a = s["attrition"]["completion_skin"], s["attrition"]
+    if cs["fraud"]["rate"] < cs["honest"]["rate"] and a["completion_skin_p"] < 0.05:
+        out.append(f"**The fraud design's clearest effect was that people left.** Only {cs['fraud']['completed']} of "
+                   f"{cs['fraud']['consented']} fraud-skin players finished, against {cs['honest']['completed']} of "
+                   f"{cs['honest']['consented']} on the honest skin (p = {pval(a['completion_skin_p'])}). Because "
+                   "skins were randomized, this difference is causal; it also means every other skin comparison is "
+                   "between a selected group of fraud finishers and the honest players.")
+    sup = [h for h in r.hyps if h != "H8" and h != "H9" and r.hyps[h]["verdict"] == "SUPPORTED"]
+    for h in sup:
+        t = r.t(SPEC[h]["primary"])
+        extra = ""
+        if h == "H1d":
+            x = t["summary"]
+            extra = (f" {x['fraud']['yes']} of {x['fraud']['n']} fraud players opened any terms, details or badge, "
+                     f"against {x['honest']['yes']} of {x['honest']['n']} honest players.")
+        out.append(f"**{h} held: {_lc(SPEC[h]['prediction'])}** ({headline(t)}).{extra}")
+    tr = r.t("H1.sec.trap_score_shared8")
+    h1 = r.t("H1.primary")
+    if h1:
+        sm = h1["summary"]
+        subs = [h for h in ("H1a", "H1b", "H1c", "H1e", "H1f") if r.hyps[h]["verdict"] == "NOT SUPPORTED"]
+        lead = ("Dark design pushed deposits in the predicted direction, but not significantly."
+                if h1["p"] >= 0.05 and h1["direction_ok"] else f"Total deposits: {r.hyps['H1']['verdict'].lower()}.")
+        trap = (f" and fell for more of the shared traps (p = {pval(tr['p'])})" if tr["p"] < 0.05 and tr["direction_ok"]
+                else "")
+        out.append(f"**{lead}** Fraud players deposited a median {money(sm['fraud']['median'])} vs "
+                   f"{money(sm['honest']['median'])} (p = {pval(h1['p'])}){trap}. "
+                   + (f"No single feature showed a separate effect ({', '.join(_lc(SPEC[h]['short']) for h in subs)}"
+                      "), and the features were bundled, so none can be credited on its own." if subs else ""))
+    core = ["H2", "H3", "H4", "H5", "H6", "H7"]
+    ns = [h for h in core if r.hyps[h]["verdict"] == "NOT SUPPORTED"]
+    opp = [h for h in core if r.t(SPEC[h]["primary"]) and r.t(SPEC[h]["primary"]).get("direction_ok") is False
+           and r.t(SPEC[h]["primary"])["p"] < 0.10]
+    if ns:
+        topics = ", ".join(f"{h} {SPEC[h]['short'].lower()}" for h in ns)
+        line = (f"**{len(ns)} of {len(core)} single-mechanism experiments did not support their hypothesis** "
+                f"({topics}). With {r.meta['completed']} finishers the confidence intervals are wide, so these "
+                "results are inconclusive, not proof that the mechanisms do not work.")
+        if opp:
+            t = r.t(SPEC[opp[0]]["primary"])
+            line += (f" {opp[0]} even leaned the other way ({headline(t)}), a pattern worth re-testing.")
+        out.append(line)
+    if ext_done(r, "H8"):
+        e = s["external_dataset"]
+        sm, im = e["state_models"], e["investor_models"]
+        out.append(f"**Literacy and overconfidence (H8: {r.hyps['H8']['verdict']}).** In {e['state']['rows']:,} US "
+                   f"adults, literacy goes with lower odds of losing money to fraud (OR "
+                   f"{sm['lost_all']['lit']['odds_ratio']:.2f}), while among US investors overconfidence goes with "
+                   f"more investment-fraud approaches (OR {im['targeted']['oc']['odds_ratio']:.2f}). Our game could "
+                   f"not test literacy well: {pct(s['H8']['share_at_3'])} of players got every literacy question right.")
+    if ext_done(r, "H9"):
+        res = s["external"]["H9"]["groupings"]["lost_all"]
+        sig = [g for g in res if g["p"] < 0.05]
+        if sig:
+            g = sig[0]
+            runs = []  # consecutive groups with the same strongest bias
+            for k, v in g["strongest"].items():
+                if runs and runs[-1][2] == v:
+                    runs[-1][1] = k
+                else:
+                    runs.append([k, k, v])
+            pattern = "; ".join(f"{v} is strongest for {a if a == b else a + ' to ' + b}" for a, b, v in runs)
+            out.append(f"**Which bias matters depends on the group (H9: {r.hyps['H9']['verdict']}).** In US data the "
+                       f"link between biases and losing money differs by {g['grouping']} (p = {pval(g['p'])}, Holm "
+                       f"p = {pval(g['p_holm'])}): {pattern}.")
+    sv = s["survey"]
+    top = sv["tricks_seen"][0]
+    ux = s["H1h_ux_map"][0]
+    out.append(f"**The tricks are real and common.** {pct(sv['approached']['share'])} of surveyed students had been "
+               f"approached by a suspicious investment app or group, most often through "
+               f"{sv['channels'][0]['channel'].lower()}s; the most-seen trick was "
+               f"{top['trick'].lower()} ({pct(top['share'])}), while in the game the feature that fraud players said "
+               f"pushed them most was the {ux['feature']} ({ux['yes']} of {ux['n']}).")
+    return out[:7]

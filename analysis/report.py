@@ -8,7 +8,7 @@ import os
 import pandas as pd
 
 from common import RESULTS, save_table
-from narrative import (R, dataset_block, dataset_ids, dataset_headline, ext_done, attrition_bias, attrition_paragraphs, headline, held_lists, ids_for, itt_changes, limitations,
+from narrative import (R, dataset_block, dataset_ids, key_takeaways, plain_answer, dataset_headline, ext_done, attrition_bias, attrition_paragraphs, headline, held_lists, ids_for, itt_changes, limitations,
                        load, n_text, not_justified, pct, result_paragraphs, robustness, test_rows)
 from spec import SPEC
 
@@ -75,6 +75,11 @@ def build(r: R) -> str:
              f"{m['bootstrap']['seed']}).")
     L.append("")
 
+    # Key takeaways
+    L.append("## Key takeaways")
+    L.append("")
+    L += [f"- {x}" for x in key_takeaways(r)] + [""]
+
     # 1. Scorecard
     L.append("## 1. Summary scorecard")
     L.append("")
@@ -124,7 +129,7 @@ def build(r: R) -> str:
         L.append("")
         L.append(f"**What we claimed.** {sp['claim']}")
         L.append("")
-        L.append(f"**How the experiment tests it.** {sp['how']}")
+        L.append(f"**How does our experiment test this?** {sp['how']}")
         L.append("")
         L.append("**The maths.**")
         L.append("")
@@ -149,8 +154,9 @@ def build(r: R) -> str:
                 L += [md_table(item), ""]
             elif kind == "fig":
                 L += [f"![{hid} dataset](figures/{item}.png)", ""]
-        L.append("**Verdict and what the data does NOT justify.**")
+        L.append("**What did we claim that the results do not justify?**")
         L.append("")
+        L += [plain_answer(r, hid), ""]
         L += [f"- {x}" for x in not_justified(r, hid)] + [""]
         rob = robustness(r, hid)
         if rob:

@@ -78,7 +78,7 @@ def main() -> None:
     report.run()
     build_html.run()
     check = verify_outputs.run()
-    print(f"done: results.json, ANALYSIS_REPORT.md, index.html, {check['figures']} figures, {check['tables']} tables; "
+    print(f"done: results.json, ANALYSIS_REPORT.md, index.html, {check['figures']} figures, {check['tables']} tables, {check['rows_checked']} test rows; "
           "outputs agree with results.json")
 
 
