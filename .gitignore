@@ -5,8 +5,13 @@ dist/
 *.db-wal
 *.db-shm
 *.db-journal
-data/
+data/*
+!data/external/
+data/external/*
+!data/external/README.md
 coverage/
 *.log
 .DS_Store
 .vite/
+__pycache__/
+*.pyc
