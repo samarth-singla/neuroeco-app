@@ -372,7 +372,7 @@ def style() -> None:
         "text.color": INK, "axes.titlecolor": INK, "axes.grid": True, "grid.color": GRID,
         "grid.linewidth": 0.6, "axes.axisbelow": True, "axes.spines.top": False, "axes.spines.right": False,
         "font.size": 11, "axes.titlesize": 12.5, "axes.titleweight": "bold", "axes.labelsize": 11,
-        "legend.frameon": False, "figure.dpi": 100,
+        "legend.frameon": False, "figure.dpi": 100, "text.parse_math": False,
     })
 
 

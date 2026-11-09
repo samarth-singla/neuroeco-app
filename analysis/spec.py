@@ -280,14 +280,29 @@ Fisher's exact test on reinvest_accept: H0: OR = 1, H1: OR > 1""",
         primary="H8.primary", secondary=["H8.literacy"], extra=["H8.dataset"], kind="h8",
         how="App part: literacy (Big Three items, incentivized at ₹100 each) and self-rated money skill (asked "
             "before the game) are measured, and the number of shared traps fallen for is the susceptibility "
-            "outcome. This is correlational. Dataset part: the same model on real victimization in a population "
-            "survey (pending).",
+            "outcome. This is correlational. Dataset part: the same idea on real fraud in two US population surveys "
+            "(NFCS 2024). The Investor Survey (investment fraud; primary model, fixed before fitting) measures an "
+            "11-item investing-knowledge quiz and self-rated investing knowledge; the State-by-State Survey (any "
+            "financial fraud; large-sample check) measures the Big Three and self-rated financial knowledge. "
+            "Survey-weighted logistic regressions relate knowledge and overconfidence to being targeted, losing "
+            "money, wanting a 'guaranteed 25%' offer and checking a regulator. Measured, not assigned: these are "
+            "associations, not causal effects.",
         maths="""overconfidence = z(self_rated_literacy) − z(literacy_score),  z = (x − x̄)/s over the 61 completers
 trap_score_shared8 = β0 + β1·literacy + β2·overconfidence + β3·fin_edu + β4·fraud + β5·exp_investing + ε
 H0: β2 = 0 (and β1 < 0: literacy protects)
 H1: β2 > 0 and β1 ≥ 0     (HC3 robust SEs)
-Note: with literacy in the model, β2 is the effect of a higher self-rating at equal literacy.""",
-        figures=["H8"], tables=["H8_literacy_distribution", "H8_ols"],
+Note: with literacy in the model, β2 is the effect of a higher self-rating at equal literacy.
+
+NFCS (dataset part), survey-weighted logistic regression, HC1 SEs, odds ratios per SD:
+logit P(victim) = α + a·z(lit) + b·z(OC) + controls,   OC = z(self) − z(lit)
+H0: e^b = 1 (and e^a < 1: literacy protects)     H1: e^b > 1 and the CI of e^a not entirely below 1
+
+Reparameterization (same model, same fit):
+a·z(lit) + b·(z(self) − z(lit)) = (a − b)·z(lit) + b·z(self)
+→ with OC in the model, a = literacy at equal overconfidence;
+  with z(self) in the model, (a − b) = literacy at equal self-rating.
+  (OC is standardized here, so b above is our coefficient divided by SD(OC).)""",
+        figures=["H8"], dataset_figures=["external_H8"], tables=["H8_literacy_distribution", "H8_ols"],
         overclaim="The app part is correlational: literacy and self-rating were measured, not assigned, and the "
                   "trap score counts choices in a game, not real victimization.",
     ),
@@ -300,11 +315,18 @@ Note: with literacy in the model, β2 is the effect of a higher self-rating at e
                              "H9.app.crt_correct_x_male", "H9.dataset"], kind="h9",
         how="App part (exploratory): the trap score is regressed on four measured biases (loss aversion, FOMO, "
             "overconfidence, CRT) and their interactions with gender. Age and income cannot be tested: almost all "
-            "app players are 18–20 students. The main test needs the external dataset (pending).",
+            "app players are 18–20 students. Main test: the NFCS 2024 State-by-State Survey (about 19,000 US "
+            "adults). For gender, age group and income group, a joint Wald test asks whether the effects of the "
+            "bias proxies (overconfidence, risk willingness) differ between groups; models within each group name "
+            "the strongest bias. Primary outcome (fixed before fitting): lost money to a fraud.",
         maths="""trap_score_shared8 = β0 + Σ_b β_b·bias_b + γ·male + Σ_b δ_b·bias_b·male + ε   (HC3)
 slope_b(not male) = β_b,   slope_b(male) = β_b + δ_b
-H0: δ_b = 0 for each bias    (exploratory; no verdict beyond EXPLORATORY)""",
-        figures=["H9"], tables=["H9_ols", "H9_simple_slopes"],
+H0: δ_b = 0 for each bias    (exploratory; no verdict beyond EXPLORATORY)
+
+NFCS: logit P(lost money) = α + Σ_b β_b·bias_b + Σ_g γ_g·group_g + Σ_b Σ_g δ_bg·bias_b·group_g + controls
+bias ∈ {z(overconfidence), z(risk willingness)};  group ∈ gender | age | income
+H0: all δ_bg = 0 (joint Wald test, Holm over the three groupings)""",
+        figures=["H9"], dataset_figures=["external_H9"], tables=["H9_ols", "H9_simple_slopes"],
         overclaim="With few non-male players and ten parameters, the app model cannot establish group differences; "
                   "any pattern here is a hypothesis for the dataset part, not a finding.",
     ),

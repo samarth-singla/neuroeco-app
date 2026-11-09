@@ -226,3 +226,74 @@ enabled and disabled, at 1366×768 and 1920×1080 (12 runs). Result: 23/23 secti
 every run, no errors, no external requests, no horizontal scroll, no clipped or overlapping cards. Present mode
 works (with JavaScript) and Esc restores every section. Screenshots were checked by eye. The Firefox and WebKit
 engines were installed once with `npx playwright-core install firefox webkit`.
+
+## Final 2 — External datasets: NFCS 2024 for H8 and H9 (2026-11-09)
+
+**Status:** done. `analysis/external_config.yaml` filled; `analysis/external.py` rewritten for the two NFCS surveys;
+the report, the page and `verify_outputs.py` now show and check the dataset parts.
+
+**Data handling.** The raw files are in `data/external/nfcs2024_state/` (39 MB) and `data/external/nfcs2024_investor/`
+(3.6 MB). `data/external/*/` is git-ignored (the line was already in `.gitignore`, now committed); only
+`data/external/README.md` is tracked.
+
+**Codebook check (State-by-State), from the Stata value labels, the questionnaire and the data-file-info PDF.**
+- J65 = "targeted in a financial fraud or scam in the past year" (1 yes, 2 no, 98 don't know → missing,
+  99 → missing). It is **any** financial fraud, not investment fraud.
+- J66 = lost money; asked only if J65 = 1. lost = 0 if not targeted; don't know → missing.
+- M6 correct = 1 ("More than $102"); M7 correct = 3 ("Less than today"); M10 correct = 2 ("False"). Don't know (98)
+  = wrong, prefer not to say (99) = missing.
+- M4 = "overall financial knowledge" 1–7. M20 has three answers (offered and participated / offered but did not
+  participate / not offered), coded 1 = participated.
+- A3Ar_w labels confirmed (18-24 … 65+). A8_2021 has 10 bands, collapsed to <$50K / $50K-$100K / $100K+. A50A:
+  male / female (nonbinary randomly assigned by FINRA). J2 = risk willingness 1–10. wgt_n2 = national weight.
+- **Mismatch:** `B14A` does not exist in the 2024 file. It is a grid: `B14A_1` = stocks, bonds, mutual funds
+  (used as "owns investments") and `B14A_60` = crypto (not used).
+
+**Codebook check (Investor Survey).**
+- D41 = targeted in an **investment** fraud (127 yes); D42 = lost money (56 yes, asked if D41 = 1).
+- G2 = self-rated investing knowledge 1–7. G43 = "guaranteed, risk-free 25% annual return every year for 5 years:
+  would you invest?" (1,249 yes / 616 no / 989 don't know = "not sure"). C7 = ever checked a regulator about a
+  financial professional. F40 = decisions based on a social media personality (finfluencer: frequently or sometimes
+  = 1). WGT1 = weight (age × education). S_Age, S_Gender2, S_Income = demographics from the State file (3 bands).
+- **Mismatch:** the public file has **12** quiz items, not 11. The classic 11 (G4, G5, G6, G7, G21, G8, G22, G11,
+  G12, G13, G23) are scored 0–11. G44 (inflation, numbered with the other new 2024 G4x items) is left out and
+  recorded in the config. The codebook has no answer key; the standard correct answers are listed per item in the
+  config.
+- **Link:** NFCSID links the Investor Survey to the State-by-State file (2,839 of 2,861 matched). The Big Three
+  robustness check uses the linked answers.
+- All requested items exist, so no model was skipped.
+
+**Decisions fixed before fitting (recorded in the config).** H8 dataset primary = Investor Survey, targeted by
+investment fraud (the only investment-fraud outcome with enough cases; "lost money" has 56 cases and is flagged low
+power). H9 primary = State-by-State, lost money (all respondents). G43 robustness = "yes or not sure" vs "no". The
+regulator model predicts overconfidence OR < 1 (less checking).
+
+**Estimation.** Survey-weighted logistic regression: GLM binomial with the weight normalized to mean 1 as variance
+weights and HC1 robust SEs. Literacy / quiz, self-rating and overconfidence are z-scored; overconfidence =
+z(self) − z(literacy), entered as z(OC). The State models also refit with z(lit) + z(self): the maximum coefficient
+difference after converting with a·z(lit) + b·(z(self) − z(lit)) = (a − b)·z(lit) + b·z(self) is about 1e-16.
+
+**Results.**
+- **Replication:** all six State-by-State odds ratios match the teammate's report within 0.01 (literacy 0.88 / 0.71 /
+  0.65, overconfidence 0.92 / 0.89 / 0.87 vs 0.92 / 0.90 / 0.88). Every teammate value lies inside our 95% CI.
+- **H8 primary (Investor, targeted):** overconfidence OR 2.22 [1.61, 3.06], p < 0.001; knowledge OR 1.38
+  [0.99, 1.92]. Dataset part SUPPORTED by the pre-registered rule. Combined with the app (NOT SUPPORTED), H8 is
+  **PARTLY SUPPORTED**.
+- **The other models disagree, and the report and page say so explicitly.**
+  - State-by-State: literacy protects strongly (ORs 0.65–0.88), and overconfidence is slightly protective
+    (0.87–0.92).
+  - Investor, Big Three (linked): overconfidence 1.13 (n.s.), literacy 0.70 (protective).
+  - Guaranteed-25% offer: knowledge protects (0.71), overconfidence null.
+  - Overconfident investors check regulators *more* (2.41).
+  - Reasons listed: general vs investment fraud, real vs simulated money, US adults vs Indian students, the app's
+    literacy ceiling (66% vs 31% at 3/3), self-reported "targeted" may measure noticing, different knowledge
+    measures.
+- **H9 (State, lost money):** the joint interaction test is significant for age (p = 0.005, Holm 0.015): risk
+  willingness is the strongest bias under 55, overconfidence from 55. Gender p = 0.145 and income p = 0.702.
+  Verdict by the pre-registered rule: **SUPPORTED** (within-group models labelled exploratory).
+- Figures: `external_H8.png` (app coefficients + all NFCS odds ratios), `external_H9.png` (literacy and
+  overconfidence ORs by group).
+
+**Fixes along the way.** PyYAML reads the keys `yes:` / `no:` as booleans, so the config uses `yes_codes` /
+`no_codes`. Matplotlib turned "$50K-$100K" into math text, so maths parsing is now off for all figures. `pypdf` was
+installed in the venv only to read the codebook PDFs (not a pipeline requirement).

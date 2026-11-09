@@ -30,6 +30,12 @@ def run() -> dict:
         for t in sp.get("tables", []):
             if not os.path.exists(os.path.join(TABLES, t + ".csv")):
                 problems.append(f"missing table {t}.csv ({hid})")
+        if r.s.get("external", {}).get(hid, {}).get("status") == "done":
+            for f in sp.get("dataset_figures", []):
+                if not os.path.exists(os.path.join(FIGURES, f + ".png")):
+                    problems.append(f"missing dataset figure {f}.png ({hid})")
+            if hid == "H8" and not os.path.exists(os.path.join(TABLES, "external_replication.csv")):
+                problems.append("missing table external_replication.csv")
         if not os.path.exists(os.path.join(TABLES, f"tests_{hid}.csv")):
             problems.append(f"missing table tests_{hid}.csv")
     for f in ("attrition_funnel", "survey_tricks_seen", "survey_what_stopped", "survey_vs_app"):

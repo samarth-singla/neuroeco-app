@@ -1,0 +1,10 @@
+grouping,p,stat,df,differs,n,p_holm,outcome,strongest
+gender,0.31501571476757984,2.310265506499659,2,False,19460,0.6300314295351597,targeted,female: risk willingness; male: risk willingness
+age,0.12147588533648719,15.300744453679215,10,True,19460,0.3644276560094616,targeted,18-24: risk willingness; 25-34: risk willingness; 35-44: risk willingness; 45-54: risk willingness; 55-64: overconfidence; 65+: overconfidence
+income,0.4072611978067864,3.9907348927452944,4,True,19460,0.6300314295351597,targeted,$100K+: overconfidence; $50K-$100K: overconfidence; <$50K: risk willingness
+gender,0.14470120264869757,3.866168668108889,2,False,19360,0.28940240529739514,lost_all,female: risk willingness; male: risk willingness
+age,0.004868379722015577,25.263166760768144,10,True,19360,0.01460513916604673,lost_all,18-24: risk willingness; 25-34: risk willingness; 35-44: risk willingness; 45-54: risk willingness; 55-64: overconfidence; 65+: overconfidence
+income,0.7023137540144444,2.1820668969879335,4,True,19360,0.7023137540144444,lost_all,$100K+: overconfidence; $50K-$100K: risk willingness; <$50K: risk willingness
+gender,0.25876956088895875,2.7036346792428554,2,True,3266,0.5175391217779175,lost_targeted,female: overconfidence; male: risk willingness
+age,0.16331789706004782,14.2170871263056,10,True,3266,0.4899536911801434,lost_targeted,18-24: risk willingness; 25-34: risk willingness; 35-44: risk willingness; 45-54: risk willingness; 55-64: overconfidence; 65+: risk willingness
+income,0.4244874156093478,3.8656926115859864,4,True,3266,0.5175391217779175,lost_targeted,$100K+: overconfidence; $50K-$100K: risk willingness; <$50K: risk willingness

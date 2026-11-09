@@ -12,7 +12,7 @@ import re
 import pandas as pd
 
 from common import FIGURES, RESULTS
-from narrative import (R, VERDICT_CLASS, attrition_bias, attrition_paragraphs, headline, held_lists, ids_for,
+from narrative import (R, VERDICT_CLASS, dataset_block, dataset_headline, ext_done, attrition_bias, attrition_paragraphs, headline, held_lists, ids_for,
                        itt_changes, limitations, load, n_text, not_justified, pct, result_paragraphs, robustness,
                        test_rows)
 from report import scorecard_rows
@@ -98,7 +98,9 @@ def card(r: R, hid: str) -> str:
         top = r.s["H1h_ux_map"][0]
         head = f"Top: {top['feature']} {top['yes']}/{top['n']}"
     elif hid == "H9":
-        head = "Exploratory bias × gender model; dataset part pending"
+        head = dataset_headline(r, hid) if ext_done(r, hid) else "Exploratory bias × gender model; dataset part pending"
+    elif hid == "H8" and ext_done(r, hid):
+        head = f"App: {headline(p)} · {dataset_headline(r, hid)}"
     elif p is not None:
         head = headline(p)
     else:
@@ -122,6 +124,21 @@ def hyp_section(r: R, hid: str) -> str:
     figs = "".join(fig(f, f"{hid} figure") for f in dict.fromkeys(sp["figures"]))
     parts.append(f'<div class="block"><h3>Result</h3>{figs}{paras(result_paragraphs(r, hid))}'
                  f'{table(test_rows(r, ids_for(r, hid)), "tests")}</div>')
+    block = dataset_block(r, hid)
+    if block:
+        inner = []
+        for kind, item in block:
+            if kind == "h":
+                inner.append(f"<h3>{inline(item)}</h3>")
+            elif kind == "p":
+                inner.append(f"<p>{inline(item)}</p>")
+            elif kind == "list":
+                inner.append(bullets(item))
+            elif kind == "table":
+                inner.append(table(item, "tests"))
+            elif kind == "fig":
+                inner.append(fig(item, f"{hid} dataset figure"))
+        parts.append('<div class="block dataset">' + "".join(inner) + "</div>")
     nj = not_justified(r, hid)
     parts.append(f'<div class="block caution"><h3>Verdict and what the data does NOT justify</h3>'
                  f'<p>{badge(h["verdict"], h.get("label"))}</p>{bullets(nj)}</div>')

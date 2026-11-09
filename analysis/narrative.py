@@ -32,6 +32,9 @@ OUTCOME_LABEL = {
     "feature_push_vip": "said the VIP levels pushed them", "feature_push_regulator": "said the NDIA badge pushed them",
     "feature_push_social": "said the social proof pushed them", "feature_push_chat": "said the mentor chat pushed them",
     "feature_push_tax": "said the withdrawal tax pushed them",
+    "targeted": "targeted by fraud", "lost_all": "lost money to fraud", "lost_targeted": "lost money (if targeted)",
+    "guaranteed": "would take a guaranteed 25% offer", "guaranteed_or_unsure": "guaranteed offer: yes or not sure",
+    "regulator": "checked a regulator",
 }
 STANDARD_EFFECTS = ("Cliff", "Odds ratio", "Interaction odds", "Share", "η²", "Kendall", "Spearman")
 
@@ -230,11 +233,24 @@ def all_ids(hid: str) -> list[str]:
     return ids
 
 
+def ext_done(r: R, hid: str) -> bool:
+    return r.s.get("external", {}).get(hid, {}).get("status") == "done"
+
+
+def dataset_ids(r: R, hid: str) -> list[str]:
+    """Tests of the external-dataset part (NFCS), in the order they were run."""
+    if not ext_done(r, hid):
+        return []
+    return [k for k, t in r.tests.items() if t["hypothesis"] == hid and
+            (k.startswith(f"{hid}.dataset") or k.startswith(("H8.state", "H8.inv")))]
+
+
 def ids_for(r: R, hid: str) -> list[str]:
-    ids = all_ids(hid)
-    if hid in ("H8", "H9"):  # dataset results replace the pending placeholder when present
-        ids += [t for t in r.tests if t.startswith(f"{hid}.dataset.") and t not in ids]
-        ids = [i for i in ids if i in r.tests]
+    """App-part tests of a hypothesis (the dataset part has its own table)."""
+    ids = [i for i in all_ids(hid) if i in r.tests]
+    if hid in ("H8", "H9") and ext_done(r, hid):
+        ds = set(dataset_ids(r, hid))
+        ids = [i for i in ids if i not in ds]
     return ids
 
 
@@ -303,9 +319,6 @@ def result_paragraphs(r: R, hid: str) -> list[str]:
         t = r.t(x)
         if t and t["role"] == "exploratory" and hid != "H9":
             out.append("**Exploratory.** " + sentence(t) + (f" Model R² = {num(t['r2'])}." if t.get("r2") else ""))
-    ds = [t for k, t in r.tests.items() if k.startswith(f"{hid}.dataset")]
-    for t in ds:
-        out.append("**Dataset part.** " + sentence(t))
     return out
 
 
@@ -321,7 +334,8 @@ def not_justified(r: R, hid: str) -> list[str]:
                        "and is not significant at 0.05, so it is not a confirmed reverse effect either; it is a "
                        "pattern to re-test.")
         elif primary["p"] >= 0.05:
-            out.append(f"A non-significant result is not evidence of no effect: the 95% CI ({effect_ci(primary)}) "
+            out.append(("In the app, a" if hid in ("H8", "H9") and ext_done(r, hid) else "A")
+                       + f" non-significant result is not evidence of no effect: the 95% CI ({effect_ci(primary)}) "
                        "is wide enough to include both no effect and a sizeable effect. The data cannot decide "
                        "between them at this sample size.")
     if v == "SUPPORTED" and primary is not None and primary.get("p_holm") is not None:
@@ -335,6 +349,8 @@ def not_justified(r: R, hid: str) -> list[str]:
                    f"{a['honest']['completed']}/{a['honest']['consented']} honest), so the fraud finishers are a "
                    "selected group; a skin difference among finishers is not a clean causal effect of the design.")
     out.append(sp["overclaim"])
+    if hid in ("H8", "H9") and ext_done(r, hid):
+        out += dataset_not_justified(r, hid)
     if hid == "H8":
         lit = r.t("H8.literacy")
         if lit and lit["ci_low"] is not None:
@@ -550,7 +566,198 @@ def limitations(r: R) -> list[str]:
         f"{s['survey']['invested_count']['yes']} respondents had invested, so the victim-sequence questions are "
         "counts only.",
     ]
+    if ext.get("status") == "done":
+        lim.append("**NFCS datasets (H8, H9):** US adults and US investors, not Indian students; cross-sectional "
+                   "associations, not causal effects; victimization is self-reported for the past year, and being "
+                   "'targeted' partly measures noticing an approach. The State-by-State survey covers any financial "
+                   "fraud, not only investment fraud.")
     if ext.get("status") != "done":
         lim.append("**External dataset pending:** the population-level parts of H8 and H9 (age, income, real "
                    "victimization) are not yet run; H8 and H9 verdicts rest on app evidence only.")
     return lim
+
+
+# ------------------------------------------------------------------------------------------------ external datasets
+
+
+def or_txt(o: dict) -> str:
+    pv = pval(o["p"])
+    return f"OR {o['odds_ratio']:.2f} [{o['or_ci_low']:.2f}, {o['or_ci_high']:.2f}], p {pv if pv.startswith('<') else '= ' + pv}"
+
+
+def _protects(o: dict, lower_is_protective: bool = True) -> bool:
+    return o["or_ci_high"] < 1 if lower_is_protective else o["or_ci_low"] > 1
+
+
+def dataset_headline(r: R, hid: str) -> str:
+    if hid == "H8":
+        t = r.t("H8.dataset")
+        return f"NFCS Investor (targeted): {headline(t)}"
+    res = r.s["external"]["H9"]["groupings"]["lost_all"]
+    return "NFCS State (lost money): " + "; ".join(f"{g['grouping']} p = {pval(g['p'])}" for g in res)
+
+
+def dataset_block(r: R, hid: str) -> list[tuple[str, object]]:
+    """Items ('h' heading, 'p' paragraph, 'list' bullets, 'table' rows, 'fig' figure name) for the dataset part."""
+    if not ext_done(r, hid):
+        return []
+    e = r.s["external_dataset"]
+    st, inv = e["state"], e["investor"]
+    ext = r.s["external"][hid]
+    out: list[tuple[str, object]] = [("h", "Dataset part: NFCS 2024 (United States)")]
+    out.append(("p", f"**Dataset verdict: {ext['verdict']}** — {ext['reason']}. {e['estimation']}"))
+    if hid == "H8":
+        sm, im = e["state_models"], e["investor_models"]
+        out.append(("p", f"**Data.** {inv['name']}: {inv['rows']:,} investors; {inv['n_targeted']} said they were "
+                         f"targeted by an investment fraud in the past year and {inv['n_lost']} lost money "
+                         f"(weighted {pct(inv['weighted_targeted'], 1)} targeted). Investing knowledge = "
+                         f"{inv['quiz_items']}-item quiz (don't know = wrong; "
+                         f"{', '.join(inv['quiz_excluded'])} left out as a newer item), mean {inv['quiz_mean']:.1f}. "
+                         f"{inv['link']['matched_in_state_file']:,} of {inv['link']['investor_rows']:,} investors link "
+                         f"to the State-by-State file by NFCSID. {st['name']}: {st['rows']:,} adults; weighted "
+                         f"{pct(st['weighted_targeted'], 1)} targeted by any financial fraud, "
+                         f"{pct(st['weighted_lost_all'], 1)} lost money. Big Three literacy scores 3 of 3 for "
+                         f"{pct(st['share_lit_3'])} of State respondents (no ceiling, unlike the app's "
+                         f"{pct(r.s['H8']['share_at_3'])})."))
+        t = im["targeted"]
+        out.append(("p", f"**Primary (fixed before fitting): Investor Survey, targeted by investment fraud.** "
+                         f"Overconfidence {or_txt(t['oc'])}; investing knowledge {or_txt(t['lit'])} "
+                         f"(n = {t['n']:,}, {t['events']} targeted)."))
+        lines = []
+        for key, lab in (("lost_all", "lost money to investment fraud"),
+                         ("guaranteed", "would invest in a 'guaranteed, risk-free 25% a year' offer (yes vs no)"),
+                         ("guaranteed_or_unsure", "same offer, yes or not sure vs no (robustness)"),
+                         ("regulator", "ever checked a regulator about a financial professional (OR > 1 = more "
+                                       "checking)")):
+            m = im[key]
+            low = r.t({"lost_all": "H8.inv.lost", "guaranteed": "H8.inv.guaranteed",
+                       "guaranteed_or_unsure": "H8.inv.guaranteed_unsure", "regulator": "H8.inv.regulator"}[key])
+            flag = " **Low power** (" + low["note"].split(":")[1].strip() + ")" if low.get("low_power") else ""
+            lines.append(f"- Investor, {lab}: overconfidence {or_txt(m['oc'])}; knowledge {or_txt(m['lit'])} "
+                         f"(n = {m['n']:,}).{flag}")
+        b3, ff = im["targeted_big3"], im["targeted_finfluencer"]
+        lines.append(f"- Investor, targeted, with the **Big Three** from the linked State answers instead of the quiz: "
+                     f"overconfidence {or_txt(b3['oc'])}; literacy {or_txt(b3['lit'])} (n = {b3['n']:,}).")
+        lines.append(f"- Investor, targeted, adding finfluencer use: overconfidence {or_txt(ff['oc'])}; finfluencer "
+                     f"use {or_txt(ff['finfluencer'])}.")
+        for y, m in sm.items():
+            lines.append(f"- State-by-State, {m['label']}: literacy {or_txt(m['lit'])}; overconfidence "
+                         f"{or_txt(m['oc'])} (n = {m['n']:,}, {m['events']:,} events).")
+        out.append(("p", "**All NFCS models** (odds ratios per SD, survey-weighted):"))
+        out.append(("list", lines))
+        out.append(("fig", "external_H8"))
+        out.append(("table", test_rows(r, dataset_ids(r, hid))))
+        out.append(("h", "Replication check: our State-by-State odds ratios vs the teammate's NFCS report"))
+        rep_rows = e["replication"]
+        out.append(("table", [{"Outcome": x["outcome"], "Predictor": x["predictor"],
+                               "Ours [95% CI]": f"{x['ours']:.2f} {x['ours_ci']}", "Teammate": f"{x['teammate']:.2f}",
+                               "Difference": f"{x['difference']:+.2f}",
+                               "> 0.02?": "yes" if x["flag"] else "no"} for x in rep_rows]))
+        flagged = [x for x in rep_rows if x["flag"]]
+        biggest = max(abs(x["difference"]) for x in rep_rows)
+        if flagged:
+            out.append(("p", "Differences larger than 0.02: " + "; ".join(
+                f"{x['outcome']} {x['predictor']} ({x['difference']:+.2f})" for x in flagged)
+                + ". Possible reasons: different controls, weights or coding of 'don't know' answers; the teammate's "
+                  "exact specification is not in this repository. "
+                + ("All teammate values lie inside our 95% CIs." if all(x["teammate_in_our_ci"] for x in rep_rows)
+                   else "Some teammate values lie outside our 95% CIs.")))
+        else:
+            out.append(("p", f"All six odds ratios agree within 0.02 (largest absolute difference {biggest:.2f}), so no "
+                             "difference needs explaining; every teammate value lies inside our 95% CI. Our "
+                             "specification: Big Three with don't know = wrong, z-scored literacy and "
+                             "overconfidence, national weights (wgt_n2), controls for financial education, age, "
+                             "gender, income, risk willingness and owning investments."))
+        out.append(("h", "Reparameterization: one model, two readings of the literacy coefficient"))
+        out.append(("p", "a·z(lit) + b·(z(self) − z(lit)) = (a − b)·z(lit) + b·z(self). The two versions fit the data "
+                         "identically (the largest coefficient difference after the conversion is printed below, "
+                         "zero up to rounding). With overconfidence in the model, the literacy odds ratio compares "
+                         "people with the same overconfidence; with the self-rating in the model, it compares people "
+                         "with the same self-rating."))
+        out.append(("table", [{"Outcome": m["label"], "Literacy (at equal overconfidence)": or_txt(m["lit"]),
+                               "Overconfidence": or_txt(m["oc"]),
+                               "Literacy (at equal self-rating)": or_txt(m["reparam"]["lit"]),
+                               "Self-rating": or_txt(m["reparam"]["self"]),
+                               "Max. difference": f"{m['reparam']['max_abs_diff']:.1e}"} for m in sm.values()]))
+        out.append(("h", "Where the app and the NFCS disagree"))
+        out.append(("list", disagreements(r)))
+    if hid == "H9":
+        res = ext["groupings"]
+        out.append(("p", f"**Data.** {st['name']}: {st['rows']:,} adults. Primary outcome (fixed before fitting): lost "
+                         "money to a fraud. Bias proxies: z(overconfidence) and z(risk willingness); literacy and the "
+                         "other controls are in every model. The within-group models are **exploratory**; Holm is "
+                         "applied over the three groupings within each outcome."))
+        rows = []
+        for y, rs in res.items():
+            for g in rs:
+                rows.append({"Outcome": y.replace("_", " "), "Grouping": g["grouping"],
+                             "Wald χ² (df)": f"{g['stat']:.1f} ({g['df']})", "p": pval(g["p"]),
+                             "Holm p": pval(g["p_holm"]),
+                             "Strongest bias by group": "; ".join(f"{k}: {v}" for k, v in g["strongest"].items())})
+        out.append(("table", rows))
+        out.append(("fig", "external_H9"))
+    return out
+
+
+def disagreements(r: R) -> list[str]:
+    e = r.s["external_dataset"]
+    sm, im = e["state_models"], e["investor_models"]
+    app_lit, app_oc = r.t("H8.literacy"), r.t("H8.primary")
+    out = []
+    app_lit_txt = (f"no evidence that literacy protects (b = {effect_ci(app_lit)} traps per correct answer)"
+                   if app_lit["ci_high"] >= 0 else f"literacy protects (b = {effect_ci(app_lit)})")
+    state_prot = [m for m in sm.values() if _protects(m["lit"])]
+    out.append(f"**Literacy.** The game shows {app_lit_txt}. In the State-by-State survey higher literacy goes with "
+               f"lower odds of fraud in {len(state_prot)} of {len(sm)} outcomes ("
+               + "; ".join(f"{m['label']}: OR {m['lit']['odds_ratio']:.2f}" for m in sm.values()) + "). "
+               f"Among investors, more investing knowledge does "
+               f"{'not ' if not _protects(im['targeted']['lit']) else ''}lower the odds of being targeted by investment "
+               f"fraud (OR {im['targeted']['lit']['odds_ratio']:.2f}) but does "
+               f"{'' if _protects(im['guaranteed']['lit']) else 'not '}lower the wish to take a 'guaranteed 25%' "
+               f"offer (OR {im['guaranteed']['lit']['odds_ratio']:.2f}).")
+    oc_state = [m["oc"]["odds_ratio"] for m in sm.values()]
+    out.append(f"**Overconfidence.** In the game it is not significant (b = {effect_ci(app_oc)}, p = "
+               f"{pval(app_oc['p'])}). Among investors it is a strong risk factor for being targeted by investment "
+               f"fraud (OR {im['targeted']['oc']['odds_ratio']:.2f}) and losing money "
+               f"(OR {im['lost_all']['oc']['odds_ratio']:.2f}), but in the general population it goes with slightly "
+               f"{'lower' if max(oc_state) < 1 else 'mixed'} odds of any fraud (ORs "
+               + ", ".join(f"{x:.2f}" for x in oc_state) + "). With the Big Three instead of the investing quiz, the "
+               f"investor effect is OR {im['targeted_big3']['oc']['odds_ratio']:.2f} (p = "
+               f"{pval(im['targeted_big3']['oc']['p'])}).")
+    out.append("**Possible reasons:** (1) general vs investment fraud: the State survey asks about any financial fraud "
+               "or scam, the Investor survey and the app are about investment fraud; (2) real vs simulated money: "
+               "the app uses virtual rupees in a 7-minute game; (3) US adults and US investors vs Indian college "
+               "students; (4) the ceiling effect in our literacy measure ("
+               f"{pct(r.s['H8']['share_at_3'])} of players scored 3 of 3, vs {pct(e['state']['share_lit_3'])} in the "
+               "State survey), which leaves almost no variation to detect protection; (5) 'targeted' is self-reported "
+               "belief: overconfident, active investors may notice and report approaches more (they also checked a "
+               f"regulator more often, OR {im['regulator']['oc']['odds_ratio']:.2f}); (6) different knowledge measures "
+               "(an 11-item investing quiz vs the Big Three).")
+    return out
+
+
+def dataset_not_justified(r: R, hid: str) -> list[str]:
+    e = r.s["external_dataset"]
+    if hid == "H8":
+        sm, im = e["state_models"], e["investor_models"]
+        out = [f"The dataset verdict rests on the pre-chosen primary model (Investor Survey, targeted by investment "
+               f"fraud). It does **not** justify a general claim that overconfidence makes people fall for fraud: in "
+               f"the State-by-State survey overconfidence goes with "
+               f"{'lower' if all(m['oc']['odds_ratio'] < 1 for m in sm.values()) else 'mixed'} odds of fraud, and "
+               f"with the Big Three instead of the quiz the investor effect is "
+               f"{'not significant' if im['targeted_big3']['oc']['p'] >= 0.05 else 'still significant'} "
+               f"(OR {im['targeted_big3']['oc']['odds_ratio']:.2f})."]
+        if any(_protects(m["lit"]) for m in sm.values()):
+            out.append("It does **not** justify 'literacy does not protect' in general: in the large US sample, literacy "
+                       "clearly goes with lower odds of being targeted and of losing money.")
+        out.append("'Targeted' is a self-report of a belief, so a higher rate among overconfident investors may partly "
+                   "reflect noticing scams, not falling for them; the NFCS results are associations in US data, not "
+                   "causal effects for Indian students.")
+        return out
+    res = r.s["external"]["H9"]["groupings"]["lost_all"]
+    sig = [g for g in res if g["p"] < 0.05]
+    return [("The dataset verdict rests on " + (", ".join(f"{g['grouping']} (p = {pval(g['p'])}, Holm p = "
+                                                          f"{pval(g['p_holm'])})" for g in sig) or "no grouping")
+             + f"; the other groupings show no reliable difference. The 'strongest bias' in each group is a ranking "
+               "of point estimates whose CIs overlap, so it is exploratory. US data: it does not show which bias "
+               "matters most for Indian students or for age and income groups outside the US.")]

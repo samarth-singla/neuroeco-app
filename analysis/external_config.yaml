@@ -1,59 +1,67 @@
-# External dataset for the dataset parts of H8 and H9 (DATA_COLLECTION_REPORT.md, Part D).
+# External datasets for the dataset parts of H8 and H9 (DATA_COLLECTION_REPORT.md, Part D):
+# NFCS 2024 State-by-State Survey (H8 large-sample check, H9 main) and NFCS 2024 Investor Survey (H8 main).
 #
-# Every dataset-specific name lives here. Replace every TODO, put the data file in data/external/, then run
-#   analysis/.venv/Scripts/python analysis/run_all.py
-# While any TODO is left (or the file is missing), H8 and H9 dataset parts stay PENDING everywhere.
-#
-# Column names must match the file exactly. Values can be numbers or text, exactly as they appear in the file.
+# Every dataset-specific name lives here. Codes were checked against the codebooks (Stata value labels and the
+# "Data File Info" PDFs); see ANALYSIS_PROGRESS.md, "Final 2". Missing-value codes: 98 = don't know,
+# 99 = prefer not to say. Data files stay local (data/external/*/ is git-ignored).
 
-dataset:
-  name: TODO                # e.g. "NFCS 2024 State-by-State Survey (US)"
-  source: TODO              # download URL or citation
-  file: TODO                # file name inside data/external/, e.g. NFCS_2024_State_Data.csv
-  format: csv               # csv | stata (.dta). Other formats: convert to csv first.
-  country: TODO             # e.g. "United States" (the report says if it is not India)
+dont_know: 98
+refused: 99
 
-# Codes that mean "don't know / refused / missing" anywhere in the file (set to [] if none)
-missing_values: [98, 99]
+state:
+  name: "NFCS 2024 State-by-State Survey"
+  source: "FINRA Investor Education Foundation, National Financial Capability Study 2024 (State Data 250623)"
+  country: "United States"
+  file: "nfcs2024_state/NFCS 2024 State Data 250623.dta"
+  id: NFCSID
+  weight: wgt_n2                  # national weight
+  targeted: {column: J65, yes_codes: [1], no_codes: [2]}          # any financial fraud or scam, past year
+  lost: {column: J66, yes_codes: [1], no_codes: [2]}              # asked only if J65 = 1; lost = 0 if not targeted
+  literacy:                       # Big Three; don't know = wrong; prefer not to say = missing
+    - {column: M6, correct: [1]}  # 2% interest: "More than $102"
+    - {column: M7, correct: [3]}  # inflation: "Less than today"
+    - {column: M10, correct: [2]} # single stock safer than fund: "False"
+  self_rated: {column: M4}        # overall financial knowledge 1-7
+  fin_edu: {column: M20, yes_codes: [2], no_codes: [1, 3]}        # 2 = offered and participated
+  age: {column: A3Ar_w, labels: {1: "18-24", 2: "25-34", 3: "35-44", 4: "45-54", 5: "55-64", 6: "65+"}}
+  income: {column: A8_2021, labels: {1: "<$50K", 2: "<$50K", 3: "<$50K", 4: "<$50K", 5: "$50K-$100K",
+                                     6: "$50K-$100K", 7: "$100K+", 8: "$100K+", 9: "$100K+", 10: "$100K+"}}
+  gender: {column: A50A, male_codes: [1]}
+  risk: {column: J2}              # willingness to take investment risks 1-10
+  owns_investments: {column: B14A_1, yes_codes: [1], no_codes: [2]}  # stocks, bonds, mutual funds (B14A_60 is crypto)
 
-victimization:              # DV for H8 and H9: 1 = victim of investment fraud, 0 = not
-  column: TODO
-  yes_values: [TODO]        # values that mean "yes, victim"
-  no_values: [TODO]         # values that mean "no"; anything else is treated as missing
+investor:
+  name: "NFCS 2024 Investor Survey"
+  source: "FINRA Investor Education Foundation, National Financial Capability Study 2024 (Investor Data 251114)"
+  country: "United States"
+  file: "nfcs2024_investor/2024-Inv-Data-and-Data-Info/NFCS 2024 Investor Data 251114.dta"
+  id: NFCSID                      # links to the State-by-State file
+  weight: WGT1
+  targeted: {column: D41, yes_codes: [1], no_codes: [2]}          # investment fraud or scam, past year
+  lost: {column: D42, yes_codes: [1], no_codes: [2]}              # asked only if D41 = 1
+  quiz:                           # 11-item investing knowledge quiz; don't know = wrong
+    - {column: G4, correct: [1]}  # stock: you own part of the company
+    - {column: G5, correct: [2]}  # bond: you have lent money
+    - {column: G6, correct: [2]}  # most at risk in bankruptcy: common stock
+    - {column: G7, correct: [1]}  # riskier investments, higher returns over time: True
+    - {column: G21, correct: [2]} # past performance a good indicator: False
+    - {column: G8, correct: [1]}  # best 20-year returns: stocks
+    - {column: G22, correct: [2]} # index funds: lower fees and expenses
+    - {column: G11, correct: [3]} # municipal bonds: can be tax-free
+    - {column: G12, correct: [3]} # $500 on margin, stock -50%: $0 left
+    - {column: G13, correct: [4]} # selling short: selling borrowed shares
+    - {column: G23, correct: [2]} # call, strike $50, price $40, expiring: $0
+  quiz_excluded: [G44]            # 2024 inflation item, not part of the classic 11-item quiz
+  self_rated: {column: G2}        # overall knowledge about investing 1-7
+  guaranteed: {column: G43, yes_codes: [1], no_codes: [2], not_sure_codes: [98]}   # guaranteed risk-free 25% a year: would invest?
+  checked_regulator: {column: C7, yes_codes: [1], no_codes: [2]}
+  finfluencer: {column: F40, yes_codes: [1, 2], no_codes: [3]}    # decisions based on a social media personality
+  age: {column: S_Age, labels: {1: "18-34", 2: "35-54", 3: "55+"}}
+  income: {column: S_Income, labels: {1: "<$50K", 2: "$50K-$100K", 3: "$100K+"}}
+  gender: {column: S_Gender2, male_codes: [1]}
 
-literacy:                   # Big Three items (or the closest available); score = number correct
-  items:
-    - column: TODO          # compound interest
-      correct: [TODO]
-    - column: TODO          # inflation
-      correct: [TODO]
-    - column: TODO          # diversification / risk
-      correct: [TODO]
-  dont_know_is_wrong: true  # "don't know" counts as wrong (as in the app)
-
-self_rated_knowledge:       # self-assessed financial knowledge (higher = more confident)
-  column: TODO
-  reverse: false            # true if a LOWER code means MORE confident
-
-age_group:                  # categorical; map raw codes to labels (all unmapped codes become missing)
-  column: TODO
-  labels: {TODO: TODO}      # e.g. {1: "18-24", 2: "25-34", 3: "35-44", 4: "45-54", 5: "55-64", 6: "65+"}
-
-income_group:
-  column: TODO
-  labels: {TODO: TODO}      # e.g. {1: "<25k", 2: "25-50k", 3: "50-75k", 4: "75k+"}
-
-gender:
-  column: TODO
-  male_values: [TODO]       # everything else that is not missing = "not male"
-
-investing_experience:       # control; numeric or categorical codes
-  column: TODO
-  labels: {TODO: TODO}      # e.g. {1: 1, 2: 0} for yes / no; leave {} to use the raw numbers
-
-risk_attitude:              # optional H9 bias proxy (higher = more risk-seeking); set column: null if absent
-  column: TODO
-  reverse: false
-
-weights:                    # optional survey weights; set column: null if the dataset has none
-  column: TODO
+# Pre-specified before fitting (see ANALYSIS_PROGRESS.md, "Final 2"):
+primary:
+  H8: investor.targeted           # investment-fraud targeting: the only investment-fraud outcome with enough cases
+  H9: state.lost_all              # lost money to a fraud (all respondents)
+low_power_events_per_parameter: 10

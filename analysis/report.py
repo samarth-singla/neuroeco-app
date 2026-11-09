@@ -8,7 +8,7 @@ import os
 import pandas as pd
 
 from common import RESULTS, save_table
-from narrative import (R, attrition_bias, attrition_paragraphs, headline, held_lists, ids_for, itt_changes, limitations,
+from narrative import (R, dataset_block, dataset_ids, dataset_headline, ext_done, attrition_bias, attrition_paragraphs, headline, held_lists, ids_for, itt_changes, limitations,
                        load, n_text, not_justified, pct, result_paragraphs, robustness, test_rows)
 from spec import SPEC
 
@@ -31,7 +31,14 @@ def scorecard_rows(r: R) -> list[dict]:
         h, sp = r.hyps[hid], SPEC[hid]
         p = r.t(sp["primary"]) if sp.get("primary") else None
         if hid == "H9":
-            res, n = "exploratory app model (bias × gender); dataset part pending", n_text(r.t("H9.app.la_group_x_male"))
+            res = "app: exploratory bias × gender model; " + (
+                dataset_headline(r, hid) if ext_done(r, hid) else "dataset part pending")
+            n = n_text(r.t("H9.app.la_group_x_male"))
+            if ext_done(r, hid):
+                n += f"; NFCS State {r.s['external_dataset']['state']['rows']:,}"
+        elif hid == "H8" and ext_done(r, hid):
+            res = f"App: {headline(p)}; {dataset_headline(r, hid)}"
+            n = f"{n_text(p)}; NFCS Investor {r.t('H8.dataset')['n']['respondents']:,}"
         elif hid == "H1h":
             top = r.s["H1h_ux_map"][0]
             res, n = f"top feature: {top['feature']} {top['yes']}/{top['n']}", f"fraud {top['n']}"
@@ -47,7 +54,7 @@ def scorecard_rows(r: R) -> list[dict]:
 def write_tables(r: R) -> None:
     save_table(pd.DataFrame(scorecard_rows(r)), "scorecard")
     for hid in ORDER:
-        save_table(pd.DataFrame(test_rows(r, ids_for(r, hid))), f"tests_{hid}")
+        save_table(pd.DataFrame(test_rows(r, ids_for(r, hid) + dataset_ids(r, hid))), f"tests_{hid}")
 
 
 def build(r: R) -> str:
@@ -131,6 +138,17 @@ def build(r: R) -> str:
         rows = test_rows(r, ids_for(r, hid))
         if rows:
             L += [md_table(rows), ""]
+        for kind, item in dataset_block(r, hid):
+            if kind == "h":
+                L += [f"#### {item}", ""]
+            elif kind == "p":
+                L += [item, ""]
+            elif kind == "list":
+                L += [x if x.startswith("- ") else f"- {x}" for x in item] + [""]
+            elif kind == "table":
+                L += [md_table(item), ""]
+            elif kind == "fig":
+                L += [f"![{hid} dataset](figures/{item}.png)", ""]
         L.append("**Verdict and what the data does NOT justify.**")
         L.append("")
         L += [f"- {x}" for x in not_justified(r, hid)] + [""]

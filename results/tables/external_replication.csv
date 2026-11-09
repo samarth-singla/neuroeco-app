@@ -1,0 +1,7 @@
+outcome,predictor,ours,ours_ci,teammate,difference,flag,teammate_in_our_ci
+targeted by a fraud or scam (past year),literacy,0.88,"[0.82, 0.94]",0.88,-0.0,False,True
+targeted by a fraud or scam (past year),overconfidence,0.92,"[0.86, 0.99]",0.92,0.0,False,True
+lost money to a fraud (all respondents),literacy,0.71,"[0.64, 0.78]",0.71,-0.0,False,True
+lost money to a fraud (all respondents),overconfidence,0.89,"[0.81, 0.98]",0.9,-0.01,False,True
+lost money (among those targeted),literacy,0.65,"[0.57, 0.74]",0.65,-0.0,False,True
+lost money (among those targeted),overconfidence,0.87,"[0.77, 0.97]",0.88,-0.01,False,True

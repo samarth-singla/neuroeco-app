@@ -1,7 +1,7 @@
 {
  "meta": {
   "title": "Behavioral Mechanics of App-Based Investment Frauds",
-  "generated_at": "2026-11-09 09:46 UTC",
+  "generated_at": "2026-11-09 10:26 UTC",
   "consented": 124,
   "consented_by_skin": {
    "honest": 62,
@@ -233,38 +233,10 @@
    "app_verdict": "NOT SUPPORTED",
    "app_reason": "overconfidence coefficient positive but p = 0.331 ≥ 0.10",
    "dataset": {
-    "status": "pending",
-    "verdict": "PENDING",
-    "reason": "no dataset file in data/external/ yet",
-    "todo": [
-     "age_group.column",
-     "age_group.labels",
-     "age_group.labels.TODO",
-     "dataset.country",
-     "dataset.file",
-     "dataset.name",
-     "dataset.source",
-     "gender.column",
-     "gender.male_values[0]",
-     "income_group.column",
-     "income_group.labels",
-     "income_group.labels.TODO",
-     "investing_experience.column",
-     "investing_experience.labels",
-     "investing_experience.labels.TODO",
-     "literacy.items[0].column",
-     "literacy.items[0].correct[0]",
-     "literacy.items[1].column",
-     "literacy.items[1].correct[0]",
-     "literacy.items[2].column",
-     "literacy.items[2].correct[0]",
-     "risk_attitude.column",
-     "self_rated_knowledge.column",
-     "victimization.column",
-     "victimization.no_values[0]",
-     "victimization.yes_values[0]",
-     "weights.column"
-    ]
+    "status": "done",
+    "verdict": "SUPPORTED",
+    "reason": "overconfidence OR > 1 (p = 0.000); knowledge CI not entirely below 1",
+    "dataset": "NFCS 2024 Investor Survey (primary) + State-by-State (check)"
    },
    "title": "Financial literacy does not protect against fraud",
    "short": "Literacy paradox",
@@ -273,55 +245,167 @@
    "secondary_tests": [
     "H8.literacy"
    ],
-   "verdict": "NOT SUPPORTED",
-   "verdict_reason": "overconfidence coefficient positive but p = 0.331 ≥ 0.10",
-   "label": "app evidence only; dataset part PENDING"
+   "verdict": "PARTLY SUPPORTED",
+   "verdict_reason": "app: NOT SUPPORTED (overconfidence coefficient positive but p = 0.331 ≥ 0.10); dataset: SUPPORTED (overconfidence OR > 1 (p = 0.000); knowledge CI not entirely below 1)",
+   "label": "app + dataset"
   },
   {
    "id": "H9",
    "app_verdict": "EXPLORATORY",
    "dataset": {
-    "status": "pending",
-    "verdict": "PENDING",
-    "reason": "no dataset file in data/external/ yet",
-    "todo": [
-     "age_group.column",
-     "age_group.labels",
-     "age_group.labels.TODO",
-     "dataset.country",
-     "dataset.file",
-     "dataset.name",
-     "dataset.source",
-     "gender.column",
-     "gender.male_values[0]",
-     "income_group.column",
-     "income_group.labels",
-     "income_group.labels.TODO",
-     "investing_experience.column",
-     "investing_experience.labels",
-     "investing_experience.labels.TODO",
-     "literacy.items[0].column",
-     "literacy.items[0].correct[0]",
-     "literacy.items[1].column",
-     "literacy.items[1].correct[0]",
-     "literacy.items[2].column",
-     "literacy.items[2].correct[0]",
-     "risk_attitude.column",
-     "self_rated_knowledge.column",
-     "victimization.column",
-     "victimization.no_values[0]",
-     "victimization.yes_values[0]",
-     "weights.column"
-    ]
+    "status": "done",
+    "verdict": "SUPPORTED",
+    "reason": "primary outcome (lost money): gender p = 0.145, strongest bias is the same across groups; age group p = 0.005, strongest bias differs across groups; income group p = 0.702, strongest bias differs across groups",
+    "groupings": {
+     "targeted": [
+      {
+       "grouping": "gender",
+       "p": 0.31501571476757984,
+       "stat": 2.310265506499659,
+       "df": 2,
+       "differs": false,
+       "strongest": {
+        "female": "risk willingness",
+        "male": "risk willingness"
+       },
+       "n": 19460,
+       "p_holm": 0.6300314295351597
+      },
+      {
+       "grouping": "age",
+       "p": 0.12147588533648719,
+       "stat": 15.300744453679215,
+       "df": 10,
+       "differs": true,
+       "strongest": {
+        "18-24": "risk willingness",
+        "25-34": "risk willingness",
+        "35-44": "risk willingness",
+        "45-54": "risk willingness",
+        "55-64": "overconfidence",
+        "65+": "overconfidence"
+       },
+       "n": 19460,
+       "p_holm": 0.3644276560094616
+      },
+      {
+       "grouping": "income",
+       "p": 0.4072611978067864,
+       "stat": 3.9907348927452944,
+       "df": 4,
+       "differs": true,
+       "strongest": {
+        "$100K+": "overconfidence",
+        "$50K-$100K": "overconfidence",
+        "<$50K": "risk willingness"
+       },
+       "n": 19460,
+       "p_holm": 0.6300314295351597
+      }
+     ],
+     "lost_all": [
+      {
+       "grouping": "gender",
+       "p": 0.14470120264869757,
+       "stat": 3.866168668108889,
+       "df": 2,
+       "differs": false,
+       "strongest": {
+        "female": "risk willingness",
+        "male": "risk willingness"
+       },
+       "n": 19360,
+       "p_holm": 0.28940240529739514
+      },
+      {
+       "grouping": "age",
+       "p": 0.004868379722015577,
+       "stat": 25.263166760768144,
+       "df": 10,
+       "differs": true,
+       "strongest": {
+        "18-24": "risk willingness",
+        "25-34": "risk willingness",
+        "35-44": "risk willingness",
+        "45-54": "risk willingness",
+        "55-64": "overconfidence",
+        "65+": "overconfidence"
+       },
+       "n": 19360,
+       "p_holm": 0.01460513916604673
+      },
+      {
+       "grouping": "income",
+       "p": 0.7023137540144444,
+       "stat": 2.1820668969879335,
+       "df": 4,
+       "differs": true,
+       "strongest": {
+        "$100K+": "overconfidence",
+        "$50K-$100K": "risk willingness",
+        "<$50K": "risk willingness"
+       },
+       "n": 19360,
+       "p_holm": 0.7023137540144444
+      }
+     ],
+     "lost_targeted": [
+      {
+       "grouping": "gender",
+       "p": 0.25876956088895875,
+       "stat": 2.7036346792428554,
+       "df": 2,
+       "differs": true,
+       "strongest": {
+        "female": "overconfidence",
+        "male": "risk willingness"
+       },
+       "n": 3266,
+       "p_holm": 0.5175391217779175
+      },
+      {
+       "grouping": "age",
+       "p": 0.16331789706004782,
+       "stat": 14.2170871263056,
+       "df": 10,
+       "differs": true,
+       "strongest": {
+        "18-24": "risk willingness",
+        "25-34": "risk willingness",
+        "35-44": "risk willingness",
+        "45-54": "risk willingness",
+        "55-64": "overconfidence",
+        "65+": "risk willingness"
+       },
+       "n": 3266,
+       "p_holm": 0.4899536911801434
+      },
+      {
+       "grouping": "income",
+       "p": 0.4244874156093478,
+       "stat": 3.8656926115859864,
+       "df": 4,
+       "differs": true,
+       "strongest": {
+        "$100K+": "overconfidence",
+        "$50K-$100K": "risk willingness",
+        "<$50K": "risk willingness"
+       },
+       "n": 3266,
+       "p_holm": 0.5175391217779175
+      }
+     ]
+    },
+    "dataset": "NFCS 2024 State-by-State Survey"
    },
    "title": "The dominant bias differs by demographic group",
    "short": "Bias by group",
    "prediction": "Bias slopes on the trap score differ between male and not-male players (app); by age, income and gender for victimization (dataset).",
    "primary_test": null,
    "secondary_tests": [],
-   "verdict": "EXPLORATORY",
-   "verdict_reason": "app part is exploratory by design (gender only, small groups)",
-   "label": "app evidence only; dataset part PENDING"
+   "verdict": "SUPPORTED",
+   "verdict_reason": "dataset: SUPPORTED (primary outcome (lost money): gender p = 0.145, strongest bias is the same across groups; age group p = 0.005, strongest bias differs across groups; income group p = 0.702, strongest bias differs across groups); app part exploratory",
+   "label": "app + dataset"
   }
  ],
  "tests": [
@@ -2697,30 +2781,6 @@
    "protects": false
   },
   {
-   "id": "H8.dataset",
-   "hypothesis": "H8",
-   "role": "primary-dataset",
-   "outcome": "victimization",
-   "prediction": "literacy does not lower victimization; overconfidence raises it",
-   "test": "Logistic regression on the external dataset",
-   "statistic_name": null,
-   "statistic": null,
-   "p": null,
-   "p_holm": null,
-   "holm_family": null,
-   "effect_name": null,
-   "effect": null,
-   "ci_low": null,
-   "ci_high": null,
-   "n": {},
-   "summary": {},
-   "direction_ok": null,
-   "testable": false,
-   "note": "PENDING: the external dataset has not been added yet (see data/external/README.md).",
-   "interpretation": null,
-   "pending": true
-  },
-  {
    "id": "H9.app.la_group_x_male",
    "hypothesis": "H9",
    "role": "exploratory",
@@ -2829,28 +2889,869 @@
    "interpretation": null
   },
   {
-   "id": "H9.dataset",
-   "hypothesis": "H9",
-   "role": "primary-dataset",
-   "outcome": "victimization",
-   "prediction": "the bias that best predicts victimization differs by age, income and gender group",
-   "test": "Logistic regression with interactions on the external dataset",
-   "statistic_name": null,
-   "statistic": null,
-   "p": null,
+   "id": "H8.state.targeted",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "targeted",
+   "prediction": "overconfidence OR > 1 (State-by-State, targeted by a fraud or scam (past year))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": -2.3856747476376685,
+   "p": 0.017047820971622087,
    "p_holm": null,
    "holm_family": null,
+   "effect_name": "Odds ratio per SD of overconfidence",
+   "effect": 0.9231848604288465,
+   "ci_low": 0.8645127367149774,
+   "ci_high": 0.9858389013024051,
+   "n": {
+    "respondents": 19460,
+    "events": 3366
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 240.4,
+   "dataset_label": "State-by-State, targeted by a fraud or scam (past year)"
+  },
+  {
+   "id": "H8.state.targeted.literacy",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "targeted",
+   "prediction": "literacy OR not protective (CI not entirely on the protective side) (State-by-State, targeted by a fraud or scam (past year))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": -3.6561004875131418,
+   "p": 0.00025608100526502406,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of literacy",
+   "effect": 0.8776010475511744,
+   "ci_low": 0.8182760397902858,
+   "ci_high": 0.9412271180032441,
+   "n": {
+    "respondents": 19460,
+    "events": 3366
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 240.4,
+   "dataset_label": "State-by-State, targeted by a fraud or scam (past year)"
+  },
+  {
+   "id": "H8.state.lost_all",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "lost_all",
+   "prediction": "overconfidence OR > 1 (State-by-State, lost money to a fraud (all respondents))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": -2.350901588648393,
+   "p": 0.018727986292705095,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of overconfidence",
+   "effect": 0.8892344910235238,
+   "ci_low": 0.8063262759850006,
+   "ci_high": 0.9806675083977727,
+   "n": {
+    "respondents": 19360,
+    "events": 1370
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 97.9,
+   "dataset_label": "State-by-State, lost money to a fraud (all respondents)"
+  },
+  {
+   "id": "H8.state.lost_all.literacy",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "lost_all",
+   "prediction": "literacy OR not protective (CI not entirely on the protective side) (State-by-State, lost money to a fraud (all respondents))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": -6.676119035675722,
+   "p": 2.4535271046951522e-11,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of literacy",
+   "effect": 0.708170114476642,
+   "ci_low": 0.639942919335617,
+   "ci_high": 0.7836713179958583,
+   "n": {
+    "respondents": 19360,
+    "events": 1370
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 97.9,
+   "dataset_label": "State-by-State, lost money to a fraud (all respondents)"
+  },
+  {
+   "id": "H8.state.lost_targeted",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "lost_targeted",
+   "prediction": "overconfidence OR > 1 (State-by-State, lost money (among those targeted))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": -2.4306042020444845,
+   "p": 0.01507367093807156,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of overconfidence",
+   "effect": 0.8672974741278193,
+   "ci_low": 0.773230073206169,
+   "ci_high": 0.9728086564319809,
+   "n": {
+    "respondents": 3266,
+    "events": 1370
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 97.9,
+   "dataset_label": "State-by-State, lost money (among those targeted)"
+  },
+  {
+   "id": "H8.state.lost_targeted.literacy",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "lost_targeted",
+   "prediction": "literacy OR not protective (CI not entirely on the protective side) (State-by-State, lost money (among those targeted))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": -6.551303357746732,
+   "p": 5.703705860193846e-11,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of literacy",
+   "effect": 0.6474320050570871,
+   "ci_low": 0.5684716595063619,
+   "ci_high": 0.7373598914961373,
+   "n": {
+    "respondents": 3266,
+    "events": 1370
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 97.9,
+   "dataset_label": "State-by-State, lost money (among those targeted)"
+  },
+  {
+   "id": "H8.dataset",
+   "hypothesis": "H8",
+   "role": "primary-dataset",
+   "outcome": "targeted",
+   "prediction": "overconfidence OR > 1 (Investor Survey, targeted by investment fraud (primary))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": 4.902281630484551,
+   "p": 9.472989316589982e-07,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of overconfidence",
+   "effect": 2.22246641649678,
+   "ci_low": 1.6149840677739196,
+   "ci_high": 3.0584555420812336,
+   "n": {
+    "respondents": 2672,
+    "events": 127
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 15.9,
+   "dataset_label": "Investor Survey, targeted by investment fraud (primary)"
+  },
+  {
+   "id": "H8.dataset.literacy",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "targeted",
+   "prediction": "investing knowledge (11-item quiz) OR not protective (CI not entirely on the protective side) (Investor Survey, targeted by investment fraud (primary))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": 1.906665053463683,
+   "p": 0.056563975125269964,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of investing knowledge (11-item quiz)",
+   "effect": 1.3805707284301616,
+   "ci_low": 0.9910254305736748,
+   "ci_high": 1.9232357489503324,
+   "n": {
+    "respondents": 2672,
+    "events": 127
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 15.9,
+   "dataset_label": "Investor Survey, targeted by investment fraud (primary)"
+  },
+  {
+   "id": "H8.inv.lost",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "lost_all",
+   "prediction": "overconfidence OR > 1 (Investor Survey, lost money to investment fraud)",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": 4.781840714201133,
+   "p": 1.7369729322841547e-06,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of overconfidence",
+   "effect": 3.2689897828242116,
+   "ci_low": 2.0117200695805364,
+   "ci_high": 5.3120184869643845,
+   "n": {
+    "respondents": 2669,
+    "events": 56
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": "LOW POWER: 56 events for 8 parameters (7.0 per parameter < 10).",
+   "interpretation": null,
+   "low_power": true,
+   "events_per_parameter": 7.0,
+   "dataset_label": "Investor Survey, lost money to investment fraud"
+  },
+  {
+   "id": "H8.inv.lost.literacy",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "lost_all",
+   "prediction": "investing knowledge (11-item quiz) OR not protective (CI not entirely on the protective side) (Investor Survey, lost money to investment fraud)",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": 1.7607685049900994,
+   "p": 0.07827759255593181,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of investing knowledge (11-item quiz)",
+   "effect": 1.599431041562821,
+   "ci_low": 0.9482555886573832,
+   "ci_high": 2.6977744052495463,
+   "n": {
+    "respondents": 2669,
+    "events": 56
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": "LOW POWER: 56 events for 8 parameters (7.0 per parameter < 10).",
+   "interpretation": null,
+   "low_power": true,
+   "events_per_parameter": 7.0,
+   "dataset_label": "Investor Survey, lost money to investment fraud"
+  },
+  {
+   "id": "H8.inv.guaranteed",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "guaranteed",
+   "prediction": "overconfidence OR > 1 (Investor Survey, would invest in a guaranteed risk-free 25% offer (yes vs no))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": -0.1201654799853027,
+   "p": 0.9043520625657028,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of overconfidence",
+   "effect": 0.9907609233876772,
+   "ci_low": 0.8515672402312587,
+   "ci_high": 1.1527066342352827,
+   "n": {
+    "respondents": 1821,
+    "events": 606
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 75.8,
+   "dataset_label": "Investor Survey, would invest in a guaranteed risk-free 25% offer (yes vs no)"
+  },
+  {
+   "id": "H8.inv.guaranteed.literacy",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "guaranteed",
+   "prediction": "investing knowledge (11-item quiz) OR not protective (CI not entirely on the protective side) (Investor Survey, would invest in a guaranteed risk-free 25% offer (yes vs no))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": -3.932356355201675,
+   "p": 8.411724491688524e-05,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of investing knowledge (11-item quiz)",
+   "effect": 0.7104087559335959,
+   "ci_low": 0.5990969597062579,
+   "ci_high": 0.8424022060712315,
+   "n": {
+    "respondents": 1821,
+    "events": 606
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 75.8,
+   "dataset_label": "Investor Survey, would invest in a guaranteed risk-free 25% offer (yes vs no)"
+  },
+  {
+   "id": "H8.inv.guaranteed_unsure",
+   "hypothesis": "H8",
+   "role": "robustness",
+   "outcome": "guaranteed_or_unsure",
+   "prediction": "overconfidence OR > 1 (Investor Survey, guaranteed offer: yes or not sure vs no (robustness))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": -1.2185356498883992,
+   "p": 0.22302048594037294,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of overconfidence",
+   "effect": 0.9154699628884742,
+   "ci_low": 0.7942372034590445,
+   "ci_high": 1.0552077506581328,
+   "n": {
+    "respondents": 2785,
+    "events": 606
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 75.8,
+   "dataset_label": "Investor Survey, guaranteed offer: yes or not sure vs no (robustness)"
+  },
+  {
+   "id": "H8.inv.guaranteed_unsure.literacy",
+   "hypothesis": "H8",
+   "role": "robustness",
+   "outcome": "guaranteed_or_unsure",
+   "prediction": "investing knowledge (11-item quiz) OR not protective (CI not entirely on the protective side) (Investor Survey, guaranteed offer: yes or not sure vs no (robustness))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": -4.3135617845878205,
+   "p": 1.606452178528696e-05,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of investing knowledge (11-item quiz)",
+   "effect": 0.71508773137528,
+   "ci_low": 0.6140223872840703,
+   "ci_high": 0.8327879799712813,
+   "n": {
+    "respondents": 2785,
+    "events": 606
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 75.8,
+   "dataset_label": "Investor Survey, guaranteed offer: yes or not sure vs no (robustness)"
+  },
+  {
+   "id": "H8.inv.regulator",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "regulator",
+   "prediction": "overconfidence OR < 1 (Investor Survey, ever checked a regulator about a financial professional)",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": 8.18024412683981,
+   "p": 2.8326938799169013e-16,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of overconfidence",
+   "effect": 2.4077406425893395,
+   "ci_low": 1.9506397442241048,
+   "ci_high": 2.9719557489496613,
+   "n": {
+    "respondents": 2755,
+    "events": 448
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 56.0,
+   "dataset_label": "Investor Survey, ever checked a regulator about a financial professional"
+  },
+  {
+   "id": "H8.inv.regulator.literacy",
+   "hypothesis": "H8",
+   "role": "secondary-dataset",
+   "outcome": "regulator",
+   "prediction": "investing knowledge (11-item quiz) OR not protective (CI not entirely on the protective side) (Investor Survey, ever checked a regulator about a financial professional)",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": 5.370454516725772,
+   "p": 7.853844072772361e-08,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of investing knowledge (11-item quiz)",
+   "effect": 1.7660783510627176,
+   "ci_low": 1.4350363946952882,
+   "ci_high": 2.173486856237325,
+   "n": {
+    "respondents": 2755,
+    "events": 448
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 56.0,
+   "dataset_label": "Investor Survey, ever checked a regulator about a financial professional"
+  },
+  {
+   "id": "H8.inv.targeted_finfluencer",
+   "hypothesis": "H8",
+   "role": "robustness",
+   "outcome": "targeted",
+   "prediction": "overconfidence OR > 1 (Investor Survey, targeted, + finfluencer use)",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": 3.774966322317865,
+   "p": 0.00016002928202236055,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of overconfidence",
+   "effect": 1.8691642852502945,
+   "ci_low": 1.3508527145022629,
+   "ci_high": 2.5863479324928225,
+   "n": {
+    "respondents": 2647,
+    "events": 125
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 13.9,
+   "dataset_label": "Investor Survey, targeted, + finfluencer use"
+  },
+  {
+   "id": "H8.inv.targeted_finfluencer.literacy",
+   "hypothesis": "H8",
+   "role": "robustness",
+   "outcome": "targeted",
+   "prediction": "investing knowledge (11-item quiz) OR not protective (CI not entirely on the protective side) (Investor Survey, targeted, + finfluencer use)",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": 1.3017466094459345,
+   "p": 0.19300302057782825,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of investing knowledge (11-item quiz)",
+   "effect": 1.2689944966718072,
+   "ci_low": 0.8865157205653633,
+   "ci_high": 1.8164901030253096,
+   "n": {
+    "respondents": 2647,
+    "events": 125
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 13.9,
+   "dataset_label": "Investor Survey, targeted, + finfluencer use"
+  },
+  {
+   "id": "H8.inv.targeted_big3",
+   "hypothesis": "H8",
+   "role": "robustness",
+   "outcome": "targeted",
+   "prediction": "overconfidence OR > 1 (Investor Survey, targeted, Big Three literacy (linked by NFCSID))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": 0.779791940235401,
+   "p": 0.43551335117885837,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of overconfidence",
+   "effect": 1.1282187798674317,
+   "ci_low": 0.8331162323082348,
+   "ci_high": 1.5278511759624671,
+   "n": {
+    "respondents": 2706,
+    "events": 125
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 15.6,
+   "dataset_label": "Investor Survey, targeted, Big Three literacy (linked by NFCSID)"
+  },
+  {
+   "id": "H8.inv.targeted_big3.literacy",
+   "hypothesis": "H8",
+   "role": "robustness",
+   "outcome": "targeted",
+   "prediction": "Big Three literacy (linked State answers) OR not protective (CI not entirely on the protective side) (Investor Survey, targeted, Big Three literacy (linked by NFCSID))",
+   "test": "Survey-weighted logistic regression (HC1 SEs)",
+   "statistic_name": "z",
+   "statistic": -2.473286694125381,
+   "p": 0.013387669674441794,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio per SD of Big Three literacy (linked State answers)",
+   "effect": 0.7025694158369686,
+   "ci_low": 0.5311260910255139,
+   "ci_high": 0.92935329747487,
+   "n": {
+    "respondents": 2706,
+    "events": 125
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false,
+   "events_per_parameter": 15.6,
+   "dataset_label": "Investor Survey, targeted, Big Three literacy (linked by NFCSID)"
+  },
+  {
+   "id": "H9.dataset.targeted.gender",
+   "hypothesis": "H9",
+   "role": "exploratory",
+   "outcome": "targeted",
+   "prediction": "bias effects (overconfidence, risk willingness) differ across genders (targeted by a fraud or scam (past year))",
+   "test": "Joint Wald test of bias × group interactions (survey-weighted logistic, HC1)",
+   "statistic_name": "Wald χ² (df = 2)",
+   "statistic": 2.310265506499659,
+   "p": 0.31501571476757984,
+   "p_holm": 0.6300314295351597,
+   "holm_family": "H9-targeted",
    "effect_name": null,
    "effect": null,
    "ci_low": null,
    "ci_high": null,
-   "n": {},
+   "n": {
+    "respondents": 19460
+   },
    "summary": {},
-   "direction_ok": null,
-   "testable": false,
-   "note": "PENDING: the external dataset has not been added yet (see data/external/README.md).",
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
    "interpretation": null,
-   "pending": true
+   "strongest_bias_by_group": {
+    "female": "risk willingness",
+    "male": "risk willingness"
+   },
+   "dataset_label": "State-by-State"
+  },
+  {
+   "id": "H9.dataset.targeted.age",
+   "hypothesis": "H9",
+   "role": "exploratory",
+   "outcome": "targeted",
+   "prediction": "bias effects (overconfidence, risk willingness) differ across age groups (targeted by a fraud or scam (past year))",
+   "test": "Joint Wald test of bias × group interactions (survey-weighted logistic, HC1)",
+   "statistic_name": "Wald χ² (df = 10)",
+   "statistic": 15.300744453679215,
+   "p": 0.12147588533648719,
+   "p_holm": 0.3644276560094616,
+   "holm_family": "H9-targeted",
+   "effect_name": null,
+   "effect": null,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {
+    "respondents": 19460
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "strongest_bias_by_group": {
+    "18-24": "risk willingness",
+    "25-34": "risk willingness",
+    "35-44": "risk willingness",
+    "45-54": "risk willingness",
+    "55-64": "overconfidence",
+    "65+": "overconfidence"
+   },
+   "dataset_label": "State-by-State"
+  },
+  {
+   "id": "H9.dataset.targeted.income",
+   "hypothesis": "H9",
+   "role": "exploratory",
+   "outcome": "targeted",
+   "prediction": "bias effects (overconfidence, risk willingness) differ across income groups (targeted by a fraud or scam (past year))",
+   "test": "Joint Wald test of bias × group interactions (survey-weighted logistic, HC1)",
+   "statistic_name": "Wald χ² (df = 4)",
+   "statistic": 3.9907348927452944,
+   "p": 0.4072611978067864,
+   "p_holm": 0.6300314295351597,
+   "holm_family": "H9-targeted",
+   "effect_name": null,
+   "effect": null,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {
+    "respondents": 19460
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "strongest_bias_by_group": {
+    "$100K+": "overconfidence",
+    "$50K-$100K": "overconfidence",
+    "<$50K": "risk willingness"
+   },
+   "dataset_label": "State-by-State"
+  },
+  {
+   "id": "H9.dataset.lost_all.gender",
+   "hypothesis": "H9",
+   "role": "primary-dataset",
+   "outcome": "lost_all",
+   "prediction": "bias effects (overconfidence, risk willingness) differ across genders (lost money to a fraud (all respondents))",
+   "test": "Joint Wald test of bias × group interactions (survey-weighted logistic, HC1)",
+   "statistic_name": "Wald χ² (df = 2)",
+   "statistic": 3.866168668108889,
+   "p": 0.14470120264869757,
+   "p_holm": 0.28940240529739514,
+   "holm_family": "H9-lost_all",
+   "effect_name": null,
+   "effect": null,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {
+    "respondents": 19360
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "strongest_bias_by_group": {
+    "female": "risk willingness",
+    "male": "risk willingness"
+   },
+   "dataset_label": "State-by-State"
+  },
+  {
+   "id": "H9.dataset.lost_all.age",
+   "hypothesis": "H9",
+   "role": "primary-dataset",
+   "outcome": "lost_all",
+   "prediction": "bias effects (overconfidence, risk willingness) differ across age groups (lost money to a fraud (all respondents))",
+   "test": "Joint Wald test of bias × group interactions (survey-weighted logistic, HC1)",
+   "statistic_name": "Wald χ² (df = 10)",
+   "statistic": 25.263166760768144,
+   "p": 0.004868379722015577,
+   "p_holm": 0.01460513916604673,
+   "holm_family": "H9-lost_all",
+   "effect_name": null,
+   "effect": null,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {
+    "respondents": 19360
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "strongest_bias_by_group": {
+    "18-24": "risk willingness",
+    "25-34": "risk willingness",
+    "35-44": "risk willingness",
+    "45-54": "risk willingness",
+    "55-64": "overconfidence",
+    "65+": "overconfidence"
+   },
+   "dataset_label": "State-by-State"
+  },
+  {
+   "id": "H9.dataset.lost_all.income",
+   "hypothesis": "H9",
+   "role": "primary-dataset",
+   "outcome": "lost_all",
+   "prediction": "bias effects (overconfidence, risk willingness) differ across income groups (lost money to a fraud (all respondents))",
+   "test": "Joint Wald test of bias × group interactions (survey-weighted logistic, HC1)",
+   "statistic_name": "Wald χ² (df = 4)",
+   "statistic": 2.1820668969879335,
+   "p": 0.7023137540144444,
+   "p_holm": 0.7023137540144444,
+   "holm_family": "H9-lost_all",
+   "effect_name": null,
+   "effect": null,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {
+    "respondents": 19360
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "strongest_bias_by_group": {
+    "$100K+": "overconfidence",
+    "$50K-$100K": "risk willingness",
+    "<$50K": "risk willingness"
+   },
+   "dataset_label": "State-by-State"
+  },
+  {
+   "id": "H9.dataset.lost_targeted.gender",
+   "hypothesis": "H9",
+   "role": "exploratory",
+   "outcome": "lost_targeted",
+   "prediction": "bias effects (overconfidence, risk willingness) differ across genders (lost money (among those targeted))",
+   "test": "Joint Wald test of bias × group interactions (survey-weighted logistic, HC1)",
+   "statistic_name": "Wald χ² (df = 2)",
+   "statistic": 2.7036346792428554,
+   "p": 0.25876956088895875,
+   "p_holm": 0.5175391217779175,
+   "holm_family": "H9-lost_targeted",
+   "effect_name": null,
+   "effect": null,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {
+    "respondents": 3266
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "strongest_bias_by_group": {
+    "female": "overconfidence",
+    "male": "risk willingness"
+   },
+   "dataset_label": "State-by-State"
+  },
+  {
+   "id": "H9.dataset.lost_targeted.age",
+   "hypothesis": "H9",
+   "role": "exploratory",
+   "outcome": "lost_targeted",
+   "prediction": "bias effects (overconfidence, risk willingness) differ across age groups (lost money (among those targeted))",
+   "test": "Joint Wald test of bias × group interactions (survey-weighted logistic, HC1)",
+   "statistic_name": "Wald χ² (df = 10)",
+   "statistic": 14.2170871263056,
+   "p": 0.16331789706004782,
+   "p_holm": 0.4899536911801434,
+   "holm_family": "H9-lost_targeted",
+   "effect_name": null,
+   "effect": null,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {
+    "respondents": 3266
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "strongest_bias_by_group": {
+    "18-24": "risk willingness",
+    "25-34": "risk willingness",
+    "35-44": "risk willingness",
+    "45-54": "risk willingness",
+    "55-64": "overconfidence",
+    "65+": "risk willingness"
+   },
+   "dataset_label": "State-by-State"
+  },
+  {
+   "id": "H9.dataset.lost_targeted.income",
+   "hypothesis": "H9",
+   "role": "exploratory",
+   "outcome": "lost_targeted",
+   "prediction": "bias effects (overconfidence, risk willingness) differ across income groups (lost money (among those targeted))",
+   "test": "Joint Wald test of bias × group interactions (survey-weighted logistic, HC1)",
+   "statistic_name": "Wald χ² (df = 4)",
+   "statistic": 3.8656926115859864,
+   "p": 0.4244874156093478,
+   "p_holm": 0.5175391217779175,
+   "holm_family": "H9-lost_targeted",
+   "effect_name": null,
+   "effect": null,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {
+    "respondents": 3266
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "strongest_bias_by_group": {
+    "$100K+": "overconfidence",
+    "$50K-$100K": "risk willingness",
+    "<$50K": "risk willingness"
+   },
+   "dataset_label": "State-by-State"
   }
  ],
  "sections": {
@@ -3659,74 +4560,582 @@
    "r2": 0.3178382645387845,
    "n": 58
   },
+  "external_dataset": {
+   "state": {
+    "name": "NFCS 2024 State-by-State Survey",
+    "source": "FINRA Investor Education Foundation, National Financial Capability Study 2024 (State Data 250623)",
+    "country": "United States",
+    "rows": 25539,
+    "weighted_targeted": 0.16688254918482726,
+    "weighted_lost_all": 0.07182538783943213,
+    "weighted_lost_targeted": 0.4455912330886677,
+    "n_targeted": 3933,
+    "n_lost": 1616,
+    "literacy_distribution": {
+     "0": 3948,
+     "1": 5837,
+     "2": 7546,
+     "3": 7892
+    },
+    "share_lit_3": 0.30901758095461845,
+    "sd_overconfidence_raw": 1.2385314229565831
+   },
+   "investor": {
+    "name": "NFCS 2024 Investor Survey",
+    "source": "FINRA Investor Education Foundation, National Financial Capability Study 2024 (Investor Data 251114)",
+    "country": "United States",
+    "rows": 2861,
+    "n_targeted": 127,
+    "n_lost": 56,
+    "weighted_targeted": 0.06558125054518335,
+    "weighted_guaranteed_yes": 0.7062618626370474,
+    "weighted_regulator": 0.20187111644845737,
+    "weighted_finfluencer": 0.26372901768441176,
+    "quiz_items": 11,
+    "quiz_excluded": [
+     "G44"
+    ],
+    "quiz_mean": 5.096820292961772,
+    "sd_overconfidence_raw": 1.1083487988594072,
+    "link": {
+     "investor_rows": 2861,
+     "matched_in_state_file": 2839
+    },
+    "guaranteed_counts": {
+     "yes": 1249,
+     "no": 616,
+     "not_sure": 989
+    }
+   },
+   "estimation": "Survey-weighted logistic regression: GLM binomial, weights normalized to mean 1, HC1 robust SEs; odds ratios per SD.",
+   "state_models": {
+    "targeted": {
+     "label": "targeted by a fraud or scam (past year)",
+     "n": 19460,
+     "events": 3366,
+     "lit": {
+      "term": "z_lit",
+      "coef": -0.13056317636734582,
+      "odds_ratio": 0.8776010475511744,
+      "or_ci_low": 0.8182760397902858,
+      "or_ci_high": 0.9412271180032441,
+      "p": 0.00025608100526502406,
+      "z": -3.6561004875131418
+     },
+     "oc": {
+      "term": "z_oc",
+      "coef": -0.07992578237831481,
+      "odds_ratio": 0.9231848604288465,
+      "or_ci_low": 0.8645127367149774,
+      "or_ci_high": 0.9858389013024051,
+      "p": 0.017047820971622087,
+      "z": -2.3856747476376685
+     },
+     "reparam": {
+      "lit": {
+       "term": "z_lit",
+       "coef": -0.06603047182964494,
+       "odds_ratio": 0.9361023391060063,
+       "or_ci_low": 0.8894925127492086,
+       "or_ci_high": 0.9851545423033872,
+       "p": 0.01127904930232644,
+       "z": -2.533932384877692
+      },
+      "self": {
+       "term": "z_self",
+       "coef": -0.06453270453770035,
+       "odds_ratio": 0.9375054530782381,
+       "or_ci_low": 0.8890961476063509,
+       "or_ci_high": 0.9885505374392584,
+       "p": 0.017047820971622076,
+       "z": -2.385674747637669
+      },
+      "check_lit": -0.06603047182964543,
+      "check_self": -0.0645327045377004,
+      "max_abs_diff": 4.85722573273506e-16
+     }
+    },
+    "lost_all": {
+     "label": "lost money to a fraud (all respondents)",
+     "n": 19360,
+     "events": 1370,
+     "lit": {
+      "term": "z_lit",
+      "coef": -0.34507093946523365,
+      "odds_ratio": 0.708170114476642,
+      "or_ci_low": 0.639942919335617,
+      "or_ci_high": 0.7836713179958583,
+      "p": 2.4535271046951522e-11,
+      "z": -6.676119035675722
+     },
+     "oc": {
+      "term": "z_oc",
+      "coef": -0.11739430881898716,
+      "odds_ratio": 0.8892344910235238,
+      "or_ci_low": 0.8063262759850006,
+      "or_ci_high": 0.9806675083977727,
+      "p": 0.018727986292705095,
+      "z": -2.350901588648393
+     },
+     "reparam": {
+      "lit": {
+       "term": "z_lit",
+       "coef": -0.250285852350732,
+       "odds_ratio": 0.7785781928522963,
+       "or_ci_low": 0.7225961949553759,
+       "or_ci_high": 0.8388973075378326,
+       "p": 4.895133044725072e-11,
+       "z": -6.57409087163763
+      },
+      "self": {
+       "term": "z_self",
+       "coef": -0.09478508711450108,
+       "odds_ratio": 0.9095683914319304,
+       "or_ci_low": 0.8404581552082729,
+       "or_ci_high": 0.9843615099279434,
+       "p": 0.01872798629270521,
+       "z": -2.350901588648391
+      },
+      "check_lit": -0.2502858523507322,
+      "check_self": -0.09478508711450144,
+      "max_abs_diff": 3.608224830031759e-16
+     }
+    },
+    "lost_targeted": {
+     "label": "lost money (among those targeted)",
+     "n": 3266,
+     "events": 1370,
+     "lit": {
+      "term": "z_lit",
+      "coef": -0.4347415024173834,
+      "odds_ratio": 0.6474320050570871,
+      "or_ci_low": 0.5684716595063619,
+      "or_ci_high": 0.7373598914961373,
+      "p": 5.703705860193846e-11,
+      "z": -6.551303357746732
+     },
+     "oc": {
+      "term": "z_oc",
+      "coef": -0.14237325363562037,
+      "odds_ratio": 0.8672974741278193,
+      "or_ci_low": 0.773230073206169,
+      "or_ci_high": 0.9728086564319809,
+      "p": 0.01507367093807156,
+      "z": -2.4306042020444845
+     },
+     "reparam": {
+      "lit": {
+       "term": "z_lit",
+       "coef": -0.3197882190394367,
+       "odds_ratio": 0.726302837899743,
+       "or_ci_low": 0.6602977954319328,
+       "or_ci_high": 0.7989059118335338,
+       "p": 4.7523709781126644e-11,
+       "z": -6.57849398390524
+      },
+      "self": {
+       "term": "z_self",
+       "coef": -0.11495328337794791,
+       "odds_ratio": 0.8914077864947793,
+       "or_ci_low": 0.8124929412601454,
+       "or_ci_high": 0.9779873786855497,
+       "p": 0.015073670938071076,
+       "z": -2.430604202044496
+      },
+      "check_lit": -0.3197882190394361,
+      "check_self": -0.11495328337794727,
+      "max_abs_diff": 6.38378239159465e-16
+     }
+    }
+   },
+   "investor_models": {
+    "targeted": {
+     "label": "Investor Survey, targeted by investment fraud (primary)",
+     "n": 2672,
+     "events": 127,
+     "lit": {
+      "term": "z_lit",
+      "coef": 0.3224969849982684,
+      "odds_ratio": 1.3805707284301616,
+      "or_ci_low": 0.9910254305736748,
+      "or_ci_high": 1.9232357489503324,
+      "p": 0.056563975125269964,
+      "z": 1.906665053463683
+     },
+     "oc": {
+      "term": "z_oc",
+      "coef": 0.798617577604142,
+      "odds_ratio": 2.22246641649678,
+      "or_ci_low": 1.6149840677739196,
+      "or_ci_high": 3.0584555420812336,
+      "p": 9.472989316589982e-07,
+      "z": 4.902281630484551
+     },
+     "predicted_oc": ">"
+    },
+    "lost_all": {
+     "label": "Investor Survey, lost money to investment fraud",
+     "n": 2669,
+     "events": 56,
+     "lit": {
+      "term": "z_lit",
+      "coef": 0.4696479669821735,
+      "odds_ratio": 1.599431041562821,
+      "or_ci_low": 0.9482555886573832,
+      "or_ci_high": 2.6977744052495463,
+      "p": 0.07827759255593181,
+      "z": 1.7607685049900994
+     },
+     "oc": {
+      "term": "z_oc",
+      "coef": 1.184481002262797,
+      "odds_ratio": 3.2689897828242116,
+      "or_ci_low": 2.0117200695805364,
+      "or_ci_high": 5.3120184869643845,
+      "p": 1.7369729322841547e-06,
+      "z": 4.781840714201133
+     },
+     "predicted_oc": ">"
+    },
+    "guaranteed": {
+     "label": "Investor Survey, would invest in a guaranteed risk-free 25% offer (yes vs no)",
+     "n": 1821,
+     "events": 1215,
+     "lit": {
+      "term": "z_lit",
+      "coef": -0.34191476202315724,
+      "odds_ratio": 0.7104087559335959,
+      "or_ci_low": 0.5990969597062579,
+      "or_ci_high": 0.8424022060712315,
+      "p": 8.411724491688524e-05,
+      "z": -3.932356355201675
+     },
+     "oc": {
+      "term": "z_oc",
+      "coef": -0.009282021600000016,
+      "odds_ratio": 0.9907609233876772,
+      "or_ci_low": 0.8515672402312587,
+      "or_ci_high": 1.1527066342352827,
+      "p": 0.9043520625657028,
+      "z": -0.1201654799853027
+     },
+     "predicted_oc": ">"
+    },
+    "guaranteed_or_unsure": {
+     "label": "Investor Survey, guaranteed offer: yes or not sure vs no (robustness)",
+     "n": 2785,
+     "events": 2179,
+     "lit": {
+      "term": "z_lit",
+      "coef": -0.335350042591141,
+      "odds_ratio": 0.71508773137528,
+      "or_ci_low": 0.6140223872840703,
+      "or_ci_high": 0.8327879799712813,
+      "p": 1.606452178528696e-05,
+      "z": -4.3135617845878205
+     },
+     "oc": {
+      "term": "z_oc",
+      "coef": -0.08831772492140913,
+      "odds_ratio": 0.9154699628884742,
+      "or_ci_low": 0.7942372034590445,
+      "or_ci_high": 1.0552077506581328,
+      "p": 0.22302048594037294,
+      "z": -1.2185356498883992
+     },
+     "predicted_oc": ">"
+    },
+    "regulator": {
+     "label": "Investor Survey, ever checked a regulator about a financial professional",
+     "n": 2755,
+     "events": 448,
+     "lit": {
+      "term": "z_lit",
+      "coef": 0.5687614675977885,
+      "odds_ratio": 1.7660783510627176,
+      "or_ci_low": 1.4350363946952882,
+      "or_ci_high": 2.173486856237325,
+      "p": 7.853844072772361e-08,
+      "z": 5.370454516725772
+     },
+     "oc": {
+      "term": "z_oc",
+      "coef": 0.8786888150799169,
+      "odds_ratio": 2.4077406425893395,
+      "or_ci_low": 1.9506397442241048,
+      "or_ci_high": 2.9719557489496613,
+      "p": 2.8326938799169013e-16,
+      "z": 8.18024412683981
+     },
+     "predicted_oc": "<"
+    },
+    "targeted_finfluencer": {
+     "n": 2647,
+     "finfluencer": {
+      "term": "finfluencer",
+      "coef": 1.5732783579027905,
+      "odds_ratio": 4.822431965156487,
+      "or_ci_low": 3.1212152463370257,
+      "or_ci_high": 7.450895956584698,
+      "p": 1.3630708526264035e-12,
+      "z": 7.08775287800367
+     },
+     "lit": {
+      "term": "z_lit",
+      "coef": 0.23822485197880214,
+      "odds_ratio": 1.2689944966718072,
+      "or_ci_low": 0.8865157205653633,
+      "or_ci_high": 1.8164901030253096,
+      "p": 0.19300302057782825,
+      "z": 1.3017466094459345
+     },
+     "oc": {
+      "term": "z_oc",
+      "coef": 0.6254914246908545,
+      "odds_ratio": 1.8691642852502945,
+      "or_ci_low": 1.3508527145022629,
+      "or_ci_high": 2.5863479324928225,
+      "p": 0.00016002928202236055,
+      "z": 3.774966322317865
+     }
+    },
+    "targeted_big3": {
+     "n": 2706,
+     "lit": {
+      "term": "z_big3",
+      "coef": -0.3530110700765628,
+      "odds_ratio": 0.7025694158369686,
+      "or_ci_low": 0.5311260910255139,
+      "or_ci_high": 0.92935329747487,
+      "p": 0.013387669674441794,
+      "z": -2.473286694125381
+     },
+     "oc": {
+      "term": "z_oc_big3",
+      "coef": 0.12064008805244802,
+      "odds_ratio": 1.1282187798674317,
+      "or_ci_low": 0.8331162323082348,
+      "or_ci_high": 1.5278511759624671,
+      "p": 0.43551335117885837,
+      "z": 0.779791940235401
+     }
+    }
+   },
+   "replication": [
+    {
+     "outcome": "targeted by a fraud or scam (past year)",
+     "predictor": "literacy",
+     "ours": 0.88,
+     "ours_ci": "[0.82, 0.94]",
+     "teammate": 0.88,
+     "difference": -0.0,
+     "flag": false,
+     "teammate_in_our_ci": true
+    },
+    {
+     "outcome": "targeted by a fraud or scam (past year)",
+     "predictor": "overconfidence",
+     "ours": 0.92,
+     "ours_ci": "[0.86, 0.99]",
+     "teammate": 0.92,
+     "difference": 0.0,
+     "flag": false,
+     "teammate_in_our_ci": true
+    },
+    {
+     "outcome": "lost money to a fraud (all respondents)",
+     "predictor": "literacy",
+     "ours": 0.71,
+     "ours_ci": "[0.64, 0.78]",
+     "teammate": 0.71,
+     "difference": -0.0,
+     "flag": false,
+     "teammate_in_our_ci": true
+    },
+    {
+     "outcome": "lost money to a fraud (all respondents)",
+     "predictor": "overconfidence",
+     "ours": 0.89,
+     "ours_ci": "[0.81, 0.98]",
+     "teammate": 0.9,
+     "difference": -0.01,
+     "flag": false,
+     "teammate_in_our_ci": true
+    },
+    {
+     "outcome": "lost money (among those targeted)",
+     "predictor": "literacy",
+     "ours": 0.65,
+     "ours_ci": "[0.57, 0.74]",
+     "teammate": 0.65,
+     "difference": -0.0,
+     "flag": false,
+     "teammate_in_our_ci": true
+    },
+    {
+     "outcome": "lost money (among those targeted)",
+     "predictor": "overconfidence",
+     "ours": 0.87,
+     "ours_ci": "[0.77, 0.97]",
+     "teammate": 0.88,
+     "difference": -0.01,
+     "flag": false,
+     "teammate_in_our_ci": true
+    }
+   ]
+  },
   "external": {
    "H8": {
-    "status": "pending",
-    "verdict": "PENDING",
-    "reason": "no dataset file in data/external/ yet",
-    "todo": [
-     "age_group.column",
-     "age_group.labels",
-     "age_group.labels.TODO",
-     "dataset.country",
-     "dataset.file",
-     "dataset.name",
-     "dataset.source",
-     "gender.column",
-     "gender.male_values[0]",
-     "income_group.column",
-     "income_group.labels",
-     "income_group.labels.TODO",
-     "investing_experience.column",
-     "investing_experience.labels",
-     "investing_experience.labels.TODO",
-     "literacy.items[0].column",
-     "literacy.items[0].correct[0]",
-     "literacy.items[1].column",
-     "literacy.items[1].correct[0]",
-     "literacy.items[2].column",
-     "literacy.items[2].correct[0]",
-     "risk_attitude.column",
-     "self_rated_knowledge.column",
-     "victimization.column",
-     "victimization.no_values[0]",
-     "victimization.yes_values[0]",
-     "weights.column"
-    ]
+    "status": "done",
+    "verdict": "SUPPORTED",
+    "reason": "overconfidence OR > 1 (p = 0.000); knowledge CI not entirely below 1",
+    "dataset": "NFCS 2024 Investor Survey (primary) + State-by-State (check)"
    },
    "H9": {
-    "status": "pending",
-    "verdict": "PENDING",
-    "reason": "no dataset file in data/external/ yet",
-    "todo": [
-     "age_group.column",
-     "age_group.labels",
-     "age_group.labels.TODO",
-     "dataset.country",
-     "dataset.file",
-     "dataset.name",
-     "dataset.source",
-     "gender.column",
-     "gender.male_values[0]",
-     "income_group.column",
-     "income_group.labels",
-     "income_group.labels.TODO",
-     "investing_experience.column",
-     "investing_experience.labels",
-     "investing_experience.labels.TODO",
-     "literacy.items[0].column",
-     "literacy.items[0].correct[0]",
-     "literacy.items[1].column",
-     "literacy.items[1].correct[0]",
-     "literacy.items[2].column",
-     "literacy.items[2].correct[0]",
-     "risk_attitude.column",
-     "self_rated_knowledge.column",
-     "victimization.column",
-     "victimization.no_values[0]",
-     "victimization.yes_values[0]",
-     "weights.column"
-    ]
+    "status": "done",
+    "verdict": "SUPPORTED",
+    "reason": "primary outcome (lost money): gender p = 0.145, strongest bias is the same across groups; age group p = 0.005, strongest bias differs across groups; income group p = 0.702, strongest bias differs across groups",
+    "groupings": {
+     "targeted": [
+      {
+       "grouping": "gender",
+       "p": 0.31501571476757984,
+       "stat": 2.310265506499659,
+       "df": 2,
+       "differs": false,
+       "strongest": {
+        "female": "risk willingness",
+        "male": "risk willingness"
+       },
+       "n": 19460,
+       "p_holm": 0.6300314295351597
+      },
+      {
+       "grouping": "age",
+       "p": 0.12147588533648719,
+       "stat": 15.300744453679215,
+       "df": 10,
+       "differs": true,
+       "strongest": {
+        "18-24": "risk willingness",
+        "25-34": "risk willingness",
+        "35-44": "risk willingness",
+        "45-54": "risk willingness",
+        "55-64": "overconfidence",
+        "65+": "overconfidence"
+       },
+       "n": 19460,
+       "p_holm": 0.3644276560094616
+      },
+      {
+       "grouping": "income",
+       "p": 0.4072611978067864,
+       "stat": 3.9907348927452944,
+       "df": 4,
+       "differs": true,
+       "strongest": {
+        "$100K+": "overconfidence",
+        "$50K-$100K": "overconfidence",
+        "<$50K": "risk willingness"
+       },
+       "n": 19460,
+       "p_holm": 0.6300314295351597
+      }
+     ],
+     "lost_all": [
+      {
+       "grouping": "gender",
+       "p": 0.14470120264869757,
+       "stat": 3.866168668108889,
+       "df": 2,
+       "differs": false,
+       "strongest": {
+        "female": "risk willingness",
+        "male": "risk willingness"
+       },
+       "n": 19360,
+       "p_holm": 0.28940240529739514
+      },
+      {
+       "grouping": "age",
+       "p": 0.004868379722015577,
+       "stat": 25.263166760768144,
+       "df": 10,
+       "differs": true,
+       "strongest": {
+        "18-24": "risk willingness",
+        "25-34": "risk willingness",
+        "35-44": "risk willingness",
+        "45-54": "risk willingness",
+        "55-64": "overconfidence",
+        "65+": "overconfidence"
+       },
+       "n": 19360,
+       "p_holm": 0.01460513916604673
+      },
+      {
+       "grouping": "income",
+       "p": 0.7023137540144444,
+       "stat": 2.1820668969879335,
+       "df": 4,
+       "differs": true,
+       "strongest": {
+        "$100K+": "overconfidence",
+        "$50K-$100K": "risk willingness",
+        "<$50K": "risk willingness"
+       },
+       "n": 19360,
+       "p_holm": 0.7023137540144444
+      }
+     ],
+     "lost_targeted": [
+      {
+       "grouping": "gender",
+       "p": 0.25876956088895875,
+       "stat": 2.7036346792428554,
+       "df": 2,
+       "differs": true,
+       "strongest": {
+        "female": "overconfidence",
+        "male": "risk willingness"
+       },
+       "n": 3266,
+       "p_holm": 0.5175391217779175
+      },
+      {
+       "grouping": "age",
+       "p": 0.16331789706004782,
+       "stat": 14.2170871263056,
+       "df": 10,
+       "differs": true,
+       "strongest": {
+        "18-24": "risk willingness",
+        "25-34": "risk willingness",
+        "35-44": "risk willingness",
+        "45-54": "risk willingness",
+        "55-64": "overconfidence",
+        "65+": "risk willingness"
+       },
+       "n": 3266,
+       "p_holm": 0.4899536911801434
+      },
+      {
+       "grouping": "income",
+       "p": 0.4244874156093478,
+       "stat": 3.8656926115859864,
+       "df": 4,
+       "differs": true,
+       "strongest": {
+        "$100K+": "overconfidence",
+        "$50K-$100K": "risk willingness",
+        "<$50K": "risk willingness"
+       },
+       "n": 3266,
+       "p_holm": 0.5175391217779175
+      }
+     ]
+    },
+    "dataset": "NFCS 2024 State-by-State Survey"
    }
   },
   "survey": {
