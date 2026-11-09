@@ -153,3 +153,26 @@ hypothesis.
 - ITT definition used in the report: the conclusion "changes" only if significance changes, or if both results are
   significant but in opposite directions. Two non-significant results count as the same conclusion. Result:
   only the H1 round-1 stake changes (completers p = 0.090 → ITT p = 0.037, fraud higher).
+
+## Step 7 — results/index.html (2026-11-09)
+
+**Status:** done. `analysis/build_html.py` generates `results/index.html` from results.json, the tables and the
+figures; `run_all.py` rebuilds it every run.
+
+- One self-contained file (~2.4 MB): CSS and JS inline, all figures embedded as base64 PNG, no external requests.
+  Opens offline by double-clicking.
+- Dark theme matching the app; sticky navigation (Scorecard, Attrition, H1–H9, H1 parts, Survey, Limitations); a
+  scorecard card per hypothesis with a coloured verdict badge (click jumps to the section); per-hypothesis sections
+  mirroring the report; "Present mode" shows one section at a time (← → to move, Esc to exit).
+- No participant IDs or raw rows in the page (checked automatically).
+- Checked in headless Edge at 1366×768 and 1920×1080 with `npm run check:results`
+  (`scripts/check-results-html.mjs`): no horizontal scroll, no element outside the viewport, all 23 figures loaded,
+  no clipped cards, no overlapping cards, no external requests, present mode works. Fixed after the first
+  screenshots: table cells broke words mid-word (now wrap only between words, and numeric columns never wrap); the
+  present mode did not jump to the top of the next section (smooth scrolling); the nav highlight was stale in
+  present mode.
+- `analysis/verify_outputs.py` runs last in `run_all.py`. It checks that every figure and table exists, that the
+  report and the page show the same verdicts and primary results as results.json, that no participant ID appears in
+  any output, and that the page has no external resources.
+- Housekeeping: `eslint.config.js` reformatted with prettier; the Step 1 commit had left it unformatted (the npm
+  notices hid the prettier warning).

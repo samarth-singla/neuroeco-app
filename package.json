@@ -17,6 +17,7 @@
     "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
     "simulate": "npm run simulate -w server",
     "smoke": "node scripts/browser-smoke.mjs",
+    "check:results": "node scripts/check-results-html.mjs",
     "db:reset": "tsx server/scripts/reset-db.ts",
     "docs:dictionary": "npm run docs:dictionary -w server"
   },

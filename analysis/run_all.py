@@ -2,8 +2,8 @@
 
     analysis/.venv/Scripts/python analysis/run_all.py
 
-Order: data checks -> attrition -> hypothesis tests -> external dataset (H8/H9, pending until added) -> survey ->
-verdicts and Holm -> results.json -> ANALYSIS_REPORT.md -> index.html.
+Order: data checks -> attrition -> hypothesis tests -> external dataset (H8/H9, pending until added) -> verdicts and
+Holm -> survey -> results.json -> ANALYSIS_REPORT.md -> index.html -> output check (agreement, no participant data).
 """
 
 from __future__ import annotations
@@ -16,12 +16,14 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import attrition  # noqa: E402
+import build_html  # noqa: E402
 import checks  # noqa: E402
 import report  # noqa: E402
 import survey  # noqa: E402
 import external  # noqa: E402
 import h1, h2, h3, h4, h5, h6, h7, h8, h9  # noqa: E401,E402
 import verdicts  # noqa: E402
+import verify_outputs  # noqa: E402
 from common import FIGURES, RESULTS, TABLES, Registry, ensure_dirs, prepare_wide, read_csv, style  # noqa: E402
 
 
@@ -74,7 +76,10 @@ def main() -> None:
 
     reg.save(os.path.join(RESULTS, "results.json"), meta(df))
     report.run()
-    print("done:", os.path.join(RESULTS, "results.json"))
+    build_html.run()
+    check = verify_outputs.run()
+    print(f"done: results.json, ANALYSIS_REPORT.md, index.html, {check['figures']} figures, {check['tables']} tables; "
+          "outputs agree with results.json")
 
 
 if __name__ == "__main__":
