@@ -28,3 +28,20 @@ analysis/.venv/Scripts/python analysis/run_all.py
   - the survey export is named `Investment Apps – Quick Survey (Responses) - Form responses 1.csv` (not
     `survey.csv`); the code finds it by pattern, and the file is not renamed (data/ is read-only);
   - `data/external/` did not exist; it is created in Step 4b with a README only.
+
+## Step 2 — Data checks (2026-11-09)
+
+**Status:** done. Module `analysis/checks.py`; tables `results/tables/checks_*.csv`; section `checks` in
+`results/results.json`.
+
+- 61 completers (no pilots): honest 39 / fraud 22. The other factors are close to 50/50 among completers.
+- Among completers, skin is independent of every other randomized factor (Fisher, smallest p = 0.108 for the Gold
+  Plan framing).
+- No missing values except blanks by design (fraud-only columns, `withdrew` when not offered, escalation ratio when
+  round 1 was skipped, loss-aversion group for 3 inconsistent spin players).
+- All `crt_1` answers are numbers.
+- Decision-time outliers (> Q3 + 3 × IQR = 68.9 s): 3 players (2 honest, 1 fraud). They are kept in every test;
+  the H1 timing tests are rerun without them as robustness.
+- One player has duplicated round events (identical amounts, from a double tap or refresh). The first event is used,
+  which reproduces `wide.csv` exactly. The S3 decision time from `events.csv` also matches `wide.csv` exactly for all
+  61 completers.

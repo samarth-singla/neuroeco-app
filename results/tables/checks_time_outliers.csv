@@ -1,0 +1,2 @@
+rule,threshold_s,total,honest,fraud,flagged_values_s
+decision_time_first_invest > Q3 + 3 x IQR (pooled completers),68.941,3,2,1,80.3; 134.3; 172.2

@@ -1,0 +1,9 @@
+check,value
+"completers (wide.csv, is_pilot = 0)",61
+"smallest Fisher p, skin x other factor",0.1083
+inconsistent spin players (la_consistent = 0),3
+players with a spin missing,0
+crt_1 answers that are not numbers (all consented),0
+decision-time outlier threshold (s),68.9
+decision-time outliers (honest / fraud),2 / 1
+players with duplicated round events (first event used),1

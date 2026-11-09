@@ -1,0 +1,51 @@
+column,applies_to,n_applicable,missing,missing_share
+total_deposited,all,61,0,0.0
+decision_time_first_invest,all,61,0,0.0
+r1_amount,all,61,0,0.0
+r2_amount,all,61,0,0.0
+r4_amount,all,61,0,0.0
+escalation_ratio,r1_amount > 0 only,54,0,0.0
+verify_any,all,61,0,0.0
+verify_count,all,61,0,0.0
+app_trust,all,61,0,0.0
+app_urgency,all,61,0,0.0
+trap_score_shared8,all,61,0,0.0
+vip_upgrade,all,61,0,0.0
+vip_level,all,61,0,0.0
+chat_deposit,fraud only,22,0,0.0
+tax_paid,fraud only,22,0,0.0
+deal_invest_500,all,61,0,0.0
+deal_invest_3000,all,61,0,0.0
+deal_invest_8000,all,61,0,0.0
+deal_details_500,all,61,0,0.0
+deal_details_3000,all,61,0,0.0
+deal_details_8000,all,61,0,0.0
+deal_time_500,all,61,0,0.0
+deal_time_3000,all,61,0,0.0
+deal_time_8000,all,61,0,0.0
+pool_join,all,61,0,0.0
+pool_details,all,61,0,0.0
+pool_time,all,61,0,0.0
+post_withdrawal_deposit,all,61,0,0.0
+withdrew,withdrawal offered only,33,0,0.0
+reinvest_amount,all,61,0,0.0
+reinvest_accept,all,61,0,0.0
+crash_topup,all,61,0,0.0
+crash_topup_amount,all,61,0,0.0
+loss_aversion_group,consistent spin choices only,58,0,0.0
+crt_correct,all,61,0,0.0
+literacy_score,all,61,0,0.0
+self_rated_literacy,all,61,0,0.0
+overconfidence,all,61,0,0.0
+fomo_score,all,61,0,0.0
+exp_investing,all,61,0,0.0
+exp_trading_app,all,61,0,0.0
+exp_fin_edu,all,61,0,0.0
+demo_gender,all,61,0,0.0
+feature_push_timer,fraud only,22,0,0.0
+feature_push_bonus,fraud only,22,0,0.0
+feature_push_vip,fraud only,22,0,0.0
+feature_push_regulator,fraud only,22,0,0.0
+feature_push_social,fraud only,22,0,0.0
+feature_push_chat,fraud only,22,0,0.0
+feature_push_tax,fraud only,22,0,0.0

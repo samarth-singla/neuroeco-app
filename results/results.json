@@ -1,0 +1,176 @@
+{
+ "meta": {
+  "title": "Behavioral Mechanics of App-Based Investment Frauds",
+  "generated_at": "2026-11-09 09:21 UTC",
+  "consented": 124,
+  "consented_by_skin": {
+   "honest": 62,
+   "fraud": 62
+  },
+  "completed": 61,
+  "completed_by_skin": {
+   "honest": 39,
+   "fraud": 22
+  },
+  "collection_start": "2026-11-02",
+  "collection_end": "2026-11-08",
+  "alpha": 0.05,
+  "bootstrap": {
+   "resamples": 2000,
+   "seed": 42
+  }
+ },
+ "hypotheses": [],
+ "tests": [],
+ "sections": {
+  "checks": {
+   "factor_counts": [
+    {
+     "factor": "skin",
+     "hypothesis": "H1",
+     "level": "honest",
+     "completers": 39
+    },
+    {
+     "factor": "skin",
+     "hypothesis": "H1",
+     "level": "fraud",
+     "completers": 22
+    },
+    {
+     "factor": "round1_outcome",
+     "hypothesis": "H2",
+     "level": "small_win",
+     "completers": 29
+    },
+    {
+     "factor": "round1_outcome",
+     "hypothesis": "H2",
+     "level": "flat",
+     "completers": 32
+    },
+    {
+     "factor": "pool_source",
+     "hypothesis": "H5",
+     "level": "friend",
+     "completers": 30
+    },
+    {
+     "factor": "pool_source",
+     "hypothesis": "H5",
+     "level": "ad",
+     "completers": 31
+    },
+    {
+     "factor": "withdrawal_offer",
+     "hypothesis": "H6",
+     "level": "allowed",
+     "completers": 33
+    },
+    {
+     "factor": "withdrawal_offer",
+     "hypothesis": "H6",
+     "level": "not_offered",
+     "completers": 28
+    },
+    {
+     "factor": "reinvest_framing",
+     "hypothesis": "H7",
+     "level": "profit",
+     "completers": 29
+    },
+    {
+     "factor": "reinvest_framing",
+     "hypothesis": "H7",
+     "level": "main",
+     "completers": 32
+    }
+   ],
+   "randomization": [
+    {
+     "factor": "round1_outcome",
+     "level_1": "small_win",
+     "level_2": "flat",
+     "honest_level_1": 21,
+     "honest_level_2": 18,
+     "fraud_level_1": 8,
+     "fraud_level_2": 14,
+     "odds_ratio_fraud_vs_honest": 0.4897959183673469,
+     "ci_low": 0.16753006776152637,
+     "ci_high": 1.4319820009313353,
+     "fisher_p": 0.28571375999270393
+    },
+    {
+     "factor": "pool_source",
+     "level_1": "friend",
+     "level_2": "ad",
+     "honest_level_1": 17,
+     "honest_level_2": 22,
+     "fraud_level_1": 13,
+     "fraud_level_2": 9,
+     "odds_ratio_fraud_vs_honest": 1.869281045751634,
+     "ci_low": 0.6478228838020672,
+     "ci_high": 5.39377616224179,
+     "fisher_p": 0.29298417350706396
+    },
+    {
+     "factor": "withdrawal_offer",
+     "level_1": "allowed",
+     "level_2": "not_offered",
+     "honest_level_1": 19,
+     "honest_level_2": 20,
+     "fraud_level_1": 14,
+     "fraud_level_2": 8,
+     "odds_ratio_fraud_vs_honest": 1.8421052631578947,
+     "ci_low": 0.6306878644280897,
+     "ci_high": 5.380398120758391,
+     "fisher_p": 0.2959392670139264
+    },
+    {
+     "factor": "reinvest_framing",
+     "level_1": "profit",
+     "level_2": "main",
+     "honest_level_1": 22,
+     "honest_level_2": 17,
+     "fraud_level_1": 7,
+     "fraud_level_2": 15,
+     "odds_ratio_fraud_vs_honest": 0.3606060606060606,
+     "ci_low": 0.12028126519250898,
+     "ci_high": 1.0811054467850776,
+     "fisher_p": 0.10833373338148655
+    }
+   ],
+   "randomization_min_p": 0.10833373338148655,
+   "missing_nonzero": [],
+   "la_inconsistent": 3,
+   "la_missing_spin": 0,
+   "crt_non_numeric_all": 0,
+   "crt_non_numeric_completers": 0,
+   "crt_answers_completers": {
+    "5": 42,
+    "10": 16,
+    "90": 1,
+    "100": 1,
+    "105": 1
+   },
+   "crt_non_numeric_values": [],
+   "time_outlier_threshold_s": 68.941,
+   "time_outliers": {
+    "total": 3,
+    "honest": 2,
+    "fraud": 1,
+    "values_s": [
+     80.3,
+     134.3,
+     172.2
+    ]
+   },
+   "duplicate_round_events": {
+    "players": 1,
+    "rounds": 2
+   },
+   "overconfidence_recomputed_n": 61
+  }
+ },
+ "problems": []
+}

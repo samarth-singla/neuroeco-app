@@ -1,0 +1,11 @@
+factor,hypothesis,level,completers
+skin,H1,honest,39
+skin,H1,fraud,22
+round1_outcome,H2,small_win,29
+round1_outcome,H2,flat,32
+pool_source,H5,friend,30
+pool_source,H5,ad,31
+withdrawal_offer,H6,allowed,33
+withdrawal_offer,H6,not_offered,28
+reinvest_framing,H7,profit,29
+reinvest_framing,H7,main,32
