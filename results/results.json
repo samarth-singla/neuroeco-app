@@ -1,7 +1,7 @@
 {
  "meta": {
   "title": "Behavioral Mechanics of App-Based Investment Frauds",
-  "generated_at": "2026-11-09 09:23 UTC",
+  "generated_at": "2026-11-09 09:31 UTC",
   "consented": 124,
   "consented_by_skin": {
    "honest": 62,
@@ -20,7 +20,248 @@
    "seed": 42
   }
  },
- "hypotheses": [],
+ "hypotheses": [
+  {
+   "id": "H1",
+   "title": "Dark design overrides deliberate judgment",
+   "short": "Dark design",
+   "prediction": "Fraud players deposit more in total (and decide faster, invest more often, verify less, trust more, feel more urgency).",
+   "primary_test": "H1.primary",
+   "secondary_tests": [
+    "H1.sec.decision_time",
+    "H1.sec.invested_r1",
+    "H1.sec.verify_any",
+    "H1.sec.app_trust",
+    "H1.sec.app_urgency",
+    "H1.sec.trap_score_shared8"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "predicted direction but not significant (primary p = 0.102 ≥ 0.10; 2 of 6 secondary tests significant in the predicted direction)",
+   "label": null
+  },
+  {
+   "id": "H1a",
+   "title": "Countdown timers and \"only 3 slots left\"",
+   "short": "Timer / scarcity",
+   "prediction": "Fraud players make the first decision faster than honest players.",
+   "primary_test": "H1ae.primary",
+   "secondary_tests": [
+    "H1a.sec.feature_push_timer"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "predicted direction but not significant (primary p = 0.494 ≥ 0.10; the secondary outcomes are descriptive shares without a test)",
+   "label": null
+  },
+  {
+   "id": "H1b",
+   "title": "Sign-up bonus locked until the first deposit",
+   "short": "Locked bonus",
+   "prediction": "More fraud players invest in round 1 (the first real deposit).",
+   "primary_test": "H1b.primary",
+   "secondary_tests": [
+    "H1b.sec.feature_push_bonus"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "predicted direction but not significant (primary p = 1.000 ≥ 0.10; the secondary outcomes are descriptive shares without a test)",
+   "label": null
+  },
+  {
+   "id": "H1c",
+   "title": "VIP levels",
+   "short": "VIP levels",
+   "prediction": "More fraud players deposit at least ₹5,000 (VIP 2).",
+   "primary_test": "H1c.primary",
+   "secondary_tests": [
+    "H1c.sec.vip_level",
+    "H1c.sec.feature_push_vip"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "estimate points the opposite way and is not significant (p = 0.658): no evidence for the predicted effect",
+   "label": null
+  },
+  {
+   "id": "H1d",
+   "title": "Fake regulatory credentials",
+   "short": "Fake credentials",
+   "prediction": "Fewer fraud players open any T&C, details, badge or About page.",
+   "primary_test": "H1d.primary",
+   "secondary_tests": [
+    "H1d.sec.verify_count",
+    "H1d.sec.feature_push_regulator"
+   ],
+   "verdict": "SUPPORTED",
+   "verdict_reason": "primary in the predicted direction, p = 0.002 < 0.05",
+   "label": null
+  },
+  {
+   "id": "H1e",
+   "title": "Social proof (ticker, testimonials)",
+   "short": "Social proof",
+   "prediction": "Fraud players make the first decision faster than honest players.",
+   "primary_test": "H1ae.primary",
+   "secondary_tests": [
+    "H1e.sec.feature_push_social"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "predicted direction but not significant (primary p = 0.494 ≥ 0.10; the secondary outcomes are descriptive shares without a test)",
+   "label": null
+  },
+  {
+   "id": "H1f",
+   "title": "Mentor chat nudging deposits",
+   "short": "Mentor chat",
+   "prediction": "Fraud players (who see the chat right before round 4) stake more in round 4.",
+   "primary_test": "H1f.primary",
+   "secondary_tests": [
+    "H1f.sec.chat_deposit",
+    "H1f.sec.feature_push_chat"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "predicted direction but not significant (primary p = 0.148 ≥ 0.10; the secondary outcomes are descriptive shares without a test)",
+   "label": null
+  },
+  {
+   "id": "H1g",
+   "title": "Withdrawal blocked by a \"tax\"",
+   "short": "Withdrawal tax",
+   "prediction": "Fraud players pay the tax to unlock their withdrawal.",
+   "primary_test": "H1g.primary",
+   "secondary_tests": [
+    "H1g.sec.feature_push_tax"
+   ],
+   "verdict": "NOT TESTABLE",
+   "verdict_reason": "no comparison group exists in the design; the rate is descriptive",
+   "label": null
+  },
+  {
+   "id": "H1h",
+   "title": "UX map: which features felt persuasive",
+   "short": "UX map",
+   "prediction": "Descriptive: rank the seven features by the share of fraud players who felt pushed.",
+   "primary_test": null,
+   "secondary_tests": [],
+   "verdict": "DESCRIPTIVE",
+   "verdict_reason": "shares only, no hypothesis test",
+   "label": null
+  },
+  {
+   "id": "H2",
+   "title": "An early small win increases later investment",
+   "short": "Early win",
+   "prediction": "Players randomized to a +8% round 1 escalate their round-2 stake more than players with a flat round 1.",
+   "primary_test": "H2.primary",
+   "secondary_tests": [
+    "H2.sec.r2_amount"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "estimate points the opposite way and is not significant (p = 0.551): no evidence for the predicted effect",
+   "label": null
+  },
+  {
+   "id": "H3",
+   "title": "People trust faster when stakes are small",
+   "short": "Small stakes",
+   "prediction": "At ₹500 players open the deal details least and invest most.",
+   "primary_test": "H3.primary",
+   "secondary_tests": [
+    "H3.sec.deal_invest",
+    "H3.sec.deal_time",
+    "H3.pair.details_500_vs_3000",
+    "H3.pair.details_500_vs_8000",
+    "H3.pair.details_3000_vs_8000"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "estimate points the opposite way and is not significant (p = 0.336): no evidence for the predicted effect",
+   "label": null
+  },
+  {
+   "id": "H4",
+   "title": "Loss aversion drives loss chasing",
+   "short": "Loss chasing",
+   "prediction": "A higher loss-aversion group predicts topping up after the crash.",
+   "primary_test": "H4.primary",
+   "secondary_tests": [
+    "H4.sec.amount_ols",
+    "H4.sec.amount_spearman"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "estimate points the opposite way and is not significant (p = 0.084): no evidence for the predicted effect",
+   "label": null
+  },
+  {
+   "id": "H5",
+   "title": "A friend's referral lowers verification",
+   "short": "Friend referral",
+   "prediction": "More players join the Diamond Pool when the invite comes from a friend.",
+   "primary_test": "H5.primary",
+   "secondary_tests": [
+    "H5.sec.pool_details",
+    "H5.sec.pool_time"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "estimate points the opposite way and is not significant (p = 0.416): no evidence for the predicted effect",
+   "label": null
+  },
+  {
+   "id": "H6",
+   "title": "A small successful withdrawal builds trust",
+   "short": "Test withdrawal",
+   "prediction": "Players offered the ₹500 test withdrawal deposit more right after it.",
+   "primary_test": "H6.primary",
+   "secondary_tests": [
+    "H6.sec.app_trust"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "estimate points the opposite way and is not significant (p = 0.542): no evidence for the predicted effect",
+   "label": null
+  },
+  {
+   "id": "H7",
+   "title": "App profits are treated as house money",
+   "short": "House money",
+   "prediction": "More is put into the Gold Plan when it is funded from the Profit wallet than from Main.",
+   "primary_test": "H7.primary",
+   "secondary_tests": [
+    "H7.sec.reinvest_accept"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "estimate points the opposite way and is not significant (p = 0.714): no evidence for the predicted effect",
+   "label": null
+  },
+  {
+   "id": "H8",
+   "app_verdict": "NOT SUPPORTED",
+   "app_reason": "overconfidence coefficient positive but p = 0.331 ≥ 0.10",
+   "dataset": {
+    "status": "pending"
+   },
+   "title": "Financial literacy does not protect against fraud",
+   "short": "Literacy paradox",
+   "prediction": "Literacy coefficient not negative; overconfidence coefficient positive.",
+   "primary_test": "H8.primary",
+   "secondary_tests": [
+    "H8.literacy"
+   ],
+   "verdict": "NOT SUPPORTED",
+   "verdict_reason": "overconfidence coefficient positive but p = 0.331 ≥ 0.10",
+   "label": "app evidence only (dataset part PENDING)"
+  },
+  {
+   "id": "H9",
+   "app_verdict": "EXPLORATORY",
+   "dataset": {
+    "status": "pending"
+   },
+   "title": "The dominant bias differs by demographic group",
+   "short": "Bias by group",
+   "prediction": "Bias slopes on the trap score differ between male and not-male players (app); by age, income and gender for victimization (dataset).",
+   "primary_test": null,
+   "secondary_tests": [],
+   "verdict": "EXPLORATORY",
+   "verdict_reason": "app part is exploratory by design (gender only, small groups)",
+   "label": "app evidence only (dataset part PENDING)"
+  }
+ ],
  "tests": [
   {
    "id": "ATT.completion_skin",
@@ -309,6 +550,2245 @@
     "flat"
    ],
    "predicted": "greater"
+  },
+  {
+   "id": "H1.primary",
+   "hypothesis": "H1",
+   "role": "primary",
+   "outcome": "total_deposited",
+   "prediction": "fraud > honest",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 538.5,
+   "p": 0.10154436475063493,
+   "p_holm": 0.5077218237531747,
+   "holm_family": "H1",
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": 0.25524475524475526,
+   "ci_low": -0.07112470862470861,
+   "ci_high": 0.5547785547785548,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "mean": 23010.909090909092,
+     "median": 19500.0,
+     "q1": 10625.0,
+     "q3": 28875.0,
+     "min": 2500.0,
+     "max": 59400.0
+    },
+    "honest": {
+     "n": 39,
+     "mean": 15836.923076923076,
+     "median": 10500.0,
+     "q1": 7000.0,
+     "q3": 22250.0,
+     "min": 0.0,
+     "max": 51300.0
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H1.sec.decision_time",
+   "hypothesis": "H1",
+   "role": "secondary",
+   "outcome": "decision_time_first_invest",
+   "prediction": "fraud < honest",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 383.0,
+   "p": 0.49436648955400264,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": -0.10722610722610723,
+   "ci_low": -0.3962703962703963,
+   "ci_high": 0.19353146853146821,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "mean": 26.19,
+     "median": 19.205,
+     "q1": 11.1565,
+     "q3": 24.078249999999997,
+     "min": 1.23,
+     "max": 172.222
+    },
+    "honest": {
+     "n": 39,
+     "mean": 26.23682051282051,
+     "median": 19.804,
+     "q1": 14.259,
+     "q3": 28.7275,
+     "min": 5.631,
+     "max": 134.325
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "less"
+  },
+  {
+   "id": "H1.sec.invested_r1",
+   "hypothesis": "H1",
+   "role": "secondary",
+   "outcome": "invested_r1",
+   "prediction": "fraud > honest",
+   "test": "Fisher's exact test (two-sided)",
+   "statistic_name": "OR",
+   "statistic": 1.4705882352941178,
+   "p": 1.0,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio (fraud vs honest)",
+   "effect": 1.4705882352941178,
+   "ci_low": 0.2606153270716367,
+   "ci_high": 8.298167963049286,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "yes": 20,
+     "share": 0.9090909090909091,
+     "ci_low": 0.7218505315839416,
+     "ci_high": 0.9747045710090048
+    },
+    "honest": {
+     "n": 39,
+     "yes": 34,
+     "share": 0.8717948717948718,
+     "ci_low": 0.7329425662025454,
+     "ci_high": 0.9439718246302861
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater",
+   "risk_difference": 0.037296037296037254
+  },
+  {
+   "id": "H1.sec.verify_any",
+   "hypothesis": "H1",
+   "role": "secondary",
+   "outcome": "verify_any",
+   "prediction": "fraud < honest",
+   "test": "Fisher's exact test (two-sided)",
+   "statistic_name": "OR",
+   "statistic": 0.06845238095238096,
+   "p": 0.0024159318008489653,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio (fraud vs honest)",
+   "effect": 0.06845238095238096,
+   "ci_low": 0.008339369772644238,
+   "ci_high": 0.5618804041308441,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "yes": 1,
+     "share": 0.045454545454545456,
+     "ci_low": 0.008069427621263836,
+     "ci_high": 0.2179804583865734
+    },
+    "honest": {
+     "n": 39,
+     "yes": 16,
+     "share": 0.41025641025641024,
+     "ci_low": 0.27079310000725165,
+     "ci_high": 0.5658137711710303
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "less",
+   "risk_difference": -0.3648018648018648
+  },
+  {
+   "id": "H1.sec.app_trust",
+   "hypothesis": "H1",
+   "role": "secondary",
+   "outcome": "app_trust",
+   "prediction": "fraud > honest",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 333.0,
+   "p": 0.1444951147166034,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": -0.22377622377622378,
+   "ci_low": -0.49653263403263403,
+   "ci_high": 0.06180069930069914,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "mean": 2.8636363636363638,
+     "median": 3.0,
+     "q1": 2.0,
+     "q3": 4.0,
+     "min": 1.0,
+     "max": 6.0
+    },
+    "honest": {
+     "n": 39,
+     "mean": 3.5384615384615383,
+     "median": 3.0,
+     "q1": 2.0,
+     "q3": 5.0,
+     "min": 1.0,
+     "max": 7.0
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H1.sec.app_urgency",
+   "hypothesis": "H1",
+   "role": "secondary",
+   "outcome": "app_urgency",
+   "prediction": "fraud > honest",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 445.0,
+   "p": 0.8098057218083734,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": 0.037296037296037296,
+   "ci_low": -0.25993589743589746,
+   "ci_high": 0.3391899766899765,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "mean": 4.954545454545454,
+     "median": 5.0,
+     "q1": 5.0,
+     "q3": 6.0,
+     "min": 1.0,
+     "max": 7.0
+    },
+    "honest": {
+     "n": 39,
+     "mean": 4.6923076923076925,
+     "median": 5.0,
+     "q1": 3.0,
+     "q3": 6.0,
+     "min": 1.0,
+     "max": 7.0
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H1.sec.trap_score_shared8",
+   "hypothesis": "H1",
+   "role": "secondary",
+   "outcome": "trap_score_shared8",
+   "prediction": "fraud > honest",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 579.0,
+   "p": 0.022711728608481963,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": 0.34965034965034963,
+   "ci_low": 0.05241841491841492,
+   "ci_high": 0.6258741258741258,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "mean": 6.2272727272727275,
+     "median": 6.5,
+     "q1": 5.0,
+     "q3": 8.0,
+     "min": 1.0,
+     "max": 8.0
+    },
+    "honest": {
+     "n": 39,
+     "mean": 5.128205128205129,
+     "median": 5.0,
+     "q1": 4.0,
+     "q3": 7.0,
+     "min": 1.0,
+     "max": 8.0
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H1.rob.decision_time_no_outliers",
+   "hypothesis": "H1",
+   "role": "robustness",
+   "outcome": "decision_time_first_invest",
+   "prediction": "fraud < honest (outliers > Q3 + 3 IQR removed)",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 344.0,
+   "p": 0.4765390955151415,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": -0.11454311454311454,
+   "ci_low": -0.43114543114543114,
+   "ci_high": 0.1995495495495492,
+   "n": {
+    "fraud": 21,
+    "honest": 37
+   },
+   "summary": {
+    "fraud": {
+     "n": 21,
+     "mean": 19.23609523809524,
+     "median": 19.122,
+     "q1": 10.338,
+     "q3": 23.584,
+     "min": 1.23,
+     "max": 46.6
+    },
+    "honest": {
+     "n": 37,
+     "mean": 21.85332432432432,
+     "median": 18.066,
+     "q1": 14.201,
+     "q3": 27.664,
+     "min": 5.631,
+     "max": 64.574
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": "threshold 68.9 s",
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "less"
+  },
+  {
+   "id": "H1.rob.r1_amount",
+   "hypothesis": "H1",
+   "role": "robustness",
+   "outcome": "r1_amount",
+   "prediction": "fraud > honest (completers; compare with the ITT rerun)",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 539.0,
+   "p": 0.08971355636327885,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": 0.2564102564102564,
+   "ci_low": -0.02456293706293706,
+   "ci_high": 0.5303030303030303,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "mean": 2818.181818181818,
+     "median": 1000.0,
+     "q1": 1000.0,
+     "q3": 2000.0,
+     "min": 0.0,
+     "max": 10000.0
+    },
+    "honest": {
+     "n": 39,
+     "mean": 1358.974358974359,
+     "median": 1000.0,
+     "q1": 500.0,
+     "q3": 2000.0,
+     "min": 0.0,
+     "max": 10000.0
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H1.mod.fraud_x_crt",
+   "hypothesis": "H1",
+   "role": "exploratory",
+   "outcome": "log1p(total_deposited)",
+   "prediction": "fraud effect smaller for CRT-correct players (interaction < 0)",
+   "test": "OLS with HC3 SEs: log1p(total_deposited) ~ fraud × crt_correct + exp_investing + exp_trading_app",
+   "statistic_name": "t",
+   "statistic": -0.9628428006096369,
+   "p": 0.33562641803034887,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Interaction coefficient (log points)",
+   "effect": -0.8494039032723166,
+   "ci_low": -2.578451529413773,
+   "ci_high": 0.8796437228691398,
+   "n": {
+    "players": 61,
+    "fraud=0, crt=0": 11,
+    "fraud=0, crt=1": 28,
+    "fraud=1, crt=0": 8,
+    "fraud=1, crt=1": 14
+   },
+   "summary": {
+    "fraud_coef": 1.1317393722958535,
+    "fraud_p": 0.2140754370306991
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "r2": 0.12428131176081259
+  },
+  {
+   "id": "H1ae.primary",
+   "hypothesis": "H1a",
+   "role": "primary",
+   "outcome": "decision_time_first_invest",
+   "prediction": "fraud < honest",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 383.0,
+   "p": 0.49436648955400264,
+   "p_holm": 1.0,
+   "holm_family": "H1",
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": -0.10722610722610723,
+   "ci_low": -0.3962703962703963,
+   "ci_high": 0.19353146853146821,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "mean": 26.19,
+     "median": 19.205,
+     "q1": 11.1565,
+     "q3": 24.078249999999997,
+     "min": 1.23,
+     "max": 172.222
+    },
+    "honest": {
+     "n": 39,
+     "mean": 26.23682051282051,
+     "median": 19.804,
+     "q1": 14.259,
+     "q3": 28.7275,
+     "min": 5.631,
+     "max": 134.325
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": "Shared primary test of H1a and H1e (counted once in the Holm family).",
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "less"
+  },
+  {
+   "id": "H1ae.rob.no_outliers",
+   "hypothesis": "H1a",
+   "role": "robustness",
+   "outcome": "decision_time_first_invest",
+   "prediction": "fraud < honest (outliers removed)",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 344.0,
+   "p": 0.4765390955151415,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": -0.11454311454311454,
+   "ci_low": -0.43114543114543114,
+   "ci_high": 0.1995495495495492,
+   "n": {
+    "fraud": 21,
+    "honest": 37
+   },
+   "summary": {
+    "fraud": {
+     "n": 21,
+     "mean": 19.23609523809524,
+     "median": 19.122,
+     "q1": 10.338,
+     "q3": 23.584,
+     "min": 1.23,
+     "max": 46.6
+    },
+    "honest": {
+     "n": 37,
+     "mean": 21.85332432432432,
+     "median": 18.066,
+     "q1": 14.201,
+     "q3": 27.664,
+     "min": 5.631,
+     "max": 64.574
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": "threshold 68.9 s",
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "less"
+  },
+  {
+   "id": "H1a.sec.feature_push_timer",
+   "hypothesis": "H1a",
+   "role": "secondary",
+   "outcome": "feature_push_timer",
+   "prediction": "share of fraud players saying the timer pushed them",
+   "test": "Share with Wilson 95% CI (no test)",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Share",
+   "effect": 0.5454545454545454,
+   "ci_low": 0.3465979532073493,
+   "ci_high": 0.7307970581918668,
+   "n": {
+    "players": 22
+   },
+   "summary": {
+    "yes": 12,
+    "n": 22
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H1e.sec.feature_push_social",
+   "hypothesis": "H1e",
+   "role": "secondary",
+   "outcome": "feature_push_social",
+   "prediction": "share of fraud players saying social proof pushed them",
+   "test": "Share with Wilson 95% CI (no test)",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Share",
+   "effect": 0.36363636363636365,
+   "ci_low": 0.19733204670366128,
+   "ci_high": 0.57048291909869,
+   "n": {
+    "players": 22
+   },
+   "summary": {
+    "yes": 8,
+    "n": 22
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H1b.primary",
+   "hypothesis": "H1b",
+   "role": "primary",
+   "outcome": "trap_hook",
+   "prediction": "fraud > honest",
+   "test": "Fisher's exact test (two-sided)",
+   "statistic_name": "OR",
+   "statistic": 1.4705882352941178,
+   "p": 1.0,
+   "p_holm": 1.0,
+   "holm_family": "H1",
+   "effect_name": "Odds ratio (fraud vs honest)",
+   "effect": 1.4705882352941178,
+   "ci_low": 0.2606153270716367,
+   "ci_high": 8.298167963049286,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "yes": 20,
+     "share": 0.9090909090909091,
+     "ci_low": 0.7218505315839416,
+     "ci_high": 0.9747045710090048
+    },
+    "honest": {
+     "n": 39,
+     "yes": 34,
+     "share": 0.8717948717948718,
+     "ci_low": 0.7329425662025454,
+     "ci_high": 0.9439718246302861
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater",
+   "risk_difference": 0.037296037296037254
+  },
+  {
+   "id": "H1b.sec.feature_push_bonus",
+   "hypothesis": "H1b",
+   "role": "secondary",
+   "outcome": "feature_push_bonus",
+   "prediction": "share of fraud players saying the locked bonus pushed them",
+   "test": "Share with Wilson 95% CI (no test)",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Share",
+   "effect": 0.7272727272727273,
+   "ci_low": 0.5184826598759761,
+   "ci_high": 0.8684923971201054,
+   "n": {
+    "players": 22
+   },
+   "summary": {
+    "yes": 16,
+    "n": 22
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H1c.primary",
+   "hypothesis": "H1c",
+   "role": "primary",
+   "outcome": "vip_upgrade",
+   "prediction": "fraud > honest",
+   "test": "Fisher's exact test (two-sided)",
+   "statistic_name": "OR",
+   "statistic": 0.5277777777777778,
+   "p": 0.657814431211735,
+   "p_holm": 1.0,
+   "holm_family": "H1",
+   "effect_name": "Odds ratio (fraud vs honest)",
+   "effect": 0.5277777777777778,
+   "ci_low": 0.0969870583505415,
+   "ci_high": 2.8720263038526754,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "yes": 19,
+     "share": 0.8636363636363636,
+     "ci_low": 0.6666501283342827,
+     "ci_high": 0.9525099628594476
+    },
+    "honest": {
+     "n": 39,
+     "yes": 36,
+     "share": 0.9230769230769231,
+     "ci_low": 0.7967892883204502,
+     "ci_high": 0.9734926046962202
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater",
+   "risk_difference": -0.05944055944055948
+  },
+  {
+   "id": "H1c.sec.vip_level",
+   "hypothesis": "H1c",
+   "role": "secondary",
+   "outcome": "vip_level",
+   "prediction": "fraud > honest",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 521.0,
+   "p": 0.11273196065948442,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": 0.21445221445221446,
+   "ci_low": -0.050145687645687644,
+   "ci_high": 0.47785547785547783,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "mean": 2.6363636363636362,
+     "median": 3.0,
+     "q1": 3.0,
+     "q3": 3.0,
+     "min": 1.0,
+     "max": 3.0
+    },
+    "honest": {
+     "n": 39,
+     "mean": 2.41025641025641,
+     "median": 3.0,
+     "q1": 2.0,
+     "q3": 3.0,
+     "min": 0.0,
+     "max": 3.0
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H1c.sec.feature_push_vip",
+   "hypothesis": "H1c",
+   "role": "secondary",
+   "outcome": "feature_push_vip",
+   "prediction": "share of fraud players saying the VIP levels pushed them",
+   "test": "Share with Wilson 95% CI (no test)",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Share",
+   "effect": 0.6818181818181818,
+   "ci_low": 0.47318597741042745,
+   "ci_high": 0.8363940681864375,
+   "n": {
+    "players": 22
+   },
+   "summary": {
+    "yes": 15,
+    "n": 22
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H1d.primary",
+   "hypothesis": "H1d",
+   "role": "primary",
+   "outcome": "verify_any",
+   "prediction": "fraud < honest",
+   "test": "Fisher's exact test (two-sided)",
+   "statistic_name": "OR",
+   "statistic": 0.06845238095238096,
+   "p": 0.0024159318008489653,
+   "p_holm": 0.014495590805093793,
+   "holm_family": "H1",
+   "effect_name": "Odds ratio (fraud vs honest)",
+   "effect": 0.06845238095238096,
+   "ci_low": 0.008339369772644238,
+   "ci_high": 0.5618804041308441,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "yes": 1,
+     "share": 0.045454545454545456,
+     "ci_low": 0.008069427621263836,
+     "ci_high": 0.2179804583865734
+    },
+    "honest": {
+     "n": 39,
+     "yes": 16,
+     "share": 0.41025641025641024,
+     "ci_low": 0.27079310000725165,
+     "ci_high": 0.5658137711710303
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "less",
+   "risk_difference": -0.3648018648018648
+  },
+  {
+   "id": "H1d.sec.verify_count",
+   "hypothesis": "H1d",
+   "role": "secondary",
+   "outcome": "verify_count",
+   "prediction": "fraud < honest",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 270.5,
+   "p": 0.0026593068199908167,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": -0.36946386946386944,
+   "ci_low": -0.5384615384615384,
+   "ci_high": -0.20046620046620048,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "mean": 0.09090909090909091,
+     "median": 0.0,
+     "q1": 0.0,
+     "q3": 0.0,
+     "min": 0.0,
+     "max": 2.0
+    },
+    "honest": {
+     "n": 39,
+     "mean": 1.1794871794871795,
+     "median": 0.0,
+     "q1": 0.0,
+     "q3": 2.0,
+     "min": 0.0,
+     "max": 7.0
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "less"
+  },
+  {
+   "id": "H1d.sec.feature_push_regulator",
+   "hypothesis": "H1d",
+   "role": "secondary",
+   "outcome": "feature_push_regulator",
+   "prediction": "share of fraud players saying the NDIA badge pushed them",
+   "test": "Share with Wilson 95% CI (no test)",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Share",
+   "effect": 0.8181818181818182,
+   "ci_low": 0.6148339256287345,
+   "ci_high": 0.9269311541657794,
+   "n": {
+    "players": 22
+   },
+   "summary": {
+    "yes": 18,
+    "n": 22
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H1f.primary",
+   "hypothesis": "H1f",
+   "role": "primary",
+   "outcome": "r4_amount",
+   "prediction": "fraud > honest",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 524.0,
+   "p": 0.14776691006943443,
+   "p_holm": 0.5910676402777377,
+   "holm_family": "H1",
+   "effect_name": "Cliff's δ (fraud vs honest)",
+   "effect": 0.22144522144522144,
+   "ci_low": -0.08394522144522144,
+   "ci_high": 0.5140442890442887,
+   "n": {
+    "fraud": 22,
+    "honest": 39
+   },
+   "summary": {
+    "fraud": {
+     "n": 22,
+     "mean": 4090.909090909091,
+     "median": 4250.0,
+     "q1": 1250.0,
+     "q3": 5000.0,
+     "min": 0.0,
+     "max": 10000.0
+    },
+    "honest": {
+     "n": 39,
+     "mean": 2749.230769230769,
+     "median": 2000.0,
+     "q1": 1000.0,
+     "q3": 5000.0,
+     "min": 0.0,
+     "max": 10000.0
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "fraud",
+    "honest"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H1f.sec.chat_deposit",
+   "hypothesis": "H1f",
+   "role": "secondary",
+   "outcome": "chat_deposit",
+   "prediction": "share of fraud players depositing within 60 s of the chat",
+   "test": "Share with Wilson 95% CI (no test)",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Share",
+   "effect": 0.9545454545454546,
+   "ci_low": 0.7820195416134266,
+   "ci_high": 0.9919305723787362,
+   "n": {
+    "players": 22
+   },
+   "summary": {
+    "yes": 21,
+    "n": 22
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H1f.sec.feature_push_chat",
+   "hypothesis": "H1f",
+   "role": "secondary",
+   "outcome": "feature_push_chat",
+   "prediction": "share of fraud players saying the mentor chat pushed them",
+   "test": "Share with Wilson 95% CI (no test)",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Share",
+   "effect": 0.5454545454545454,
+   "ci_low": 0.3465979532073493,
+   "ci_high": 0.7307970581918668,
+   "n": {
+    "players": 22
+   },
+   "summary": {
+    "yes": 12,
+    "n": 22
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H1g.primary",
+   "hypothesis": "H1g",
+   "role": "primary",
+   "outcome": "tax_paid",
+   "prediction": "share of fraud players shown the tax who paid it",
+   "test": "Share with Wilson 95% CI (no test)",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Share",
+   "effect": 0.6363636363636364,
+   "ci_low": 0.4295170809013101,
+   "ci_high": 0.8026679532963388,
+   "n": {
+    "players": 22
+   },
+   "summary": {
+    "yes": 14,
+    "n": 22
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": "No honest comparison exists (the honest skin has no tax), so there is no test or p-value.",
+   "interpretation": null
+  },
+  {
+   "id": "H1g.sec.feature_push_tax",
+   "hypothesis": "H1g",
+   "role": "secondary",
+   "outcome": "feature_push_tax",
+   "prediction": "share of fraud players saying the tax pushed them",
+   "test": "Share with Wilson 95% CI (no test)",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Share",
+   "effect": 0.6818181818181818,
+   "ci_low": 0.47318597741042745,
+   "ci_high": 0.8363940681864375,
+   "n": {
+    "players": 22
+   },
+   "summary": {
+    "yes": 15,
+    "n": 22
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H2.primary",
+   "hypothesis": "H2",
+   "role": "primary",
+   "outcome": "escalation_ratio",
+   "prediction": "small win > flat",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 330.5,
+   "p": 0.550840115284619,
+   "p_holm": 1.0,
+   "holm_family": "H2-H7",
+   "effect_name": "Cliff's δ (small win vs flat)",
+   "effect": -0.09327846364883402,
+   "ci_low": -0.3882373113854595,
+   "ci_high": 0.21810699588477367,
+   "n": {
+    "small win": 27,
+    "flat": 27
+   },
+   "summary": {
+    "small win": {
+     "n": 27,
+     "mean": 2.077777777777778,
+     "median": 1.0,
+     "q1": 0.55,
+     "q3": 2.0,
+     "min": 0.0,
+     "max": 20.0
+    },
+    "flat": {
+     "n": 27,
+     "mean": 2.3981481481481484,
+     "median": 1.0,
+     "q1": 0.5,
+     "q3": 2.25,
+     "min": 0.0,
+     "max": 20.0
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": "Only players with r1_amount > 0; 7 excluded (round 1 skipped).",
+   "interpretation": null,
+   "groups": [
+    "small win",
+    "flat"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H2.sec.r2_amount",
+   "hypothesis": "H2",
+   "role": "secondary",
+   "outcome": "r2_amount",
+   "prediction": "small win > flat",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 396.5,
+   "p": 0.3269356280283917,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (small win vs flat)",
+   "effect": -0.14547413793103448,
+   "ci_low": -0.43324353448275865,
+   "ci_high": 0.13903556034482742,
+   "n": {
+    "small win": 29,
+    "flat": 32
+   },
+   "summary": {
+    "small win": {
+     "n": 29,
+     "mean": 2337.9310344827586,
+     "median": 1000.0,
+     "q1": 200.0,
+     "q3": 2000.0,
+     "min": 0.0,
+     "max": 10000.0
+    },
+    "flat": {
+     "n": 32,
+     "mean": 2750.0,
+     "median": 1500.0,
+     "q1": 500.0,
+     "q3": 4250.0,
+     "min": 0.0,
+     "max": 10000.0
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "small win",
+    "flat"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H3.primary",
+   "hypothesis": "H3",
+   "role": "primary",
+   "outcome": "deal_details",
+   "prediction": "details opened least at ₹500 (share lowest at ₹500)",
+   "test": "Cochran's Q (df = 2)",
+   "statistic_name": "Q",
+   "statistic": 2.1818181818181817,
+   "p": 0.33591098123916246,
+   "p_holm": 1.0,
+   "holm_family": "H2-H7",
+   "effect_name": "η²_Q = Q / (n(k − 1))",
+   "effect": 0.01788375558867362,
+   "ci_low": 0.001639344262295082,
+   "ci_high": 0.08548009367681499,
+   "n": {
+    "players": 61
+   },
+   "summary": {
+    "500": {
+     "n": 61,
+     "yes": 7,
+     "share": 0.11475409836065574,
+     "ci_low": 0.05671202660732205,
+     "ci_high": 0.2184430847240108
+    },
+    "3000": {
+     "n": 61,
+     "yes": 9,
+     "share": 0.14754098360655737,
+     "ci_low": 0.07961168507932755,
+     "ci_high": 0.25723235294721103
+    },
+    "8000": {
+     "n": 61,
+     "yes": 5,
+     "share": 0.08196721311475409,
+     "ci_low": 0.03551956660687357,
+     "ci_high": 0.17794661802925354
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H3.sec.deal_invest",
+   "hypothesis": "H3",
+   "role": "secondary",
+   "outcome": "deal_invest",
+   "prediction": "investing most at ₹500 (share highest at ₹500)",
+   "test": "Cochran's Q (df = 2)",
+   "statistic_name": "Q",
+   "statistic": 5.066666666666666,
+   "p": 0.07939393227707821,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "η²_Q = Q / (n(k − 1))",
+   "effect": 0.04153005464480874,
+   "ci_low": 0.004984111427892611,
+   "ci_high": 0.15056971019641674,
+   "n": {
+    "players": 61
+   },
+   "summary": {
+    "500": {
+     "n": 61,
+     "yes": 30,
+     "share": 0.4918032786885246,
+     "ci_low": 0.3706039532371102,
+     "ci_high": 0.6139738150890883
+    },
+    "3000": {
+     "n": 61,
+     "yes": 26,
+     "share": 0.4262295081967213,
+     "ci_low": 0.3101522193852528,
+     "ci_high": 0.5510476955505343
+    },
+    "8000": {
+     "n": 61,
+     "yes": 20,
+     "share": 0.32786885245901637,
+     "ci_low": 0.22335119798553632,
+     "ci_high": 0.4527819368646337
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H3.sec.deal_time",
+   "hypothesis": "H3",
+   "role": "secondary",
+   "outcome": "deal_time",
+   "prediction": "shortest time at ₹500",
+   "test": "Friedman test (df = 2)",
+   "statistic_name": "χ²_F",
+   "statistic": 0.16000000000014247,
+   "p": 0.92311634638657,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Kendall's W",
+   "effect": 0.0013114754098372335,
+   "ci_low": 0.0004312663178073212,
+   "ci_high": 0.06572173291637141,
+   "n": {
+    "players": 61
+   },
+   "summary": {
+    "500": {
+     "median": 12.318
+    },
+    "3000": {
+     "median": 12.141
+    },
+    "8000": {
+     "median": 10.902
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H3.pair.details_500_vs_3000",
+   "hypothesis": "H3",
+   "role": "secondary",
+   "outcome": "deal_details",
+   "prediction": "details share lower at ₹500 than at ₹3,000",
+   "test": "Exact McNemar test (pairwise, Holm within H3)",
+   "statistic_name": "discordant b / c",
+   "statistic": "3 / 5",
+   "p": 0.7265625,
+   "p_holm": 1.0,
+   "holm_family": "H3-pairs",
+   "effect_name": "Difference in share (₹500 − ₹3,000)",
+   "effect": -0.032786885245901634,
+   "ci_low": -0.11475409836065574,
+   "ci_high": 0.04918032786885247,
+   "n": {
+    "players": 61
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "pairwise": true
+  },
+  {
+   "id": "H3.pair.details_500_vs_8000",
+   "hypothesis": "H3",
+   "role": "secondary",
+   "outcome": "deal_details",
+   "prediction": "details share lower at ₹500 than at ₹8,000",
+   "test": "Exact McNemar test (pairwise, Holm within H3)",
+   "statistic_name": "discordant b / c",
+   "statistic": "5 / 3",
+   "p": 0.7265625,
+   "p_holm": 1.0,
+   "holm_family": "H3-pairs",
+   "effect_name": "Difference in share (₹500 − ₹8,000)",
+   "effect": 0.03278688524590165,
+   "ci_low": -0.04918032786885247,
+   "ci_high": 0.11475409836065574,
+   "n": {
+    "players": 61
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "pairwise": true
+  },
+  {
+   "id": "H3.pair.details_3000_vs_8000",
+   "hypothesis": "H3",
+   "role": "secondary",
+   "outcome": "deal_details",
+   "prediction": "details share lower at ₹3,000 than at ₹8,000",
+   "test": "Exact McNemar test (pairwise, Holm within H3)",
+   "statistic_name": "discordant b / c",
+   "statistic": "5 / 1",
+   "p": 0.21875,
+   "p_holm": 0.65625,
+   "holm_family": "H3-pairs",
+   "effect_name": "Difference in share (₹3,000 − ₹8,000)",
+   "effect": 0.06557377049180328,
+   "ci_low": 0.0,
+   "ci_high": 0.14754098360655737,
+   "n": {
+    "players": 61
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "pairwise": true
+  },
+  {
+   "id": "H3.order.details_by_position",
+   "hypothesis": "H3",
+   "role": "check",
+   "outcome": "deal_details",
+   "prediction": "(check) no card-position effect",
+   "test": "Cochran's Q over card position (df = 2)",
+   "statistic_name": "Q",
+   "statistic": 2.1818181818181817,
+   "p": 0.33591098123916246,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "η²_Q",
+   "effect": 0.01788375558867362,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {
+    "players": 61
+   },
+   "summary": {
+    "position 1": {
+     "share": 0.11475409836065574
+    },
+    "position 2": {
+     "share": 0.08196721311475409
+    },
+    "position 3": {
+     "share": 0.14754098360655737
+    }
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H3.order.invest_by_position",
+   "hypothesis": "H3",
+   "role": "check",
+   "outcome": "deal_invest",
+   "prediction": "(check) no card-position effect",
+   "test": "Cochran's Q over card position (df = 2)",
+   "statistic_name": "Q",
+   "statistic": 3.2666666666666666,
+   "p": 0.19527756283568576,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "η²_Q",
+   "effect": 0.026775956284153003,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {
+    "players": 61
+   },
+   "summary": {
+    "position 1": {
+     "share": 0.3442622950819672
+    },
+    "position 2": {
+     "share": 0.47540983606557374
+    },
+    "position 3": {
+     "share": 0.4262295081967213
+    }
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H4.primary",
+   "hypothesis": "H4",
+   "role": "primary",
+   "outcome": "crash_topup",
+   "prediction": "higher loss-aversion group → more likely to top up (OR > 1)",
+   "test": "Logistic regression: crash_topup ~ loss_aversion_group + fraud + exp_investing",
+   "statistic_name": "z",
+   "statistic": -1.728610716292206,
+   "p": 0.08387879039266564,
+   "p_holm": 0.5032727423559938,
+   "holm_family": "H2-H7",
+   "effect_name": "Odds ratio per loss-aversion group step",
+   "effect": 0.5106897588339473,
+   "ci_low": 0.23837171659197645,
+   "ci_high": 1.094106438073341,
+   "n": {
+    "players": 58
+   },
+   "summary": {
+    "Low (1)": {
+     "n": 39,
+     "yes": 26
+    },
+    "Typical (2)": {
+     "n": 10,
+     "yes": 5
+    },
+    "High (3)": {
+     "n": 9,
+     "yes": 3
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "low_power": false
+  },
+  {
+   "id": "H4.sec.amount_ols",
+   "hypothesis": "H4",
+   "role": "secondary",
+   "outcome": "crash_topup_amount",
+   "prediction": "coefficient of loss_aversion_group > 0",
+   "test": "OLS (HC3): crash_topup_amount ~ loss_aversion_group + fraud + exp_investing",
+   "statistic_name": "t",
+   "statistic": -1.8715914246121463,
+   "p": 0.061263150701978394,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "₹ per loss-aversion group step",
+   "effect": -287.7694983437838,
+   "ci_low": -589.1268593499968,
+   "ci_high": 13.587862662429188,
+   "n": {
+    "players": 58
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H4.sec.amount_spearman",
+   "hypothesis": "H4",
+   "role": "secondary",
+   "outcome": "crash_topup_amount",
+   "prediction": "ρ(loss_aversion_group, crash_topup_amount) > 0",
+   "test": "Spearman correlation",
+   "statistic_name": "ρ",
+   "statistic": -0.19855242818509652,
+   "p": 0.1351407462770735,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Spearman ρ",
+   "effect": -0.19855242818509652,
+   "ci_low": -0.44085803750026925,
+   "ci_high": 0.05280337633316959,
+   "n": {
+    "players": 58
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H4.order.spin_order",
+   "hypothesis": "H4",
+   "role": "check",
+   "outcome": "la_group",
+   "prediction": "(check) no spin-order effect on the loss-aversion group",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 344.5,
+   "p": 0.2702694334911483,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (150;250 vs 250;150)",
+   "effect": -0.14409937888198757,
+   "ci_low": -0.3838509316770186,
+   "ci_high": 0.11180124223602485,
+   "n": {
+    "150;250": 23,
+    "250;150": 35
+   },
+   "summary": {
+    "150;250": {
+     "n": 23,
+     "mean": 1.391304347826087,
+     "median": 1.0,
+     "q1": 1.0,
+     "q3": 1.0,
+     "min": 1.0,
+     "max": 3.0
+    },
+    "250;150": {
+     "n": 35,
+     "mean": 1.542857142857143,
+     "median": 1.0,
+     "q1": 1.0,
+     "q3": 2.0,
+     "min": 1.0,
+     "max": 3.0
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "150;250",
+    "250;150"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H5.primary",
+   "hypothesis": "H5",
+   "role": "primary",
+   "outcome": "pool_join",
+   "prediction": "friend > ad",
+   "test": "Fisher's exact test (two-sided)",
+   "statistic_name": "OR",
+   "statistic": 0.5757575757575758,
+   "p": 0.4155077860815992,
+   "p_holm": 1.0,
+   "holm_family": "H2-H7",
+   "effect_name": "Odds ratio (friend vs ad)",
+   "effect": 0.5757575757575758,
+   "ci_low": 0.1945570453209007,
+   "ci_high": 1.7038539287820325,
+   "n": {
+    "friend": 30,
+    "ad": 31
+   },
+   "summary": {
+    "friend": {
+     "n": 30,
+     "yes": 8,
+     "share": 0.26666666666666666,
+     "ci_low": 0.1418266331959632,
+     "ci_high": 0.44447961695188887
+    },
+    "ad": {
+     "n": 31,
+     "yes": 12,
+     "share": 0.3870967741935484,
+     "ci_low": 0.2373310142038025,
+     "ci_high": 0.5617589138033927
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "friend",
+    "ad"
+   ],
+   "predicted": "greater",
+   "risk_difference": -0.12043010752688171
+  },
+  {
+   "id": "H5.sec.pool_details",
+   "hypothesis": "H5",
+   "role": "secondary",
+   "outcome": "pool_details",
+   "prediction": "friend < ad",
+   "test": "Fisher's exact test (two-sided)",
+   "statistic_name": "OR",
+   "statistic": 0.5777777777777777,
+   "p": 0.7071820854011812,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio (friend vs ad)",
+   "effect": 0.5777777777777777,
+   "ci_low": 0.12519177590162794,
+   "ci_high": 2.666526280097973,
+   "n": {
+    "friend": 30,
+    "ad": 31
+   },
+   "summary": {
+    "friend": {
+     "n": 30,
+     "yes": 3,
+     "share": 0.1,
+     "ci_low": 0.03459988874733416,
+     "ci_high": 0.25621082579184085
+    },
+    "ad": {
+     "n": 31,
+     "yes": 5,
+     "share": 0.16129032258064516,
+     "ci_low": 0.07092624443365303,
+     "ci_high": 0.32634353958793266
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "friend",
+    "ad"
+   ],
+   "predicted": "less",
+   "risk_difference": -0.06129032258064515
+  },
+  {
+   "id": "H5.sec.pool_time",
+   "hypothesis": "H5",
+   "role": "secondary",
+   "outcome": "pool_time",
+   "prediction": "friend < ad",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 497.0,
+   "p": 0.6495217256524117,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (friend vs ad)",
+   "effect": 0.06881720430107527,
+   "ci_low": -0.22580645161290322,
+   "ci_high": 0.35698924731182796,
+   "n": {
+    "friend": 30,
+    "ad": 31
+   },
+   "summary": {
+    "friend": {
+     "n": 30,
+     "mean": 7.812299999999999,
+     "median": 6.5085,
+     "q1": 3.5425,
+     "q3": 9.53475,
+     "min": 1.242,
+     "max": 34.163
+    },
+    "ad": {
+     "n": 31,
+     "mean": 7.442774193548388,
+     "median": 5.119,
+     "q1": 3.4965,
+     "q3": 8.1495,
+     "min": 1.182,
+     "max": 36.786
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "friend",
+    "ad"
+   ],
+   "predicted": "less"
+  },
+  {
+   "id": "H5.mod.friend_x_fomo",
+   "hypothesis": "H5",
+   "role": "exploratory",
+   "outcome": "pool_join",
+   "prediction": "friend effect larger for higher FOMO (interaction OR > 1)",
+   "test": "Logistic regression: pool_join ~ friend × fomo_score",
+   "statistic_name": "z",
+   "statistic": -1.3107374790657287,
+   "p": 0.1899464716970075,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Interaction odds ratio",
+   "effect": 0.5077651846861462,
+   "ci_low": 0.18430477606825946,
+   "ci_high": 1.3989083098088977,
+   "n": {
+    "players": 61
+   },
+   "summary": {},
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H6.primary",
+   "hypothesis": "H6",
+   "role": "primary",
+   "outcome": "post_withdrawal_deposit",
+   "prediction": "allowed > not offered",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 420.5,
+   "p": 0.5420716642725949,
+   "p_holm": 1.0,
+   "holm_family": "H2-H7",
+   "effect_name": "Cliff's δ (allowed vs not offered)",
+   "effect": -0.08982683982683982,
+   "ci_low": -0.3593073593073593,
+   "ci_high": 0.21003787878787833,
+   "n": {
+    "allowed": 33,
+    "not offered": 28
+   },
+   "summary": {
+    "allowed": {
+     "n": 33,
+     "mean": 1651.5151515151515,
+     "median": 500.0,
+     "q1": 0.0,
+     "q3": 2000.0,
+     "min": 0.0,
+     "max": 5000.0
+    },
+    "not offered": {
+     "n": 28,
+     "mean": 1589.2857142857142,
+     "median": 1000.0,
+     "q1": 375.0,
+     "q3": 2000.0,
+     "min": 0.0,
+     "max": 5000.0
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": "Intention-to-treat on the offer: everyone offered counts as 'allowed', whether or not they withdrew.",
+   "interpretation": null,
+   "groups": [
+    "allowed",
+    "not offered"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H6.sec.app_trust",
+   "hypothesis": "H6",
+   "role": "secondary",
+   "outcome": "app_trust",
+   "prediction": "allowed > not offered",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 457.0,
+   "p": 0.9471712700314778,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Cliff's δ (allowed vs not offered)",
+   "effect": -0.010822510822510822,
+   "ci_low": -0.30305735930735933,
+   "ci_high": 0.27816558441558425,
+   "n": {
+    "allowed": 33,
+    "not offered": 28
+   },
+   "summary": {
+    "allowed": {
+     "n": 33,
+     "mean": 3.272727272727273,
+     "median": 3.0,
+     "q1": 2.0,
+     "q3": 5.0,
+     "min": 1.0,
+     "max": 6.0
+    },
+    "not offered": {
+     "n": 28,
+     "mean": 3.3214285714285716,
+     "median": 3.0,
+     "q1": 2.0,
+     "q3": 5.0,
+     "min": 1.0,
+     "max": 7.0
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "allowed",
+    "not offered"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H6.sec.withdrew",
+   "hypothesis": "H6",
+   "role": "descriptive",
+   "outcome": "withdrew",
+   "prediction": "take-up of the ₹500 test withdrawal among those offered",
+   "test": "Share with Wilson 95% CI (no test)",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Share",
+   "effect": 0.8181818181818182,
+   "ci_low": 0.6561176836533009,
+   "ci_high": 0.9138923179105933,
+   "n": {
+    "players": 33
+   },
+   "summary": {
+    "yes": 27,
+    "n": 33
+   },
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H7.primary",
+   "hypothesis": "H7",
+   "role": "primary",
+   "outcome": "reinvest_amount",
+   "prediction": "profit > main",
+   "test": "Mann-Whitney U (two-sided)",
+   "statistic_name": "U",
+   "statistic": 438.5,
+   "p": 0.713523535109325,
+   "p_holm": 1.0,
+   "holm_family": "H2-H7",
+   "effect_name": "Cliff's δ (profit wallet vs main wallet)",
+   "effect": -0.05495689655172414,
+   "ci_low": -0.3416217672413793,
+   "ci_high": 0.22526939655172384,
+   "n": {
+    "profit wallet": 29,
+    "main wallet": 32
+   },
+   "summary": {
+    "profit wallet": {
+     "n": 29,
+     "mean": 972.4137931034483,
+     "median": 1000.0,
+     "q1": 500.0,
+     "q3": 1800.0,
+     "min": 0.0,
+     "max": 2000.0
+    },
+    "main wallet": {
+     "n": 32,
+     "mean": 1031.25,
+     "median": 1000.0,
+     "q1": 500.0,
+     "q3": 2000.0,
+     "min": 0.0,
+     "max": 2000.0
+    }
+   },
+   "direction_ok": false,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "profit wallet",
+    "main wallet"
+   ],
+   "predicted": "greater"
+  },
+  {
+   "id": "H7.sec.reinvest_accept",
+   "hypothesis": "H7",
+   "role": "secondary",
+   "outcome": "reinvest_accept",
+   "prediction": "profit > main",
+   "test": "Fisher's exact test (two-sided)",
+   "statistic_name": "OR",
+   "statistic": 1.0733333333333333,
+   "p": 1.0,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Odds ratio (profit wallet vs main wallet)",
+   "effect": 1.0733333333333333,
+   "ci_low": 0.3141286943816117,
+   "ci_high": 3.6674282389653676,
+   "n": {
+    "profit wallet": 29,
+    "main wallet": 32
+   },
+   "summary": {
+    "profit wallet": {
+     "n": 29,
+     "yes": 23,
+     "share": 0.7931034482758621,
+     "ci_low": 0.6160990959613211,
+     "ci_high": 0.9015392980215897
+    },
+    "main wallet": {
+     "n": 32,
+     "yes": 25,
+     "share": 0.78125,
+     "ci_low": 0.6124500635075647,
+     "ci_high": 0.8897616374739581
+    }
+   },
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "groups": [
+    "profit wallet",
+    "main wallet"
+   ],
+   "predicted": "greater",
+   "risk_difference": 0.0118534482758621
+  },
+  {
+   "id": "H8.primary",
+   "hypothesis": "H8",
+   "role": "primary",
+   "outcome": "trap_score_shared8",
+   "prediction": "overconfidence coefficient > 0",
+   "test": "OLS with HC3 SEs: trap_score_shared8 ~ literacy + overconfidence + fin. education + fraud + investing experience",
+   "statistic_name": "t",
+   "statistic": 0.9718210614927084,
+   "p": 0.331139576104327,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Traps per 1 unit of overconfidence",
+   "effect": 0.2431815517143941,
+   "ci_low": -0.24726581761168548,
+   "ci_high": 0.7336289210404736,
+   "n": {
+    "players": 61
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "r2": 0.15944361123031936,
+   "ceiling": true
+  },
+  {
+   "id": "H8.literacy",
+   "hypothesis": "H8",
+   "role": "secondary",
+   "outcome": "trap_score_shared8",
+   "prediction": "literacy coefficient not negative (CI not entirely < 0)",
+   "test": "OLS with HC3 SEs: trap_score_shared8 ~ literacy + overconfidence + fin. education + fraud + investing experience",
+   "statistic_name": "t",
+   "statistic": -0.19439813351665763,
+   "p": 0.8458641512822844,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Traps per extra correct literacy answer",
+   "effect": -0.08278803474609663,
+   "ci_low": -0.9174748885645572,
+   "ci_high": 0.7518988190723639,
+   "n": {
+    "players": 61
+   },
+   "summary": {},
+   "direction_ok": true,
+   "testable": true,
+   "note": null,
+   "interpretation": null,
+   "protects": false
+  },
+  {
+   "id": "H8.dataset",
+   "hypothesis": "H8",
+   "role": "primary-dataset",
+   "outcome": "victimization",
+   "prediction": "literacy does not lower victimization; overconfidence raises it",
+   "test": "Logistic regression on the external dataset",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": null,
+   "effect": null,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {},
+   "summary": {},
+   "direction_ok": null,
+   "testable": false,
+   "note": "PENDING: the external dataset has not been added yet (see data/external/README.md).",
+   "interpretation": null,
+   "pending": true
+  },
+  {
+   "id": "H9.app.la_group_x_male",
+   "hypothesis": "H9",
+   "role": "exploratory",
+   "outcome": "trap_score_shared8",
+   "prediction": "slope of la_group differs between male and not-male players",
+   "test": "OLS (HC3) with bias × male interactions",
+   "statistic_name": "t",
+   "statistic": -0.9396350382808973,
+   "p": 0.34740479719734085,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Interaction: slope(male) − slope(not male)",
+   "effect": -0.898464541334178,
+   "ci_low": -2.7725518951040375,
+   "ci_high": 0.9756228124356815,
+   "n": {
+    "players": 58,
+    "male": 40,
+    "not male": 18
+   },
+   "summary": {},
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H9.app.fomo_score_x_male",
+   "hypothesis": "H9",
+   "role": "exploratory",
+   "outcome": "trap_score_shared8",
+   "prediction": "slope of fomo_score differs between male and not-male players",
+   "test": "OLS (HC3) with bias × male interactions",
+   "statistic_name": "t",
+   "statistic": 0.2900072465035896,
+   "p": 0.7718106938216517,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Interaction: slope(male) − slope(not male)",
+   "effect": 0.16496469706549072,
+   "ci_low": -0.9499207717185458,
+   "ci_high": 1.2798501658495274,
+   "n": {
+    "players": 58,
+    "male": 40,
+    "not male": 18
+   },
+   "summary": {},
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H9.app.overconfidence_x_male",
+   "hypothesis": "H9",
+   "role": "exploratory",
+   "outcome": "trap_score_shared8",
+   "prediction": "slope of overconfidence differs between male and not-male players",
+   "test": "OLS (HC3) with bias × male interactions",
+   "statistic_name": "t",
+   "statistic": -1.0105393394130113,
+   "p": 0.3122369617245081,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Interaction: slope(male) − slope(not male)",
+   "effect": -0.5364881778339466,
+   "ci_low": -1.5770191751693252,
+   "ci_high": 0.5040428195014318,
+   "n": {
+    "players": 58,
+    "male": 40,
+    "not male": 18
+   },
+   "summary": {},
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H9.app.crt_correct_x_male",
+   "hypothesis": "H9",
+   "role": "exploratory",
+   "outcome": "trap_score_shared8",
+   "prediction": "slope of crt_correct differs between male and not-male players",
+   "test": "OLS (HC3) with bias × male interactions",
+   "statistic_name": "t",
+   "statistic": -0.6775713047762637,
+   "p": 0.49804354531930084,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": "Interaction: slope(male) − slope(not male)",
+   "effect": -0.9968548416950507,
+   "ci_low": -3.880388388296212,
+   "ci_high": 1.886678704906111,
+   "n": {
+    "players": 58,
+    "male": 40,
+    "not male": 18
+   },
+   "summary": {},
+   "direction_ok": null,
+   "testable": true,
+   "note": null,
+   "interpretation": null
+  },
+  {
+   "id": "H9.dataset",
+   "hypothesis": "H9",
+   "role": "primary-dataset",
+   "outcome": "victimization",
+   "prediction": "the bias that best predicts victimization differs by age, income and gender group",
+   "test": "Logistic regression with interactions on the external dataset",
+   "statistic_name": null,
+   "statistic": null,
+   "p": null,
+   "p_holm": null,
+   "holm_family": null,
+   "effect_name": null,
+   "effect": null,
+   "ci_low": null,
+   "ci_high": null,
+   "n": {},
+   "summary": {},
+   "direction_ok": null,
+   "testable": false,
+   "note": "PENDING: the external dataset has not been added yet (see data/external/README.md).",
+   "interpretation": null,
+   "pending": true
   }
  ],
  "sections": {
@@ -872,6 +3352,276 @@
     },
     "non_completers_included": 50
    }
+  },
+  "H1c_within_fraud": {
+   "vip_nudge_taps_any": 4,
+   "n": 22,
+   "vip_nudge_taps_mean": 0.3181818181818182,
+   "vip_level_ups_mean": 2.0,
+   "vip_level_ups_any": 22
+  },
+  "H1f_chat": {
+   "chat_open": 10,
+   "n": 22
+  },
+  "H1g_tax": {
+   "tax_shown": 22,
+   "n": 22
+  },
+  "H1h_ux_map": [
+   {
+    "feature": "NDIA badge / certificate",
+    "sub_hypothesis": "H1d",
+    "column": "feature_push_regulator",
+    "yes": 18,
+    "n": 22,
+    "share": 0.8181818181818182,
+    "ci_low": 0.6148339256287345,
+    "ci_high": 0.9269311541657794
+   },
+   {
+    "feature": "Locked sign-up bonus",
+    "sub_hypothesis": "H1b",
+    "column": "feature_push_bonus",
+    "yes": 16,
+    "n": 22,
+    "share": 0.7272727272727273,
+    "ci_low": 0.5184826598759761,
+    "ci_high": 0.8684923971201054
+   },
+   {
+    "feature": "VIP levels",
+    "sub_hypothesis": "H1c",
+    "column": "feature_push_vip",
+    "yes": 15,
+    "n": 22,
+    "share": 0.6818181818181818,
+    "ci_low": 0.47318597741042745,
+    "ci_high": 0.8363940681864375
+   },
+   {
+    "feature": "Withdrawal tax",
+    "sub_hypothesis": "H1g",
+    "column": "feature_push_tax",
+    "yes": 15,
+    "n": 22,
+    "share": 0.6818181818181818,
+    "ci_low": 0.47318597741042745,
+    "ci_high": 0.8363940681864375
+   },
+   {
+    "feature": "Countdown timer / slots left",
+    "sub_hypothesis": "H1a",
+    "column": "feature_push_timer",
+    "yes": 12,
+    "n": 22,
+    "share": 0.5454545454545454,
+    "ci_low": 0.3465979532073493,
+    "ci_high": 0.7307970581918668
+   },
+   {
+    "feature": "Mentor chat",
+    "sub_hypothesis": "H1f",
+    "column": "feature_push_chat",
+    "yes": 12,
+    "n": 22,
+    "share": 0.5454545454545454,
+    "ci_low": 0.3465979532073493,
+    "ci_high": 0.7307970581918668
+   },
+   {
+    "feature": "Social proof (ticker, toasts)",
+    "sub_hypothesis": "H1e",
+    "column": "feature_push_social",
+    "yes": 8,
+    "n": 22,
+    "share": 0.36363636363636365,
+    "ci_low": 0.19733204670366128,
+    "ci_high": 0.57048291909869
+   }
+  ],
+  "H1h_feature_push_count": {
+   "mean": 4.363636363636363,
+   "median": 4.5,
+   "n": 22,
+   "zero": 1
+  },
+  "H2": {
+   "excluded_r1_zero": 7,
+   "excluded_by_condition": {
+    "small_win": 2,
+    "flat": 5
+   }
+  },
+  "H4": {
+   "distribution": {
+    "Low (1)": 39,
+    "Typical (2)": 10,
+    "High (3)": 9
+   },
+   "inconsistent": 3,
+   "largest_group_share": 0.6724137931034483,
+   "low_power": false,
+   "by_spin_order": {
+    "150;250": {
+     "Low (1)": 18,
+     "Typical (2)": 1,
+     "High (3)": 4
+    },
+    "250;150": {
+     "Low (1)": 21,
+     "Typical (2)": 9,
+     "High (3)": 5
+    }
+   }
+  },
+  "H8": {
+   "literacy_distribution": {
+    "0": 1,
+    "1": 5,
+    "2": 15,
+    "3": 40
+   },
+   "ceiling_effect": true,
+   "share_at_3": 0.6557377049180327,
+   "self_rating_distribution": {
+    "1": 3,
+    "2": 2,
+    "3": 8,
+    "4": 19,
+    "5": 20,
+    "6": 5,
+    "7": 4
+   }
+  },
+  "H9": {
+   "group_sizes_model": {
+    "male": 40,
+    "not male": 18
+   },
+   "gender_counts_all": {
+    "male": 42,
+    "female": 17,
+    "other": 1,
+    "prefer_not": 1
+   },
+   "age_counts": {
+    "18_20": 37,
+    "21_23": 11,
+    "36_plus": 10,
+    "24_26": 2,
+    "27_35": 1
+   },
+   "income_counts": {
+    "prefer_not": 18,
+    "gt_25l": 16,
+    "12l_25l": 13,
+    "6l_12l": 7,
+    "3l_6l": 5,
+    "lt_3l": 2
+   },
+   "simple_slopes": [
+    {
+     "bias": "la_group",
+     "label": "Loss-aversion group (1–3)",
+     "group": "not male",
+     "slope": -0.5748554429078043,
+     "ci_low": -2.063470510451827,
+     "ci_high": 0.9137596246362187,
+     "p": 0.44912457916221915
+    },
+    {
+     "bias": "la_group",
+     "label": "Loss-aversion group (1–3)",
+     "group": "male",
+     "slope": -1.4733199842419822,
+     "ci_low": -2.611840335505418,
+     "ci_high": -0.3347996329785463,
+     "p": 0.011202370662159306
+    },
+    {
+     "bias": "fomo_score",
+     "label": "FOMO score (0–3)",
+     "group": "not male",
+     "slope": -0.047491397317875994,
+     "ci_low": -0.8554879746588208,
+     "ci_high": 0.7605051800230688,
+     "p": 0.9082863803084523
+    },
+    {
+     "bias": "fomo_score",
+     "label": "FOMO score (0–3)",
+     "group": "male",
+     "slope": 0.11747329974761472,
+     "ci_low": -0.6507136172921897,
+     "ci_high": 0.885660216787419,
+     "p": 0.7643883049734654
+    },
+    {
+     "bias": "overconfidence",
+     "label": "Overconfidence",
+     "group": "not male",
+     "slope": 0.6857528491422458,
+     "ci_low": -0.18644960401854593,
+     "ci_high": 1.5579553023030375,
+     "p": 0.12332043970258245
+    },
+    {
+     "bias": "overconfidence",
+     "label": "Overconfidence",
+     "group": "male",
+     "slope": 0.14926467130829912,
+     "ci_low": -0.41815725029506656,
+     "ci_high": 0.7166865929116648,
+     "p": 0.606145337326363
+    },
+    {
+     "bias": "crt_correct",
+     "label": "CRT correct (reflective)",
+     "group": "not male",
+     "slope": 0.3046979284688911,
+     "ci_low": -2.032508894300631,
+     "ci_high": 2.641904751238413,
+     "p": 0.7983235210352697
+    },
+    {
+     "bias": "crt_correct",
+     "label": "CRT correct (reflective)",
+     "group": "male",
+     "slope": -0.6921569132261596,
+     "ci_low": -2.3810115493549997,
+     "ci_high": 0.9966977229026805,
+     "p": 0.4218199398973783
+    }
+   ],
+   "r2": 0.3178382645387845,
+   "n": 58
+  },
+  "external": {
+   "H8": {
+    "status": "pending"
+   },
+   "H9": {
+    "status": "pending"
+   }
+  },
+  "holm_families": {
+   "H1": [
+    "H1.primary",
+    "H1ae.primary",
+    "H1b.primary",
+    "H1c.primary",
+    "H1d.primary",
+    "H1f.primary"
+   ],
+   "H2-H7": [
+    "H2.primary",
+    "H3.primary",
+    "H4.primary",
+    "H5.primary",
+    "H6.primary",
+    "H7.primary"
+   ]
   }
  },
  "problems": []

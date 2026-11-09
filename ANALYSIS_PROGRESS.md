@@ -64,3 +64,35 @@ analysis/.venv/Scripts/python analysis/run_all.py
   are stored as robustness tests; the comparison with the completer results is part of Step 4 and the report.
 - Implementation notes: the first event per participant and round is used (one duplicated player). Reaching
   `g:home` = a `screen_view` on `g:home`, or `current_step` at or past `g:home`.
+
+## Step 4 — Hypothesis tests (2026-11-09)
+
+**Status:** done, run exactly as in `results/ANALYSIS_PLAN.md`. Modules `analysis/h1.py` … `h9.py`, verdict rules
+in `analysis/verdicts.py`, fixed text per hypothesis in `analysis/spec.py`. Tables `results/tables/H*.csv`, one
+figure per hypothesis in `results/figures/`, every test in `results/results.json`.
+
+- No model failed to fit and no fallback was needed (`problems` in results.json is empty). All logistic models
+  converged without separation warnings.
+- Verdicts (raw p, pre-registered rules):
+  - SUPPORTED: H1d.
+  - NOT SUPPORTED: H1, H1a, H1b, H1c, H1e, H1f, H2–H8 (H8 app evidence only).
+  - NOT TESTABLE: H1g (no comparison group).
+  - DESCRIPTIVE: H1h.
+  - EXPLORATORY: H9 (app part).
+  - PENDING: H8 and H9 dataset parts.
+- Things to know when reading the results:
+  - H1 primary just misses (p = 0.102, δ = 0.26 in the predicted direction); 2 of 6 secondary outcomes are
+    significant in the predicted direction (`verify_any`, `trap_score_shared8`), which is not "more than half", so
+    the rule gives NOT SUPPORTED.
+  - H4: the estimate points the opposite way (higher loss aversion → fewer top-ups, OR 0.51, p = 0.084). It is not
+    marked low-power (largest group 67% < 70%).
+  - H3: investing falls with stake size (secondary, p = 0.079), but the primary (details) is not lowest at ₹500.
+  - H8: ceiling effect flagged (40 of 61 players score 3 of 3 on literacy).
+  - The H1b primary (`trap_hook`) is the same variable as the H1 secondary `invested_r1` (`r1_amount > 0`), and the
+    H1d primary is the same test as the H1 secondary `verify_any`. They are listed under both, as the plan
+    specifies.
+  - H3 card-position check: the position totals happen to be a permutation of the size totals for `details`, so
+    the two Cochran's Q values coincide.
+- Rule set before any dataset result exists: when the H8 dataset part is added, the final H8 verdict is the common
+  verdict if both parts agree, NOT SUPPORTED if one part is NOT SUPPORTED and neither is SUPPORTED, otherwise
+  PARTLY SUPPORTED (`verdicts.combine`).
