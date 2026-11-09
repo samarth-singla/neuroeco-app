@@ -288,8 +288,8 @@ H0: β2 = 0 (and β1 < 0: literacy protects)
 H1: β2 > 0 and β1 ≥ 0     (HC3 robust SEs)
 Note: with literacy in the model, β2 is the effect of a higher self-rating at equal literacy.""",
         figures=["H8"], tables=["H8_literacy_distribution", "H8_ols"],
-        overclaim="A non-significant literacy coefficient is not proof that literacy does not matter: the CI shows "
-                  "how large a protective effect is still compatible with the data.",
+        overclaim="The app part is correlational: literacy and self-rating were measured, not assigned, and the "
+                  "trap score counts choices in a game, not real victimization.",
     ),
     "H9": dict(
         title="The dominant bias differs by demographic group", short="Bias by group",

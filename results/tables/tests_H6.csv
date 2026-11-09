@@ -1,0 +1,4 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,deposit after the withdrawal stage,allowed > not offered,Mann-Whitney U (two-sided),U = 420.50,0.542,1.000,"δ = -0.09 [-0.36, 0.21]","allowed 33, not offered 28",opposite
+Secondary,trust rating (1–7),allowed > not offered,Mann-Whitney U (two-sided),U = 457.00,0.947,–,"δ = -0.01 [-0.30, 0.28]","allowed 33, not offered 28",opposite
+Descriptive,took the test withdrawal,take-up of the ₹500 test withdrawal among those offered,Share with Wilson 95% CI (no test),–,–,–,"share = 82% [66%, 91%]",players 33,–

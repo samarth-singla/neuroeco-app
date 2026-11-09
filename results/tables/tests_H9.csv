@@ -1,0 +1,6 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Exploratory,trap score (shared 8),slope of la_group differs between male and not-male players,OLS (HC3) with bias × male interactions,t = -0.94,0.347,–,"b = -0.90 [-2.77, 0.98]","players 58, male 40, not male 18",–
+Exploratory,trap score (shared 8),slope of fomo_score differs between male and not-male players,OLS (HC3) with bias × male interactions,t = 0.29,0.772,–,"b = 0.16 [-0.95, 1.28]","players 58, male 40, not male 18",–
+Exploratory,trap score (shared 8),slope of overconfidence differs between male and not-male players,OLS (HC3) with bias × male interactions,t = -1.01,0.312,–,"b = -0.54 [-1.58, 0.50]","players 58, male 40, not male 18",–
+Exploratory,trap score (shared 8),slope of crt_correct differs between male and not-male players,OLS (HC3) with bias × male interactions,t = -0.68,0.498,–,"b = -1.00 [-3.88, 1.89]","players 58, male 40, not male 18",–
+Primary (dataset),fraud victimization,"the bias that best predicts victimization differs by age, income and gender group",Logistic regression with interactions on the external dataset,–,–,–,pending,–,–

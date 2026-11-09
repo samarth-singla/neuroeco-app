@@ -1,0 +1,18 @@
+Hyp.,Short,Prediction,Primary result,n,Verdict
+H1,Dark design,"Fraud players deposit more in total (and decide faster, invest more often, verify less, trust more, feel more urgency).","Mann-Whitney U (two-sided): δ = 0.26 [-0.07, 0.55], p = 0.102","fraud 22, honest 39",NOT SUPPORTED
+H1a,Timer / scarcity,Fraud players make the first decision faster than honest players.,"Mann-Whitney U (two-sided): δ = -0.11 [-0.40, 0.19], p = 0.494","fraud 22, honest 39",NOT SUPPORTED
+H1b,Locked bonus,More fraud players invest in round 1 (the first real deposit).,"Fisher's exact test (two-sided): OR = 1.47 [0.26, 8.30], p = 1.000","fraud 22, honest 39",NOT SUPPORTED
+H1c,VIP levels,"More fraud players deposit at least ₹5,000 (VIP 2).","Fisher's exact test (two-sided): OR = 0.53 [0.10, 2.87], p = 0.658","fraud 22, honest 39",NOT SUPPORTED
+H1d,Fake credentials,"Fewer fraud players open any T&C, details, badge or About page.","Fisher's exact test (two-sided): OR = 0.07 [0.01, 0.56], p = 0.002","fraud 22, honest 39",SUPPORTED
+H1e,Social proof,Fraud players make the first decision faster than honest players.,"Mann-Whitney U (two-sided): δ = -0.11 [-0.40, 0.19], p = 0.494","fraud 22, honest 39",NOT SUPPORTED
+H1f,Mentor chat,Fraud players (who see the chat right before round 4) stake more in round 4.,"Mann-Whitney U (two-sided): δ = 0.22 [-0.08, 0.51], p = 0.148","fraud 22, honest 39",NOT SUPPORTED
+H1g,Withdrawal tax,Fraud players pay the tax to unlock their withdrawal.,"Share with Wilson 95% CI (no test): share = 64% [43%, 80%]",players 22,NOT TESTABLE
+H1h,UX map,Descriptive: rank the seven features by the share of fraud players who felt pushed.,top feature: NDIA badge / certificate 18/22,fraud 22,DESCRIPTIVE
+H2,Early win,Players randomized to a +8% round 1 escalate their round-2 stake more than players with a flat round 1.,"Mann-Whitney U (two-sided): δ = -0.09 [-0.39, 0.22], p = 0.551","small win 27, flat 27",NOT SUPPORTED
+H3,Small stakes,At ₹500 players open the deal details least and invest most.,"Cochran's Q (df = 2): η²_Q = 0.02 [0.00, 0.09], p = 0.336",players 61,NOT SUPPORTED
+H4,Loss chasing,A higher loss-aversion group predicts topping up after the crash.,"Logistic regression: crash_topup ~ loss_aversion_group + fraud + exp_investing: OR = 0.51 [0.24, 1.09], p = 0.084",players 58,NOT SUPPORTED
+H5,Friend referral,More players join the Diamond Pool when the invite comes from a friend.,"Fisher's exact test (two-sided): OR = 0.58 [0.19, 1.70], p = 0.416","friend 30, ad 31",NOT SUPPORTED
+H6,Test withdrawal,Players offered the ₹500 test withdrawal deposit more right after it.,"Mann-Whitney U (two-sided): δ = -0.09 [-0.36, 0.21], p = 0.542","allowed 33, not offered 28",NOT SUPPORTED
+H7,House money,More is put into the Gold Plan when it is funded from the Profit wallet than from Main.,"Mann-Whitney U (two-sided): δ = -0.05 [-0.34, 0.23], p = 0.714","profit wallet 29, main wallet 32",NOT SUPPORTED
+H8,Literacy paradox,Literacy coefficient not negative; overconfidence coefficient positive.,"OLS with HC3 SEs: trap_score_shared8 ~ literacy + overconfidence + fin. education + fraud + investing experience: b = 0.24 [-0.25, 0.73], p = 0.331",players 61,NOT SUPPORTED (app evidence only; dataset part PENDING)
+H9,Bias by group,"Bias slopes on the trap score differ between male and not-male players (app); by age, income and gender for victimization (dataset).",exploratory app model (bias × gender); dataset part pending,"players 58, male 40, not male 18",EXPLORATORY (app evidence only; dataset part PENDING)

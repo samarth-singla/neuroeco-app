@@ -1,0 +1,4 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,round-4 stake,fraud > honest,Mann-Whitney U (two-sided),U = 524.00,0.148,0.591,"δ = 0.22 [-0.08, 0.51]","fraud 22, honest 39",as predicted
+Secondary,deposit within 60 s of the chat,share of fraud players depositing within 60 s of the chat,Share with Wilson 95% CI (no test),–,–,–,"share = 95% [78%, 99%]",players 22,–
+Secondary,said the mentor chat pushed them,share of fraud players saying the mentor chat pushed them,Share with Wilson 95% CI (no test),–,–,–,"share = 55% [35%, 73%]",players 22,–

@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import attrition  # noqa: E402
 import checks  # noqa: E402
+import report  # noqa: E402
 import survey  # noqa: E402
 import external  # noqa: E402
 import h1, h2, h3, h4, h5, h6, h7, h8, h9  # noqa: E401,E402
@@ -72,6 +73,7 @@ def main() -> None:
     verdicts.apply_verdicts(reg, external_status)
 
     reg.save(os.path.join(RESULTS, "results.json"), meta(df))
+    report.run()
     print("done:", os.path.join(RESULTS, "results.json"))
 
 

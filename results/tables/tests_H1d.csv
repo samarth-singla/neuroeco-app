@@ -1,0 +1,4 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,verified anything,fraud < honest,Fisher's exact test (two-sided),OR = 0.07,0.002,0.014,"OR = 0.07 [0.01, 0.56]","fraud 22, honest 39",as predicted
+Secondary,verification opens,fraud < honest,Mann-Whitney U (two-sided),U = 270.50,0.003,–,"δ = -0.37 [-0.54, -0.20]","fraud 22, honest 39",as predicted
+Secondary,said the NDIA badge pushed them,share of fraud players saying the NDIA badge pushed them,Share with Wilson 95% CI (no test),–,–,–,"share = 82% [61%, 93%]",players 22,–

@@ -1,0 +1,5 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,escalation ratio (r2 ÷ r1),small win > flat,Mann-Whitney U (two-sided),U = 330.50,0.551,1.000,"δ = -0.09 [-0.39, 0.22]","small win 27, flat 27",opposite
+Secondary,round-2 stake,small win > flat,Mann-Whitney U (two-sided),U = 396.50,0.327,–,"δ = -0.15 [-0.43, 0.14]","small win 29, flat 32",opposite
+Robustness,escalation ratio (r2 ÷ r1),small_win > flat (ITT: everyone who played round 2 with r1 > 0),Mann-Whitney U (two-sided),U = 592.00,0.514,–,"δ = -0.09 [-0.33, 0.18]","small_win 36, flat 36",opposite
+Robustness,round-2 stake,small_win > flat (ITT: everyone who played round 2),Mann-Whitney U (two-sided),U = 700.50,0.258,–,"δ = -0.14 [-0.39, 0.11]","small_win 39, flat 42",opposite

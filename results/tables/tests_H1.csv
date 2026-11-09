@@ -1,0 +1,14 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,total deposited,fraud > honest,Mann-Whitney U (two-sided),U = 538.50,0.102,0.508,"δ = 0.26 [-0.07, 0.55]","fraud 22, honest 39",as predicted
+Secondary,first decision time,fraud < honest,Mann-Whitney U (two-sided),U = 383.00,0.494,–,"δ = -0.11 [-0.40, 0.19]","fraud 22, honest 39",as predicted
+Secondary,invested in round 1,fraud > honest,Fisher's exact test (two-sided),OR = 1.47,1.000,–,"OR = 1.47 [0.26, 8.30]","fraud 22, honest 39",as predicted
+Secondary,verified anything,fraud < honest,Fisher's exact test (two-sided),OR = 0.07,0.002,–,"OR = 0.07 [0.01, 0.56]","fraud 22, honest 39",as predicted
+Secondary,trust rating (1–7),fraud > honest,Mann-Whitney U (two-sided),U = 333.00,0.144,–,"δ = -0.22 [-0.50, 0.06]","fraud 22, honest 39",opposite
+Secondary,urgency rating (1–7),fraud > honest,Mann-Whitney U (two-sided),U = 445.00,0.810,–,"δ = 0.04 [-0.26, 0.34]","fraud 22, honest 39",as predicted
+Secondary,trap score (shared 8),fraud > honest,Mann-Whitney U (two-sided),U = 579.00,0.023,–,"δ = 0.35 [0.05, 0.63]","fraud 22, honest 39",as predicted
+Exploratory,log(1 + total deposited),fraud effect smaller for CRT-correct players (interaction < 0),OLS with HC3 SEs: log1p(total_deposited) ~ fraud × crt_correct + exp_investing + exp_trading_app,t = -0.96,0.336,–,"b = -0.85 [-2.58, 0.88]","players 61, fraud=0, crt=0 11, fraud=0, crt=1 28, fraud=1, crt=0 8, fraud=1, crt=1 14",as predicted
+Robustness,first decision time,fraud < honest (outliers > Q3 + 3 IQR removed),Mann-Whitney U (two-sided),U = 344.00,0.477,–,"δ = -0.11 [-0.43, 0.20]","fraud 21, honest 37",as predicted
+Robustness,round-1 stake,fraud > honest (completers; compare with the ITT rerun),Mann-Whitney U (two-sided),U = 539.00,0.090,–,"δ = 0.26 [-0.02, 0.53]","fraud 22, honest 39",as predicted
+Robustness,invested in round 1,fraud > honest (ITT: everyone who reached home),Fisher's exact test (two-sided),OR = 2.10,0.337,–,"OR = 2.10 [0.50, 8.74]","fraud 39, honest 47",as predicted
+Robustness,first decision time,fraud < honest (ITT: everyone who reached home),Mann-Whitney U (two-sided),"U = 1,116",0.885,–,"δ = 0.02 [-0.22, 0.25]","fraud 43, honest 51",opposite
+Robustness,round-1 stake,fraud > honest (ITT: everyone who reached home),Mann-Whitney U (two-sided),"U = 1,152",0.037,–,"δ = 0.26 [0.03, 0.48]","fraud 39, honest 47",as predicted

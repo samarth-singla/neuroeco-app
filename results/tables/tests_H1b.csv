@@ -1,0 +1,3 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,invested in round 1 (hook),fraud > honest,Fisher's exact test (two-sided),OR = 1.47,1.000,1.000,"OR = 1.47 [0.26, 8.30]","fraud 22, honest 39",as predicted
+Secondary,said the locked bonus pushed them,share of fraud players saying the locked bonus pushed them,Share with Wilson 95% CI (no test),–,–,–,"share = 73% [52%, 87%]",players 22,–

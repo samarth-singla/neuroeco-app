@@ -1,0 +1,3 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,paid the withdrawal tax,share of fraud players shown the tax who paid it,Share with Wilson 95% CI (no test),–,–,–,"share = 64% [43%, 80%]",players 22,–
+Secondary,said the withdrawal tax pushed them,share of fraud players saying the tax pushed them,Share with Wilson 95% CI (no test),–,–,–,"share = 68% [47%, 84%]",players 22,–

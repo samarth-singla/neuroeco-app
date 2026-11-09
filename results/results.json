@@ -1,7 +1,7 @@
 {
  "meta": {
   "title": "Behavioral Mechanics of App-Based Investment Frauds",
-  "generated_at": "2026-11-09 09:36 UTC",
+  "generated_at": "2026-11-09 09:40 UTC",
   "consented": 124,
   "consented_by_skin": {
    "honest": 62,
@@ -275,7 +275,7 @@
    ],
    "verdict": "NOT SUPPORTED",
    "verdict_reason": "overconfidence coefficient positive but p = 0.331 ≥ 0.10",
-   "label": "app evidence only (dataset part PENDING)"
+   "label": "app evidence only; dataset part PENDING"
   },
   {
    "id": "H9",
@@ -321,7 +321,7 @@
    "secondary_tests": [],
    "verdict": "EXPLORATORY",
    "verdict_reason": "app part is exploratory by design (gender only, small groups)",
-   "label": "app evidence only (dataset part PENDING)"
+   "label": "app evidence only; dataset part PENDING"
   }
  ],
  "tests": [

@@ -80,12 +80,12 @@ def apply_verdicts(reg: Registry, external_status: dict) -> None:
                 verdict, reason = combine(app_v, ds["verdict"]), f"app: {app_v} ({app_r}); dataset: {ds['verdict']}"
                 label = "app + dataset"
             else:
-                verdict, reason, label = app_v, app_r, "app evidence only (dataset part PENDING)"
+                verdict, reason, label = app_v, app_r, "app evidence only; dataset part PENDING"
             reg.set_hypothesis(hid, app_verdict=app_v, app_reason=app_r, dataset=ds)
         elif kind == "h9":
             ds = external_status.get("H9", {})
             verdict, reason = EXPLORATORY, "app part is exploratory by design (gender only, small groups)"
-            label = "app evidence only (dataset part PENDING)" if ds.get("status") != "done" else "app + dataset"
+            label = "app evidence only; dataset part PENDING" if ds.get("status") != "done" else "app + dataset"
             if ds.get("status") == "done":
                 verdict, reason = ds["verdict"], f"dataset: {ds['verdict']}; app part exploratory"
             reg.set_hypothesis(hid, app_verdict=EXPLORATORY, dataset=ds)

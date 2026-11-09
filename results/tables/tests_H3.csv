@@ -1,0 +1,9 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,opened deal details,details opened least at ₹500 (share lowest at ₹500),Cochran's Q (df = 2),Q = 2.18,0.336,1.000,"η²_Q = 0.02 [0.00, 0.09]",players 61,opposite
+Secondary,invested in the deal,investing most at ₹500 (share highest at ₹500),Cochran's Q (df = 2),Q = 5.07,0.079,–,"η²_Q = 0.04 [0.00, 0.15]",players 61,as predicted
+Secondary,deal decision time,shortest time at ₹500,Friedman test (df = 2),χ²_F = 0.16,0.923,–,"W = 0.00 [0.00, 0.07]",players 61,opposite
+Secondary,opened deal details,"details share lower at ₹500 than at ₹3,000","Exact McNemar test (pairwise, Holm within H3)",discordant b / c = 3 / 5,0.727,1.000,"diff = -0.03 [-0.11, 0.05]",players 61,as predicted
+Secondary,opened deal details,"details share lower at ₹500 than at ₹8,000","Exact McNemar test (pairwise, Holm within H3)",discordant b / c = 5 / 3,0.727,1.000,"diff = 0.03 [-0.05, 0.11]",players 61,opposite
+Secondary,opened deal details,"details share lower at ₹3,000 than at ₹8,000","Exact McNemar test (pairwise, Holm within H3)",discordant b / c = 5 / 1,0.219,0.656,"diff = 0.07 [0.00, 0.15]",players 61,opposite
+Check,opened deal details,(check) no card-position effect,Cochran's Q over card position (df = 2),Q = 2.18,0.336,–,η²_Q = 0.02,players 61,–
+Check,invested in the deal,(check) no card-position effect,Cochran's Q over card position (df = 2),Q = 3.27,0.195,–,η²_Q = 0.03,players 61,–

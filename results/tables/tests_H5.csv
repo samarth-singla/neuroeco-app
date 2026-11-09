@@ -1,0 +1,5 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,joined the pool,friend > ad,Fisher's exact test (two-sided),OR = 0.58,0.416,1.000,"OR = 0.58 [0.19, 1.70]","friend 30, ad 31",opposite
+Secondary,opened pool details,friend < ad,Fisher's exact test (two-sided),OR = 0.58,0.707,–,"OR = 0.58 [0.13, 2.67]","friend 30, ad 31",as predicted
+Secondary,pool decision time,friend < ad,Mann-Whitney U (two-sided),U = 497.00,0.650,–,"δ = 0.07 [-0.23, 0.36]","friend 30, ad 31",opposite
+Exploratory,joined the pool,friend effect larger for higher FOMO (interaction OR > 1),Logistic regression: pool_join ~ friend × fomo_score,z = -1.31,0.190,–,"OR = 0.51 [0.18, 1.40]",players 61,opposite

@@ -1,0 +1,4 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,first decision time,fraud < honest,Mann-Whitney U (two-sided),U = 383.00,0.494,1.000,"δ = -0.11 [-0.40, 0.19]","fraud 22, honest 39",as predicted
+Secondary,said the timer pushed them,share of fraud players saying the timer pushed them,Share with Wilson 95% CI (no test),–,–,–,"share = 55% [35%, 73%]",players 22,–
+Robustness,first decision time,fraud < honest (outliers removed),Mann-Whitney U (two-sided),U = 344.00,0.477,–,"δ = -0.11 [-0.43, 0.20]","fraud 21, honest 37",as predicted

@@ -1,0 +1,4 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,"deposited ≥ ₹5,000 (VIP 2+)",fraud > honest,Fisher's exact test (two-sided),OR = 0.53,0.658,1.000,"OR = 0.53 [0.10, 2.87]","fraud 22, honest 39",opposite
+Secondary,VIP level (0–3),fraud > honest,Mann-Whitney U (two-sided),U = 521.00,0.113,–,"δ = 0.21 [-0.05, 0.48]","fraud 22, honest 39",as predicted
+Secondary,said the VIP levels pushed them,share of fraud players saying the VIP levels pushed them,Share with Wilson 95% CI (no test),–,–,–,"share = 68% [47%, 84%]",players 22,–

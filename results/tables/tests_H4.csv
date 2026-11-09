@@ -1,0 +1,5 @@
+Role,Outcome,Prediction,Test,Statistic,p,Holm p,Effect [95% CI],n,Direction
+Primary,topped up after the crash,higher loss-aversion group → more likely to top up (OR > 1),Logistic regression: crash_topup ~ loss_aversion_group + fraud + exp_investing,z = -1.73,0.084,0.503,"OR = 0.51 [0.24, 1.09]",players 58,opposite
+Secondary,top-up amount,coefficient of loss_aversion_group > 0,OLS (HC3): crash_topup_amount ~ loss_aversion_group + fraud + exp_investing,t = -1.87,0.061,–,"b = -287.77 [-589.13, 13.59]",players 58,opposite
+Secondary,top-up amount,"ρ(loss_aversion_group, crash_topup_amount) > 0",Spearman correlation,ρ = -0.20,0.135,–,"ρ = -0.20 [-0.44, 0.05]",players 58,opposite
+Check,loss-aversion group,(check) no spin-order effect on the loss-aversion group,Mann-Whitney U (two-sided),U = 344.50,0.270,–,"δ = -0.14 [-0.38, 0.11]","150;250 23, 250;150 35",–

@@ -137,3 +137,19 @@ figure per hypothesis in `results/figures/`, every test in `results/results.json
   not interested (12); 7 checked and found it unregistered.
 - The survey-vs-app figure pairs the 7 features both measure. The app timer card covers the countdown and the slots
   counter, so its survey counterpart is "timer OR slots".
+
+## Step 6 — ANALYSIS_REPORT.md (2026-11-09)
+
+**Status:** done. `analysis/report.py` (with `analysis/narrative.py`, the generated wording shared with the HTML page)
+writes `results/ANALYSIS_REPORT.md`, `results/tables/scorecard.csv` and one `results/tables/tests_<H>.csv` per
+hypothesis.
+
+- All numbers come from results.json and the tables. Fixed text (claims, how each experiment tests its hypothesis,
+  maths, what the data cannot justify) lives in `analysis/spec.py` and contains no result numbers. Sentences that
+  depend on the data (directions, conclusion changes, ceiling flags) are built by conditions in code.
+- Structure follows the prompt: (1) scorecard, (2) data and attrition with the funnel figure and the bias
+  discussion, (3) one section per hypothesis (claim, how, maths, result with table and figure, verdict and what the
+  data does NOT justify, robustness), (4) survey, (5) held / did not hold, (6) limitations.
+- ITT definition used in the report: the conclusion "changes" only if significance changes, or if both results are
+  significant but in opposite directions. Two non-significant results count as the same conclusion. Result:
+  only the H1 round-1 stake changes (completers p = 0.090 → ITT p = 0.037, fraud higher).
