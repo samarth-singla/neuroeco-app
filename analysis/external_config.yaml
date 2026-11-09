@@ -1,0 +1,59 @@
+# External dataset for the dataset parts of H8 and H9 (DATA_COLLECTION_REPORT.md, Part D).
+#
+# Every dataset-specific name lives here. Replace every TODO, put the data file in data/external/, then run
+#   analysis/.venv/Scripts/python analysis/run_all.py
+# While any TODO is left (or the file is missing), H8 and H9 dataset parts stay PENDING everywhere.
+#
+# Column names must match the file exactly. Values can be numbers or text, exactly as they appear in the file.
+
+dataset:
+  name: TODO                # e.g. "NFCS 2024 State-by-State Survey (US)"
+  source: TODO              # download URL or citation
+  file: TODO                # file name inside data/external/, e.g. NFCS_2024_State_Data.csv
+  format: csv               # csv | stata (.dta). Other formats: convert to csv first.
+  country: TODO             # e.g. "United States" (the report says if it is not India)
+
+# Codes that mean "don't know / refused / missing" anywhere in the file (set to [] if none)
+missing_values: [98, 99]
+
+victimization:              # DV for H8 and H9: 1 = victim of investment fraud, 0 = not
+  column: TODO
+  yes_values: [TODO]        # values that mean "yes, victim"
+  no_values: [TODO]         # values that mean "no"; anything else is treated as missing
+
+literacy:                   # Big Three items (or the closest available); score = number correct
+  items:
+    - column: TODO          # compound interest
+      correct: [TODO]
+    - column: TODO          # inflation
+      correct: [TODO]
+    - column: TODO          # diversification / risk
+      correct: [TODO]
+  dont_know_is_wrong: true  # "don't know" counts as wrong (as in the app)
+
+self_rated_knowledge:       # self-assessed financial knowledge (higher = more confident)
+  column: TODO
+  reverse: false            # true if a LOWER code means MORE confident
+
+age_group:                  # categorical; map raw codes to labels (all unmapped codes become missing)
+  column: TODO
+  labels: {TODO: TODO}      # e.g. {1: "18-24", 2: "25-34", 3: "35-44", 4: "45-54", 5: "55-64", 6: "65+"}
+
+income_group:
+  column: TODO
+  labels: {TODO: TODO}      # e.g. {1: "<25k", 2: "25-50k", 3: "50-75k", 4: "75k+"}
+
+gender:
+  column: TODO
+  male_values: [TODO]       # everything else that is not missing = "not male"
+
+investing_experience:       # control; numeric or categorical codes
+  column: TODO
+  labels: {TODO: TODO}      # e.g. {1: 1, 2: 0} for yes / no; leave {} to use the raw numbers
+
+risk_attitude:              # optional H9 bias proxy (higher = more risk-seeking); set column: null if absent
+  column: TODO
+  reverse: false
+
+weights:                    # optional survey weights; set column: null if the dataset has none
+  column: TODO

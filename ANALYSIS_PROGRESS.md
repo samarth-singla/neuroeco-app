@@ -96,3 +96,24 @@ figure per hypothesis in `results/figures/`, every test in `results/results.json
 - Rule set before any dataset result exists: when the H8 dataset part is added, the final H8 verdict is the common
   verdict if both parts agree, NOT SUPPORTED if one part is NOT SUPPORTED and neither is SUPPORTED, otherwise
   PARTLY SUPPORTED (`verdicts.combine`).
+
+## Step 4b — External dataset module (2026-11-09)
+
+**Status:** built; skipped while the data is missing. H8 and H9 dataset parts are PENDING in results.json.
+
+- `analysis/external.py` computes the dataset parts of H8 and H9. Every dataset-specific name is in
+  `analysis/external_config.yaml` (TODO placeholders). `data/external/README.md` explains what to add.
+- The module skips cleanly while `data/external/` has no data file or the config still has a TODO. The status, with
+  the list of TODO fields, goes to `results.json → sections.external`.
+- H8 model: logistic regression victim ~ literacy + overconfidence (z(self-rating) − z(literacy)) + age group +
+  gender + income group + investing experience. Survey weights are used if configured (GLM binomial with
+  normalized variance weights and HC1 SEs).
+- H9 model: for age group, income group and gender, a joint Wald test of bias × group interactions, plus models
+  within each group naming the strongest bias (z-scored overconfidence and, if available, risk attitude); Holm is
+  applied over the three groupings.
+- Verdict rules for the dataset parts were written in the module docstring before any dataset exists. The final
+  H8 verdict combines both parts (`verdicts.combine`).
+- Tested end to end on a **synthetic** file in the session scratchpad (weighted and unweighted, with and without a
+  risk-attitude column). No synthetic data was written to `data/` or `results/`. The test exposed and fixed two
+  figure issues: tick-label clutter on the log axis, and point offsets when there is a single bias.
+- `pyyaml` was added to `analysis/requirements.txt` to read the config.

@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import attrition  # noqa: E402
 import checks  # noqa: E402
+import external  # noqa: E402
 import h1, h2, h3, h4, h5, h6, h7, h8, h9  # noqa: E401,E402
 import verdicts  # noqa: E402
 from common import FIGURES, RESULTS, TABLES, Registry, ensure_dirs, prepare_wide, read_csv, style  # noqa: E402
@@ -63,7 +64,7 @@ def main() -> None:
     attrition.run(reg, df)
     for mod in (h1, h2, h3, h4, h5, h6, h7, h8, h9):
         mod.run(reg, df)
-    external_status = {"H8": {"status": "pending"}, "H9": {"status": "pending"}}
+    external_status = external.run(reg)
     reg.sections["external"] = external_status
     verdicts.apply_holm(reg)
     verdicts.apply_verdicts(reg, external_status)
